@@ -152,8 +152,10 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
 Widget mazeSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
   bool showText = maxLevelToShowCache <= 2;
-  return maxLevelToShowCache == 1
+  // ignore: dead_code
+  return true || maxLevelToShowCache == 1
       ? const SizedBox.shrink()
+      // ignore: dead_code
       : bodyWidget(
           child: Column(
             children: [

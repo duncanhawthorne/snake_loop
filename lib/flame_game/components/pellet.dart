@@ -22,18 +22,19 @@ class Pellet extends CircleComponent
     super.onLoad();
     add(CircleHitbox(
       isSolid: true,
-      collisionType: CollisionType.passive,
+      collisionType: CollisionType.active,
       radius: radius * hitBoxRadiusFactor,
       position: Vector2.all(radius),
       anchor: Anchor.center,
     ));
     //debugMode = true;
-    world.pellets.pelletsRemainingNotifier.value += 1;
+    //world.pellets.pelletsRemainingNotifier.value += 1;
   }
 
   @override
   Future<void> onRemove() async {
-    world.pellets.pelletsRemainingNotifier.value -= 1;
+    world.snakeWrapper.addNewTargetPellet();
+    //world.pellets.pelletsRemainingNotifier.value -= 1;
     super.onRemove();
   }
 }
