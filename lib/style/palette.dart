@@ -25,7 +25,7 @@ class Palette {
   static const darkGrey = Color(0xff222222);
   static const lightBluePMR = Color(0xffa2fff3);
   static const snakeGreen =
-      Color(0xffDFFF00); //Colors.greenAccent; //Color(0xff66BB6a);
+      Colors.greenAccent; //Color(0xffDFFF00); //; //Color(0xff66BB6a);
   static const redWarning = Colors.red;
   static const transp = Color(0x00000000);
   static const white = Color(0xffffffff);
