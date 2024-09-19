@@ -191,8 +191,11 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
 }
 
 int maxLevelToShow(PacmanGame game) {
-  return min(
-      gameLevels.length,
-      max(max(game.level.number, maze.mazeId == 0 ? 1 : 2),
-          game.world.playerProgress.maxLevelCompleted + 1));
+  return [
+    game.level.number,
+    isTutorialMaze(maze.mazeId) || maze.mazeId == tutorialMazeId + 1
+        ? tutorialLevelNum - 1
+        : defaultLevelNum + 1,
+    game.world.playerProgress.maxLevelCompleted + 1
+  ].reduce(max).clamp(0, maxLevel());
 }
