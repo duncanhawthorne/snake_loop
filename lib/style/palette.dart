@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// A palette of colors to be used in the game.
 
 class Palette {
-  static const seed = PaletteEntry(blueMaze); //Color(0xFF000000) //0xFF0050bc
+  static const seed = PaletteEntry(snakeGreen); //Color(0xFF000000) //0xFF0050bc
   static const text =
       PaletteEntry(white); //const PaletteEntry(Color(0xee352b42));
   static const mainBackground = PaletteEntry(black); //0xffa2fff3
@@ -14,7 +14,7 @@ class Palette {
 
   static const playSessionBackground = PaletteEntry(black); //0xffa2fff3
 
-  static const borderColor = PaletteEntry(blueMaze); //0xffa2fff3
+  static const borderColor = PaletteEntry(snakeGreen); //0xffa2fff3
   static const backgroundSettings = PaletteEntry(Color(0xffbfc8e3));
 
   static const pageTransition = PaletteEntry(black); //0xffa2fff3
@@ -24,7 +24,8 @@ class Palette {
   static const black = Color(0xff000000);
   static const darkGrey = Color(0xff222222);
   static const lightBluePMR = Color(0xffa2fff3);
-  static const blueMaze = Color(0xFF3B32D4);
+  static const snakeGreen =
+      Color(0xffDFFF00); //Colors.greenAccent; //Color(0xff66BB6a);
   static const redWarning = Colors.red;
   static const transp = Color(0x00000000);
   static const white = Color(0xffffffff);

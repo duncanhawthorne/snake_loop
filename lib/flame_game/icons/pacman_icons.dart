@@ -59,14 +59,17 @@ class PacmanPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double mouthWidth = mouthSize / pacmanCircleIncrements;
+    double mouthWidth = 0 / pacmanCircleIncrements;
+    mouthWidth = 0; //max(0, min(1, mouthWidth));
+    mouthWidth = mouthSize / pacmanCircleIncrements;
     mouthWidth = mouthWidth.clamp(0, 1);
+    mouthWidth = 0;
     canvas.drawArc(
         _pacmanRectStatusBar,
         tau / 2 + tau * ((mouthWidth / 2) + 0.5),
         tau * (1 - mouthWidth),
         true,
-        yellowPacmanPaint);
+        whitePaint);
   }
 
   @override
@@ -112,8 +115,9 @@ class PacmanPainterDirect extends CustomPainter {
             kPacmanDeadResetTimeAnimationMillis;
     double mouthWidth = mouthDouble / pacmanCircleIncrements;
     mouthWidth = mouthWidth.clamp(0, 1);
+    mouthWidth = 0;
     canvas.drawArc(_pacmanRectStatusBar, tau * ((mouthWidth / 2) + 0.5),
-        tau * (1 - mouthWidth), true, yellowPacmanPaint);
+        tau * (1 - mouthWidth), true, whitePaint);
   }
 
   @override

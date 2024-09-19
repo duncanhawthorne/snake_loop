@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:elapsed_time_display/elapsed_time_display.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,12 +43,12 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ValueListenableBuilder<int>(
-            valueListenable: game.world.pacmans.numberOfDeathsNotifier,
+            valueListenable: game.world.pellets.pelletsRemainingNotifier,
             builder: (BuildContext context, int value, Widget? child) {
               return Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: List.generate(
-                      game.level.maxAllowedDeaths,
+                      min(7, game.world.pellets.pelletsRemainingNotifier.value),
                       (index) => Padding(
                           padding: const EdgeInsets.fromLTRB(
                               4 * statusWidgetHeightFactor,
@@ -67,9 +69,8 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
                   color: Colors.white,
                   fontFamily: 'Press Start 2P'),
               formatter: (elapsedTime) {
-                return (game.stopwatchMilliSeconds / 1000)
-                    .toStringAsFixed(1)
-                    .padLeft(4, " ");
+                return game.world.pellets.pelletsRemainingNotifier.value
+                    .toString();
               },
             ),
           ),

@@ -68,7 +68,7 @@ TextStyle textStyleBodyDull = const TextStyle(
     fontFamily: 'Press Start 2P', color: Palette.playSessionDull);
 
 ButtonStyle buttonStyle(
-    {Color borderColor = Palette.blueMaze, bool small = false}) {
+    {Color borderColor = Palette.snakeGreen, bool small = false}) {
   return TextButton.styleFrom(
     minimumSize: Size.zero,
     padding: EdgeInsets.all(small ? 16 : 24),
