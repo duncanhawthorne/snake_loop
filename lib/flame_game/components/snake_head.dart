@@ -36,7 +36,7 @@ class SnakeHead extends CircleComponent
     add(CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.active,
-      radius: radius,
+      radius: radius * (1 - 0.5),
       position: Vector2.all(radius),
       anchor: Anchor.center,
     ));
