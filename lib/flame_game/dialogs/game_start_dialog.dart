@@ -152,10 +152,8 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
 Widget mazeSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
   bool showText = maxLevelToShowCache <= 2;
-  // ignore: dead_code
-  return true || maxLevelToShowCache == 1
+  return maxLevelToShowCache == 1
       ? const SizedBox.shrink()
-      // ignore: dead_code
       : bodyWidget(
           child: Column(
             children: [
@@ -189,7 +187,7 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
                   '/?$levelUrlKey=${game.level.number}&$mazeUrlKey=${mazeNames[index]}');
             }
           },
-          child: Text(mazeNames[index], style: textStyleBody)));
+          child: Text(mazeNames[index] ?? "X", style: textStyleBody)));
 }
 
 int maxLevelToShow(PacmanGame game) {

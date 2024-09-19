@@ -8,7 +8,7 @@ import 'components/super_pellet.dart';
 import 'components/wall.dart';
 import 'pacman_game.dart';
 
-final List<String> mazeNames = ["A", "B", "C"];
+final Map<int, String> mazeNames = {-1: "T", 0: "A", 1: "B", 2: "C"};
 const _bufferColumns = 2;
 
 class Maze {
@@ -42,7 +42,7 @@ class Maze {
   }
 
   final List _decodedMazeList = [
-    _decodeMazeLayout(_borders),
+    _decodeMazeLayout(_mazeP1Layout),
     _decodeMazeLayout(_mazeMP4Layout),
     _decodeMazeLayout(_mazeMP1Layout)
   ];
@@ -168,7 +168,7 @@ class Maze {
     return result;
   }
 
-  static const _mazeInnerWallWidthFactor = 1;
+  static const _mazeInnerWallWidthFactor = 0.7;
   static const double _pixelationBuffer = 0.03;
 
   List<Component> mazeWalls() {
@@ -179,11 +179,8 @@ class Maze {
         final Vector2 center = _vectorOfMazeListIndex(i, j);
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
-            /*
             result
                 .add(MazeWallCircleGround(position: center, radius: scale / 2));
-
-             */
             result.add(MazeWallCircleVisual(
                 position: center,
                 radius: scale / 2 * _mazeInnerWallWidthFactor));
@@ -195,12 +192,10 @@ class Maze {
             }
             if (k > 0) {
               final Vector2 newCentre = center + Vector2(scale * k / 2, 0);
-              /*
               result.add(MazeWallRectangleGround(
                   position: newCentre,
                   width: scale * (k + _pixelationBuffer),
                   height: scale));
-               */
               result.add(MazeWallRectangleVisual(
                   position: newCentre,
                   width: scale * (k + _pixelationBuffer),
@@ -215,12 +210,10 @@ class Maze {
             }
             if (k > 0) {
               final Vector2 newCentre = center + Vector2(0, scale * k / 2);
-              /*
               result.add(MazeWallRectangleGround(
                   position: newCentre,
                   width: scale,
                   height: scale * (k + _pixelationBuffer)));
-               */
               result.add(MazeWallRectangleVisual(
                   position: newCentre,
                   width: scale * _mazeInnerWallWidthFactor,
@@ -292,42 +285,6 @@ class Maze {
   static const _kPacmanStart = "8";
   static const _kCage = "9";
 
-  static const _borders = [
-    '11111111111111111111111111111',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444744444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444944444444444441',
-    '14444444444444244444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444844444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '14444444444444444444444444441',
-    '11111111111111111111111111111'
-  ];
-
-  // ignore: unused_field
   static const _mazeP1Layout = [
     '4111111111111111111111111111114',
     '4100000000000001000000000000014',
@@ -441,5 +398,12 @@ List<List<String>> _decodeMazeLayout(List<String> encodedMazeLayout) {
   }
   return result;
 }
+
+bool isTutorialMaze(int mazeId) {
+  return mazeId == tutorialMazeId;
+}
+
+const tutorialMazeId = -1;
+const defaultMazeId = 0;
 
 Maze maze = Maze(mazeId: 0);
