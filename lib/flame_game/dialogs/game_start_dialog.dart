@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code, duplicate_ignore
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -91,7 +93,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
                     padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                     child: Text('Level:', style: textStyleBody),
                   ),
-            levelButtonSingle(context, game, 0),
+            //levelButtonSingle(context, game, 0),
             ...List.generate(min(5, maxLevelToShowCache),
                 (index) => levelButtonSingle(context, game, index + 1)),
           ],
@@ -143,7 +145,8 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
   // ignore: dead_code
   bool showText = false && maxLevelToShowCache <= 2;
-  return maxLevelToShowCache == 1 ||
+  return true ||
+          maxLevelToShowCache == 1 ||
           isTutorialLevel(levelSelect(game.level.number))
       ? const SizedBox.shrink()
       : bodyWidget(

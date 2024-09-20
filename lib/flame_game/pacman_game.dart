@@ -36,7 +36,7 @@ import 'pacman_world.dart';
 // Reducing map size 30x, scaling up gravity 30x, & zooming 30x changes nothing,
 // but reduces chance of hitting maximum allowed speed
 const flameGameZoom = 30.0;
-const _visualZoomMultiplier = 0.92;
+const _visualZoomMultiplier = 1; //0.92;
 const double kVirtualGameSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld>
@@ -122,7 +122,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       if (world.pacmans.numberOfDeathsNotifier.value >=
               level.maxAllowedDeaths &&
           levelStarted) {
-        _handleLoseGame();
+        handleLoseGame();
       }
     });
     world.pellets.pelletsRemainingNotifier.addListener(() {
@@ -148,7 +148,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     }
   }
 
-  void _handleLoseGame() {
+  void handleLoseGame() {
     audioController.stopAllSfx();
     _cleanOverlaysAndDialogs();
     overlays.add(GameScreen.loseDialogKey);

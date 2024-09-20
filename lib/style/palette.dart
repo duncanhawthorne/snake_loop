@@ -12,17 +12,19 @@ class Palette {
   static const transp = PaletteEntry(_transp);
   static const dull = PaletteEntry(dullColor);
 
-  static const seedColor = _blueMaze;
+  static const seedColor = _snakeGreen;
   static const textColor = _white;
   static const dullColor = _grey;
 
   static const _yellow = Colors.yellowAccent;
   static const _black = Color(0xff000000);
+  // ignore: unused_field
   static const _blueMaze = Color(0xFF3B32D4);
   static const _red = Colors.red;
   static const _transp = Color(0x00000000);
   static const _white = Color(0xffffffff);
   static const _grey = Colors.grey;
+  static const _snakeGreen = Colors.greenAccent;
 }
 
 class ColorsP {}

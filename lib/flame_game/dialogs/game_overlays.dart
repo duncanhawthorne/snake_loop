@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:elapsed_time_display/elapsed_time_display.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../../settings/settings.dart';
 import '../../style/palette.dart';
 import '../game_screen.dart';
-import '../icons/pacman_icons.dart';
+import '../icons/circle_icon.dart';
 import '../pacman_game.dart';
 
 Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
@@ -42,19 +44,19 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ValueListenableBuilder<int>(
-            valueListenable: game.world.pacmans.numberOfDeathsNotifier,
+            valueListenable: game.world.pellets.pelletsRemainingNotifier,
             builder: (BuildContext context, int value, Widget? child) {
               return Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: List.generate(
-                      game.level.maxAllowedDeaths,
+                      min(7, game.world.pellets.pelletsRemainingNotifier.value),
                       (index) => Padding(
                           padding: const EdgeInsets.fromLTRB(
                               4 * statusWidgetHeightFactor,
                               0,
                               4 * statusWidgetHeightFactor,
                               0),
-                          child: animatedPacmanIcon(game, index))));
+                          child: circleIcon())));
             },
           ),
           const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
@@ -68,9 +70,8 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
                   color: Palette.textColor,
                   fontFamily: 'Press Start 2P'),
               formatter: (elapsedTime) {
-                return (game.stopwatchMilliSeconds / 1000)
-                    .toStringAsFixed(1)
-                    .padLeft(4, " ");
+                return game.world.pellets.pelletsRemainingNotifier.value
+                    .toString();
               },
             ),
           ),

@@ -14,6 +14,7 @@ import 'components/ghost_layer.dart';
 import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
+import 'components/snake_wrapper.dart';
 import 'components/tutorial_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
@@ -35,6 +36,7 @@ import 'pacman_game.dart';
 ///  to.
 
 final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
+const double gravityScale = 0.5 * 0.5 * 50 * (30 / flameGameZoom);
 
 class PacmanWorld extends Forge2DWorld
     with
@@ -61,6 +63,7 @@ class PacmanWorld extends Forge2DWorld
   final pellets = PelletWrapper();
   final _walls = WallWrapper();
   final _tutorial = TutorialWrapper();
+  // ignore: unused_field
   final _blocking = BlockingBarWrapper();
   final List<WrapperNoEvents> wrappers = [];
 
@@ -150,6 +153,8 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  final snakeWrapper = SnakeWrapper();
+
   void start() {
     play(SfxType.startMusic);
     for (WrapperNoEvents wrapper in wrappers) {
@@ -161,7 +166,7 @@ class PacmanWorld extends Forge2DWorld
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
-    wrappers.addAll([pacmans, ghosts, pellets, _walls, _tutorial, _blocking]);
+    wrappers.addAll([snakeWrapper, _walls, _tutorial]);
     for (WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
@@ -215,7 +220,7 @@ class PacmanWorld extends Forge2DWorld
 
   void _moveMazeAngleByDelta(double angleDelta) {
     if (_cameraRotatableOnPacmanDeathFlourish && game.isGameLive) {
-      _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
+      _setMazeAngle(game.camera.viewfinder.angle - angleDelta);
 
       if (!doingLevelResetFlourish) {
         game.stopwatch.resume();
@@ -225,15 +230,22 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  double extraScale() {
+    return pow(1.1, min(10, level.number)).toDouble();
+  }
+
   final _tmpGravity = Vector2.zero();
-  static const double _gravityScale = 50 * (30 / flameGameZoom);
+  final direction = Vector2.zero();
+
   void _setMazeAngle(double angle) {
     //using tmpGravity to avoid creating a new Vector2 on each update / frame
     //could instead directly do gravity = Vector2(calc, calc);
+
     _tmpGravity
-      ..x = -sin(angle) * _gravityScale
-      ..y = cos(angle) * _gravityScale;
-    gravity = _tmpGravity;
+      ..x = -sin(angle) * gravityScale * extraScale()
+      ..y = cos(angle) * gravityScale * extraScale();
+    direction.setFrom(_tmpGravity);
+    //gravity = _tmpGravity;
     game.camera.viewfinder.angle = angle;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
@@ -9,7 +10,7 @@ final Paint _wallVisualPaint = Paint()
 //..filterQuality = FilterQuality.none
 ////..color = Color.fromARGB(50, 100, 100, 100)
 //..isAntiAlias = false
-  ..color = Palette.background.color;
+  ..color = Palette.seed.color;
 final Paint _wallGroundPaint = Paint()
 //..filterQuality = FilterQuality.none
 ////..color = Color.fromARGB(50, 100, 100, 100)
@@ -23,6 +24,20 @@ class MazeWallRectangleVisual extends RectangleComponent with IgnoreEvents {
             size: Vector2(width, height),
             anchor: Anchor.center,
             paint: _wallVisualPaint);
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    add(RectangleHitbox(
+      isSolid: true,
+      collisionType: CollisionType.passive,
+      position: Vector2(width / 2, height / 2),
+      size: Vector2(width, height),
+      anchor: Anchor.center,
+    )..debugMode = false);
+    //debugMode = true;
+    //world.pellets.pelletsRemainingNotifier.value += 1;
+  }
 }
 
 class MazeVisualBlockingBar extends MazeWallRectangleVisual {
