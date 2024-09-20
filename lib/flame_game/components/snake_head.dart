@@ -23,7 +23,7 @@ class SnakeHead extends CircleComponent
         IgnoreEvents {
   SnakeHead({required super.position})
       : super(
-            paint: greenSnakePaint,
+            paint: snakePaint,
             radius: maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2,
             anchor: Anchor.center,
             priority: 100);

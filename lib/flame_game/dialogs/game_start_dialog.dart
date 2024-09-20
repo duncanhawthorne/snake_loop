@@ -48,7 +48,7 @@ class StartDialog extends StatelessWidget {
           children: game.levelStarted
               ? [
                   TextButton(
-                      style: buttonStyle(borderColor: Palette.redWarning),
+                      style: buttonStyle(borderColor: Palette.warning.color),
                       onPressed: () {
                         game.overlays.remove(GameScreen.startDialogKey);
                         game.resetAndStart();
@@ -125,7 +125,7 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
       child: TextButton(
           style: game.level.number == levelNum
               ? buttonStyle(small: true)
-              : buttonStyle(small: true, borderColor: Palette.transp),
+              : buttonStyle(small: true, borderColor: Palette.transp.color),
           onPressed: () {
             context.go(
                 '/?$levelUrlKey=$levelNum&$mazeUrlKey=${mazeNames[fixedMazeId]}');
@@ -176,7 +176,7 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
       child: TextButton(
           style: maze.mazeId == mazeId
               ? buttonStyle(small: true)
-              : buttonStyle(small: true, borderColor: Palette.transp),
+              : buttonStyle(small: true, borderColor: Palette.transp.color),
           onPressed: () {
             if (mazeId != maze.mazeId) {
               context.go(

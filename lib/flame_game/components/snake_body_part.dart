@@ -13,7 +13,7 @@ class SnakeBodyBit extends CircleComponent
       : super(
             radius: maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2,
             anchor: Anchor.center,
-            paint: greenSnakePaint);
+            paint: snakePaint);
 
   @override
   Future<void> onLoad() async {

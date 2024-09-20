@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../style/palette.dart';
 import '../game_screen.dart';
 
-final Paint _whitePaint = Paint()..color = Palette.white;
+final Paint _pelletPaint = Paint()..color = Palette.text.color;
 
 Widget circleIcon() {
   return CustomPaint(
@@ -25,7 +25,7 @@ class PacmanPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawArc(_pacmanRectStatusBar, 0, tau, true, _whitePaint);
+    canvas.drawArc(_pacmanRectStatusBar, 0, tau, true, _pelletPaint);
   }
 
   @override

@@ -6,17 +6,16 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../../style/palette.dart';
 
-// ignore: unused_element
-final Paint _blackBackgroundPaint = Paint()
+final Paint _wallVisualPaint = Paint()
 //..filterQuality = FilterQuality.none
 ////..color = Color.fromARGB(50, 100, 100, 100)
 //..isAntiAlias = false
-  ..color = Palette.black;
-final Paint _greenWallPaint = Paint()
+  ..color = Palette.seed.color;
+final Paint _wallGroundPaint = Paint()
 //..filterQuality = FilterQuality.none
 ////..color = Color.fromARGB(50, 100, 100, 100)
 //..isAntiAlias = false
-  ..color = Palette.snakeGreen;
+  ..color = Palette.seed.color;
 
 class MazeWallRectangleVisual extends RectangleComponent with IgnoreEvents {
   MazeWallRectangleVisual(
@@ -24,7 +23,7 @@ class MazeWallRectangleVisual extends RectangleComponent with IgnoreEvents {
       : super(
             size: Vector2(width, height),
             anchor: Anchor.center,
-            paint: _greenWallPaint);
+            paint: _wallVisualPaint);
 
   @override
   Future<void> onLoad() async {
@@ -50,7 +49,7 @@ class MazeVisualBlockingBar extends MazeWallRectangleVisual {
 
 class MazeWallCircleVisual extends CircleComponent with IgnoreEvents {
   MazeWallCircleVisual({required super.radius, required super.position})
-      : super(anchor: Anchor.center, paint: _greenWallPaint); //NOTE BLACK
+      : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
 class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
@@ -72,7 +71,7 @@ class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
   @override
   Body createBody() {
     final shape = PolygonShape();
-    paint = _greenWallPaint;
+    paint = _wallGroundPaint;
     shape.setAsBoxXY(width / 2, height / 2);
     final fixtureDef = FixtureDef(shape);
     final bodyDef = BodyDef(type: BodyType.static, position: position);
@@ -97,7 +96,7 @@ class MazeWallCircleGround extends BodyComponent with IgnoreEvents {
   @override
   Body createBody() {
     final shape = CircleShape();
-    paint = _greenWallPaint;
+    paint = _wallGroundPaint;
 
     shape.radius = radius;
     final fixtureDef = FixtureDef(shape);

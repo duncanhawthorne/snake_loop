@@ -11,7 +11,7 @@ import 'snake_body_part.dart';
 import 'snake_head.dart';
 import 'wrapper_no_events.dart';
 
-final Paint greenSnakePaint = Paint()..color = Palette.snakeGreen;
+final Paint snakePaint = Paint()..color = Palette.seed.color;
 
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {

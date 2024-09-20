@@ -15,7 +15,7 @@ class SnakeBodyEnd extends CircleComponent
       : super(
             radius: maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2,
             anchor: Anchor.center,
-            paint: greenSnakePaint);
+            paint: snakePaint);
 
   SnakeBodyBit? targetBodyBit;
 
