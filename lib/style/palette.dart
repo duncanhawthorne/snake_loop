@@ -26,5 +26,3 @@ class Palette {
   static const _grey = Colors.grey;
   static const _snakeGreen = Colors.greenAccent;
 }
-
-class ColorsP {}
