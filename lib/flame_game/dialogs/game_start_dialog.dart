@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code, duplicate_ignore
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -75,87 +77,78 @@ class StartDialog extends StatelessWidget {
 }
 
 const double width = 40; //70;
-const bool hideGrid = true;
 Widget levelSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
-  bool showText = maxLevelToShowCache <= 2;
-  return maxLevelToShowCache == 1
-      ? const SizedBox.shrink()
-      : bodyWidget(
-          child: Column(
-            children: [
-              hideGrid
-                  ? const SizedBox.shrink()
-                  : SizedBox(
-                      //alternative implementation
-                      width: width * 5,
-                      height: width * 2,
-                      child: GridView.builder(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          cacheExtent: 10000,
-                          reverse: false,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: 2 * 5,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5,
-                          ),
-                          itemBuilder: (BuildContext context, int index) {
-                            return levelButtonSingle(context, game, index);
-                          }),
-                    ),
-              Row(
+  // ignore: dead_code
+  bool showText = false && maxLevelToShowCache <= 2;
+  return bodyWidget(
+    child: Column(
+      children: [
+        Row(
+          children: [
+            !showText
+                ? const SizedBox.shrink()
+                // ignore: dead_code
+                : Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                    child: Text('Level:', style: textStyleBody),
+                  ),
+            //levelButtonSingle(context, game, 0),
+            ...List.generate(min(5, maxLevelToShowCache),
+                (index) => levelButtonSingle(context, game, index + 1)),
+          ],
+        ),
+        maxLevelToShowCache <= 5
+            ? const SizedBox.shrink()
+            : Row(
                 children: [
-                  !showText
-                      ? const SizedBox.shrink()
-                      : Text('Level:', style: textStyleBody),
-                  !showText
-                      ? const SizedBox.shrink()
-                      : const SizedBox(width: 10),
-                  ...List.generate(min(5, maxLevelToShowCache),
-                      (index) => levelButtonSingle(context, game, index)),
+                  ...List.generate(
+                      maxLevelToShowCache - 5,
+                      (index) =>
+                          levelButtonSingle(context, game, 5 + index + 1)),
                 ],
-              ),
-              maxLevelToShowCache <= 5
-                  ? const SizedBox.shrink()
-                  : Row(
-                      children: [
-                        ...List.generate(
-                            maxLevelToShowCache - 5,
-                            (index) =>
-                                levelButtonSingle(context, game, 5 + index)),
-                      ],
-                    )
-            ],
-          ),
-        );
+              )
+      ],
+    ),
+  );
 }
 
-Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
+Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
+  int fixedMazeId = !isTutorialLevel(levelSelect(levelNum)) &&
+          isTutorialMaze(maze.mazeId)
+      ? defaultMazeId
+      : isTutorialLevel(levelSelect(levelNum)) && !isTutorialMaze(maze.mazeId)
+          ? tutorialMazeId
+          : maze.mazeId;
   return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
       child: TextButton(
-          style: game.level.number == index + 1
+          style: game.level.number == levelNum
               ? buttonStyle(small: true)
               : buttonStyle(small: true, borderColor: Palette.transp),
           onPressed: () {
             context.go(
-                '/?$levelUrlKey=${index + 1}&$mazeUrlKey=${mazeNames[maze.mazeId]}');
+                '/?$levelUrlKey=$levelNum&$mazeUrlKey=${mazeNames[fixedMazeId]}');
           },
-          child: Text('${index + 1}',
-              style: game.world.playerProgress.levels.containsKey(index + 1)
+          child: Text(
+              isTutorialLevel(levelSelect(levelNum))
+                  ? (maxLevelToShow(game) == tutorialLevelNum
+                      ? "Tutorial"
+                      : "T")
+                  : '$levelNum',
+              style: game.world.playerProgress.levels.containsKey(levelNum)
                   ? textStyleBody
                   : textStyleBodyDull)));
 }
 
 Widget mazeSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
-  bool showText = maxLevelToShowCache <= 2;
   // ignore: dead_code
-  return true || maxLevelToShowCache == 1
+  bool showText = false && maxLevelToShowCache <= 2;
+  return true ||
+          maxLevelToShowCache == 1 ||
+          isTutorialLevel(levelSelect(game.level.number))
       ? const SizedBox.shrink()
-      // ignore: dead_code
       : bodyWidget(
           child: Column(
             children: [
@@ -163,10 +156,11 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
                 children: [
                   !showText
                       ? const SizedBox.shrink()
-                      : Text('Maze:', style: textStyleBody),
-                  !showText
-                      ? const SizedBox.shrink()
-                      : const SizedBox(width: 10),
+                      // ignore: dead_code
+                      : Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          child: Text('Maze:', style: textStyleBody),
+                        ),
                   ...List.generate(
                       3, (index) => mazeButtonSingle(context, game, index)),
                 ],
@@ -176,25 +170,28 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
         );
 }
 
-Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
+Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
   return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
       child: TextButton(
-          style: maze.mazeId == index
+          style: maze.mazeId == mazeId
               ? buttonStyle(small: true)
               : buttonStyle(small: true, borderColor: Palette.transp),
           onPressed: () {
-            if (index != maze.mazeId) {
+            if (mazeId != maze.mazeId) {
               context.go(
-                  '/?$levelUrlKey=${game.level.number}&$mazeUrlKey=${mazeNames[index]}');
+                  '/?$levelUrlKey=${game.level.number}&$mazeUrlKey=${mazeNames[mazeId]}');
             }
           },
-          child: Text(mazeNames[index] ?? "X", style: textStyleBody)));
+          child: Text(mazeNames[mazeId] ?? "X", style: textStyleBody)));
 }
 
 int maxLevelToShow(PacmanGame game) {
-  return min(
-      gameLevels.length,
-      max(max(game.level.number, maze.mazeId == 0 ? 1 : 2),
-          game.world.playerProgress.maxLevelCompleted + 1));
+  return [
+    game.level.number,
+    isTutorialMaze(maze.mazeId) || maze.mazeId == tutorialMazeId + 1
+        ? tutorialLevelNum - 1
+        : defaultLevelNum + 1,
+    game.world.playerProgress.maxLevelCompleted + 1
+  ].reduce(max).clamp(0, maxLevel());
 }

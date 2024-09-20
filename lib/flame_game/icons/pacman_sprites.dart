@@ -16,9 +16,6 @@ const int pacmanDeadIncrements = (pacmanCircleIncrements * 3) ~/ 4;
 const int pacmanEatingHalfIncrements = (pacmanCircleIncrements * 1) ~/ 4;
 final Paint yellowPacmanPaint = Paint()
   ..color = Palette.yellowPacman; //blue; //yellowAccent;
-final Paint greenSnakePaint = Paint()
-  ..color = Palette.snakeGreen; //blue; //yellowAccent;
-final Paint whitePaint = Paint()..color = Palette.white; //blue; //yellowAccent;
 const _loadFromFile = false;
 
 class PacmanSprites {

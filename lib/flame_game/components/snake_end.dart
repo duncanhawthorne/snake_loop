@@ -3,11 +3,11 @@ import 'package:flame/components.dart';
 
 import '../effects/move_to_effect.dart';
 import '../effects/remove_effects.dart';
-import '../icons/pacman_sprites.dart';
 import '../maze.dart';
 import '../pacman_world.dart';
 import 'snake_body_part.dart';
 import 'snake_head.dart';
+import 'snake_wrapper.dart';
 
 class SnakeBodyEnd extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {

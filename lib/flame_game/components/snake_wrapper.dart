@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 
+import '../../style/palette.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -7,6 +10,8 @@ import 'food_pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_head.dart';
 import 'wrapper_no_events.dart';
+
+final Paint greenSnakePaint = Paint()..color = Palette.snakeGreen;
 
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {

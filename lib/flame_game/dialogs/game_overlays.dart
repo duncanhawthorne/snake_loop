@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../settings/settings.dart';
 import '../game_screen.dart';
-import '../icons/pacman_icons.dart';
+import '../icons/circle_icon.dart';
 import '../pacman_game.dart';
 
 Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
@@ -55,7 +55,7 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
                               0,
                               4 * statusWidgetHeightFactor,
                               0),
-                          child: animatedPacmanIcon(game, index))));
+                          child: circleIcon())));
             },
           ),
           const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),

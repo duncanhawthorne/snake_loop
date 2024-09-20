@@ -1,11 +1,11 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
-import '../icons/pacman_sprites.dart';
 import '../maze.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
+import 'snake_wrapper.dart';
 
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {

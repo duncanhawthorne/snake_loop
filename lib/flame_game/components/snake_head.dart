@@ -3,7 +3,6 @@ import 'package:flame/components.dart';
 
 import '../../utils/helper.dart';
 import '../game_screen.dart';
-import '../icons/pacman_sprites.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -11,6 +10,7 @@ import 'food_pellet.dart';
 import 'pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_end.dart';
+import 'snake_wrapper.dart';
 import 'wall.dart';
 
 double snakeGapFactor = 1.02;
