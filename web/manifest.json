@@ -1,11 +1,11 @@
 {
-    "name": "Pacman ROLL",
-    "short_name": "Pacman ROLL",
+    "name": "Snake LOOP",
+    "short_name": "Snake LOOP",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#222222",
     "theme_color": "#222222",
-    "description": "Pacman ROLL",
+    "description": "Snake LOOP",
     "prefer_related_applications": false,
     "icons": [
         {
