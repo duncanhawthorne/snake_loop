@@ -75,6 +75,7 @@ Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
   );
 }
 
+// ignore: unused_element
 Widget _livesWidget(BuildContext context, PacmanGame game) {
   return ValueListenableBuilder<int>(
     valueListenable: game.world.pacmans.numberOfDeathsNotifier,
