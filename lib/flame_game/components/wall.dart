@@ -35,8 +35,6 @@ class MazeWallRectangleVisual extends RectangleComponent with IgnoreEvents {
       size: Vector2(width, height),
       anchor: Anchor.center,
     )..debugMode = false);
-    //debugMode = true;
-    //world.pellets.pelletsRemainingNotifier.value += 1;
   }
 }
 

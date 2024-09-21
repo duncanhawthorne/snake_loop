@@ -28,13 +28,11 @@ class Pellet extends CircleComponent
       anchor: Anchor.center,
     ));
     //debugMode = true;
-    //world.pellets.pelletsRemainingNotifier.value += 1;
   }
 
   @override
   Future<void> onRemove() async {
     world.snakeWrapper.addNewTargetPellet();
-    //world.pellets.pelletsRemainingNotifier.value -= 1;
     super.onRemove();
   }
 }
