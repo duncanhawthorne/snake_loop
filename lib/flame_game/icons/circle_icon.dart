@@ -2,18 +2,17 @@ import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 
 import '../../style/palette.dart';
-import '../game_screen.dart';
+import '../dialogs/game_overlays.dart';
 
 final Paint _pelletPaint = Paint()..color = Palette.text.color;
 
 Widget circleIcon() {
   return CustomPaint(
-      size: const Size(statusWidgetHeight * statusWidgetHeightFactor,
-          statusWidgetHeight * statusWidgetHeightFactor),
+      size: const Size(pacmanIconSize, pacmanIconSize),
       painter: PacmanPainter());
 }
 
-const _pacmanRectStatusBarSize = statusWidgetHeight * statusWidgetHeightFactor;
+const _pacmanRectStatusBarSize = pacmanIconSize;
 final Rect _pacmanRectStatusBar = Rect.fromCenter(
     center: const Offset(
         _pacmanRectStatusBarSize / 2, _pacmanRectStatusBarSize / 2),
