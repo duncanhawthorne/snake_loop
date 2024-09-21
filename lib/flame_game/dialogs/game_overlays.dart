@@ -61,7 +61,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
     spacing: _widgetSpacing,
     children: [
       _pelletsWidget(context, game),
-      _clockWidget(game),
+      _livesCounterWidget(game),
     ],
   );
 }
@@ -103,6 +103,7 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
   );
 }
 
+// ignore: unused_element
 Widget _clockWidget(PacmanGame game) {
   return ElapsedTimeDisplay(
     startTime: DateTime.now(), //actually ignored
@@ -112,7 +113,18 @@ Widget _clockWidget(PacmanGame game) {
         color: Palette.textColor,
         fontFamily: 'Press Start 2P'),
     formatter: (elapsedTime) {
-      return game.world.pellets.pelletsRemainingNotifier.value.toString();
+      return (game.stopwatchMilliSeconds / 1000)
+          .toStringAsFixed(1)
+          .padLeft(4, " ");
+    },
+  );
+}
+
+Widget _livesCounterWidget(PacmanGame game) {
+  return ValueListenableBuilder<int>(
+    valueListenable: game.world.pellets.pelletsRemainingNotifier,
+    builder: (BuildContext context, int value, Widget? child) {
+      return Text(game.world.pellets.pelletsRemainingNotifier.value.toString());
     },
   );
 }
