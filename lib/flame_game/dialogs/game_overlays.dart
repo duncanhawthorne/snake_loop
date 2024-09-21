@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:elapsed_time_display/elapsed_time_display.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../settings/settings.dart';
+import '../../style/dialog.dart';
 import '../../style/palette.dart';
 import '../game_screen.dart';
 import '../icons/circle_icon.dart';
@@ -14,7 +14,6 @@ import '../pacman_game.dart';
 const double _statusWidgetHeightFactor = 1.0;
 const _widgetSpacing = 15 * _statusWidgetHeightFactor;
 const _pacmanSpacing = 2 * _statusWidgetHeightFactor;
-const _fontSize = 15 * _statusWidgetHeightFactor;
 const pacmanIconSize = 21 * _statusWidgetHeightFactor;
 const circleIconSize = 10 * _statusWidgetHeightFactor;
 
@@ -60,7 +59,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
     spacing: _widgetSpacing,
     children: [
       _pelletsWidget(context, game),
-      _livesCounterWidget(game),
+      _pelletsCounterWidget(game),
     ],
   );
 }
@@ -104,22 +103,19 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
 
 // ignore: unused_element
 Widget _clockWidget(PacmanGame game) {
-  return ElapsedTimeDisplay(
-    startTime: DateTime.now(), //actually ignored
-    interval: const Duration(milliseconds: 100),
-    style: const TextStyle(
-        fontSize: _fontSize,
-        color: Palette.textColor,
-        fontFamily: 'Press Start 2P'),
-    formatter: (elapsedTime) {
-      return (game.stopwatchMilliSeconds / 1000)
-          .toStringAsFixed(1)
-          .padLeft(4, " ");
+  return StreamBuilder(
+    stream: Stream.periodic(const Duration(milliseconds: 100)),
+    builder: (context, snapshot) {
+      return Text(
+          (game.stopwatchMilliSeconds / 1000)
+              .toStringAsFixed(1)
+              .padLeft(4, " "),
+          style: textStyleBody);
     },
   );
 }
 
-Widget _livesCounterWidget(PacmanGame game) {
+Widget _pelletsCounterWidget(PacmanGame game) {
   return ValueListenableBuilder<int>(
     valueListenable: game.world.pellets.pelletsRemainingNotifier,
     builder: (BuildContext context, int value, Widget? child) {
