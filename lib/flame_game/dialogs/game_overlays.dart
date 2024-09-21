@@ -48,7 +48,6 @@ Widget _topLeftWidget(BuildContext context, PacmanGame game) {
     spacing: _widgetSpacing,
     children: [
       _mainMenuButtonWidget(context, game),
-      _audioOnOffButtonWidget(context, game),
     ],
   );
 }
@@ -97,7 +96,7 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: _pacmanSpacing,
           children: List.generate(
-              min(15, game.world.pellets.pelletsRemainingNotifier.value),
+              min(19, game.world.pellets.pelletsRemainingNotifier.value),
               (index) => circleIcon()));
     },
   );
@@ -129,6 +128,7 @@ Widget _livesCounterWidget(PacmanGame game) {
   );
 }
 
+// ignore: unused_element
 Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
   const color = Palette.textColor;
   final settingsController = context.watch<SettingsController>();
