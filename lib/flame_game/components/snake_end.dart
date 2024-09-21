@@ -37,6 +37,7 @@ class SnakeBodyEnd extends CircleComponent
         game.stopwatchMilliSeconds > 0 &&
         !(game.overlays.isActive(GameScreen.loseDialogKey)) &&
         !game.world.gameWonOrLost)) {
+      removeEffects(this);
       position = world.snakeWrapper.snakeHead.position;
     }
 
