@@ -7,6 +7,9 @@ import 'food_pellet.dart';
 import 'pellet.dart';
 import 'snake_wrapper.dart';
 
+final Vector2 offscreen =
+    Vector2(maze.mazeWidth / 2 * 100, maze.mazeHeight / 2 * 100);
+
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
   SnakeBodyBit({required super.position})
@@ -14,6 +17,22 @@ class SnakeBodyBit extends CircleComponent
             radius: maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2,
             anchor: Anchor.center,
             paint: snakePaint);
+
+  void activate(Vector2 targetPosition) {
+    if (!world.snakeWrapper.snakeHead.snakeActiveBitsList.contains(this)) {
+      world.snakeWrapper.snakeHead.snakeActiveBitsList.add(this);
+    }
+    world.snakeWrapper.snakeHead.snakeSpareBitsList.remove(this);
+    position.setFrom(targetPosition);
+  }
+
+  void deactivate() {
+    world.snakeWrapper.snakeHead.snakeActiveBitsList.remove(this);
+    if (!world.snakeWrapper.snakeHead.snakeSpareBitsList.contains(this)) {
+      world.snakeWrapper.snakeHead.snakeSpareBitsList.add(this);
+    }
+    position.setFrom(offscreen);
+  }
 
   @override
   Future<void> onLoad() async {
@@ -26,13 +45,14 @@ class SnakeBodyBit extends CircleComponent
       position: Vector2.all(radius),
       anchor: Anchor.center,
     ));
-
-    world.snakeWrapper.snakeHead.snakeBitsList.add(this);
+    activate(position);
   }
 
   @override
   Future<void> onRemove() async {
-    world.snakeWrapper.snakeHead.snakeBitsList.remove(this);
+    deactivate();
+    world.snakeWrapper.snakeHead.snakeActiveBitsList.remove(this);
+    world.snakeWrapper.snakeHead.snakeSpareBitsList.remove(this);
   }
 
   @override

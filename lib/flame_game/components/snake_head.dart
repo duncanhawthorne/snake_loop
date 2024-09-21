@@ -29,6 +29,10 @@ class SnakeHead extends CircleComponent
             priority: 100);
 
   SnakeBodyEnd snakeEnd = SnakeBodyEnd(position: Vector2(0, 0));
+  final Vector2 _snakeLastPosition = Vector2(0, 0);
+  List<SnakeBodyBit> snakeActiveBitsList = [];
+  List<SnakeBodyBit> snakeSpareBitsList = [];
+  int _maxSnakeBits = 0;
 
   @override
   Future<void> onLoad() async {
@@ -50,15 +54,17 @@ class SnakeHead extends CircleComponent
     super.onRemove();
   }
 
-  final Vector2 _snakeLastPosition = Vector2(0, 0);
-  List<SnakeBodyBit> snakeBitsList = [];
-  int _maxSnakeBits = 0;
-
   void reset() {
     for (Component child in world.snakeWrapper.children) {
       if (child is SnakeBodyBit) {
-        child.removeFromParent();
+        child.deactivate();
       }
+    }
+    for (SnakeBodyBit bit in snakeActiveBitsList) {
+      bit.deactivate();
+    }
+    for (SnakeBodyBit bit in snakeSpareBitsList) {
+      bit.deactivate();
     }
     position = Vector2(0, 0); //reset it
     _maxSnakeBits = 3; //reset it
@@ -66,25 +72,39 @@ class SnakeHead extends CircleComponent
     _snakeLastPosition.setFrom(position);
   }
 
-  bool startingPosition() {
+  bool atStartingPosition() {
     return position.x == 0 && position.y == 0;
   }
+
+  void addSnakeBitAtPosition(Vector2 targetPosition) {
+    _snakeLastPosition.setFrom(targetPosition);
+    if (snakeSpareBitsList.isNotEmpty) {
+      snakeSpareBitsList[0].activate(targetPosition);
+    } else {
+      world.snakeWrapper.add(SnakeBodyBit(position: targetPosition));
+    }
+  }
+
+  void removeSnakeBit(SnakeBodyBit bit) {
+    bit.deactivate();
+    //bit.removeFromParent();
+  }
+
+  bool get shouldSnakeMove =>
+      game.isGameLive &&
+      game.stopwatchMilliSeconds > 0 &&
+      !(game.overlays.isActive(GameScreen.loseDialogKey)) &&
+      !game.world.gameWonOrLost;
 
   @override
   void update(double dt) {
     super.update(dt);
 
-    if (game.isGameLive &&
-        game.stopwatchMilliSeconds > 0 &&
-        !(game.overlays.isActive(GameScreen.loseDialogKey)) &&
-        !game.world.gameWonOrLost) {
+    if (shouldSnakeMove) {
       position = position - world.direction * dt;
-      if (!startingPosition()) {
-        if (snakeBitsList.isEmpty) {
-          Vector2 targetPositionForNewSnakeBit = position;
-          _snakeLastPosition.setFrom(targetPositionForNewSnakeBit);
-          world.snakeWrapper
-              .add(SnakeBodyBit(position: targetPositionForNewSnakeBit));
+      if (!atStartingPosition()) {
+        if (snakeActiveBitsList.isEmpty) {
+          addSnakeBitAtPosition(position);
         } else if ((position - _snakeLastPosition).length >
             width * snakeGapFactor) {
           // rather than set new position at current position
@@ -95,14 +115,12 @@ class SnakeHead extends CircleComponent
               (position - _snakeLastPosition).normalized() *
                   width *
                   snakeGapFactor;
-          _snakeLastPosition.setFrom(targetPositionForNewSnakeBit);
-          world.snakeWrapper
-              .add(SnakeBodyBit(position: targetPositionForNewSnakeBit));
+          addSnakeBitAtPosition(targetPositionForNewSnakeBit);
         }
       }
-      if (snakeBitsList.length > _maxSnakeBits) {
-        snakeEnd.moveTo(snakeBitsList[1].position);
-        snakeBitsList[0].removeFromParent();
+      if (snakeActiveBitsList.length > _maxSnakeBits) {
+        snakeEnd.moveTo(snakeActiveBitsList[1].position);
+        removeSnakeBit(snakeActiveBitsList[0]);
       }
     }
   }
@@ -122,7 +140,7 @@ class SnakeHead extends CircleComponent
     } else if (other is SnakeHead) {
       //world.reset();
     } else if (other is SnakeBodyBit) {
-      if (other != snakeBitsList.last) {
+      if (other != snakeActiveBitsList.last) {
         game.handleLoseGame();
         debug("trail intersect");
       }
