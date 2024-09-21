@@ -28,9 +28,10 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: _widgetSpacing,
             children: [
-              topLeftWidget(context, game),
-              topRightWidget(context, game)
+              _topLeftWidget(context, game),
+              _topRightWidget(context, game)
             ],
           ),
         ],
@@ -39,33 +40,33 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget topLeftWidget(BuildContext context, PacmanGame game) {
+Widget _topLeftWidget(BuildContext context, PacmanGame game) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     spacing: _widgetSpacing,
     children: [
-      mainMenuButtonWidget(context, game),
-      audioOnOffButtonWidget(context, game),
+      _mainMenuButtonWidget(context, game),
+      _audioOnOffButtonWidget(context, game),
     ],
   );
 }
 
-Widget topRightWidget(BuildContext context, PacmanGame game) {
+Widget _topRightWidget(BuildContext context, PacmanGame game) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.end,
     mainAxisSize: MainAxisSize.min,
     spacing: _widgetSpacing,
     children: [
-      pelletsWidget(context, game),
-      clockWidget(game),
+      _pelletsWidget(context, game),
+      _clockWidget(game),
     ],
   );
 }
 
-Widget mainMenuButtonWidget(BuildContext context, PacmanGame game) {
+Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
   return IconButton(
     onPressed: () {
       game.overlays.add(GameScreen.startDialogKey);
@@ -74,7 +75,7 @@ Widget mainMenuButtonWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget livesWidget(BuildContext context, PacmanGame game) {
+Widget _livesWidget(BuildContext context, PacmanGame game) {
   return ValueListenableBuilder<int>(
     valueListenable: game.world.pacmans.numberOfDeathsNotifier,
     builder: (BuildContext context, int value, Widget? child) {
@@ -87,7 +88,7 @@ Widget livesWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget pelletsWidget(BuildContext context, PacmanGame game) {
+Widget _pelletsWidget(BuildContext context, PacmanGame game) {
   return ValueListenableBuilder<int>(
     valueListenable: game.world.pellets.pelletsRemainingNotifier,
     builder: (BuildContext context, int value, Widget? child) {
@@ -101,7 +102,7 @@ Widget pelletsWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget clockWidget(PacmanGame game) {
+Widget _clockWidget(PacmanGame game) {
   return ElapsedTimeDisplay(
     startTime: DateTime.now(), //actually ignored
     interval: const Duration(milliseconds: 100),
@@ -115,7 +116,7 @@ Widget clockWidget(PacmanGame game) {
   );
 }
 
-Widget audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
+Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
   const color = Palette.textColor;
   final settingsController = context.watch<SettingsController>();
   return ValueListenableBuilder<bool>(
