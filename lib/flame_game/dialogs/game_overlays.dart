@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:elapsed_time_display/elapsed_time_display.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +8,7 @@ import '../../settings/settings.dart';
 import '../../style/palette.dart';
 import '../game_screen.dart';
 import '../icons/circle_icon.dart';
+import '../icons/pacman_icons.dart';
 import '../pacman_game.dart';
 
 const double _statusWidgetHeightFactor = 1.0;
@@ -55,7 +58,7 @@ Widget topRightWidget(BuildContext context, PacmanGame game) {
     mainAxisSize: MainAxisSize.min,
     spacing: _widgetSpacing,
     children: [
-      livesWidget(context, game),
+      pelletsWidget(context, game),
       clockWidget(game),
     ],
   );
@@ -72,13 +75,26 @@ Widget mainMenuButtonWidget(BuildContext context, PacmanGame game) {
 
 Widget livesWidget(BuildContext context, PacmanGame game) {
   return ValueListenableBuilder<int>(
+    valueListenable: game.world.pacmans.numberOfDeathsNotifier,
+    builder: (BuildContext context, int value, Widget? child) {
+      return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: _pacmanSpacing,
+          children: List.generate(game.level.maxAllowedDeaths,
+              (index) => animatedPacmanIcon(game, index)));
+    },
+  );
+}
+
+Widget pelletsWidget(BuildContext context, PacmanGame game) {
+  return ValueListenableBuilder<int>(
     valueListenable: game.world.pellets.pelletsRemainingNotifier,
     builder: (BuildContext context, int value, Widget? child) {
       return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: _pacmanSpacing,
           children: List.generate(
-              game.world.pellets.pelletsRemainingNotifier.value,
+              min(7, game.world.pellets.pelletsRemainingNotifier.value),
               (index) => circleIcon()));
     },
   );
