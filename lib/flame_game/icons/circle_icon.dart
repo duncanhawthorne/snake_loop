@@ -9,18 +9,16 @@ final Paint _pelletPaint = Paint()..color = Palette.text.color;
 Widget circleIcon() {
   return CustomPaint(
       size: const Size(circleIconSize, circleIconSize),
-      painter: PacmanPainter());
+      painter: _CirclePainter());
 }
 
-const _pacmanRectStatusBarSize = circleIconSize;
 final Rect _pacmanRectStatusBar = Rect.fromCenter(
-    center: const Offset(
-        _pacmanRectStatusBarSize / 2, _pacmanRectStatusBarSize / 2),
-    width: _pacmanRectStatusBarSize.toDouble(),
-    height: _pacmanRectStatusBarSize.toDouble());
+    center: const Offset(circleIconSize / 2, circleIconSize / 2),
+    width: circleIconSize.toDouble(),
+    height: circleIconSize.toDouble());
 
-class PacmanPainter extends CustomPainter {
-  PacmanPainter();
+class _CirclePainter extends CustomPainter {
+  _CirclePainter();
 
   @override
   void paint(Canvas canvas, Size size) {
