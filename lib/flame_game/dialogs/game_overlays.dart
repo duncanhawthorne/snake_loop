@@ -13,9 +13,10 @@ import '../pacman_game.dart';
 
 const double _statusWidgetHeightFactor = 1.0;
 const _widgetSpacing = 15 * _statusWidgetHeightFactor;
-const _pacmanSpacing = 6 * _statusWidgetHeightFactor;
+const _pacmanSpacing = 2 * _statusWidgetHeightFactor;
 const _fontSize = 15 * _statusWidgetHeightFactor;
 const pacmanIconSize = 21 * _statusWidgetHeightFactor;
+const circleIconSize = 10 * _statusWidgetHeightFactor;
 
 Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   return Center(
@@ -94,7 +95,7 @@ Widget pelletsWidget(BuildContext context, PacmanGame game) {
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: _pacmanSpacing,
           children: List.generate(
-              min(7, game.world.pellets.pelletsRemainingNotifier.value),
+              min(10, game.world.pellets.pelletsRemainingNotifier.value),
               (index) => circleIcon()));
     },
   );
@@ -109,9 +110,7 @@ Widget clockWidget(PacmanGame game) {
         color: Palette.textColor,
         fontFamily: 'Press Start 2P'),
     formatter: (elapsedTime) {
-      return (game.stopwatchMilliSeconds / 1000)
-          .toStringAsFixed(1)
-          .padLeft(4, " ");
+      return game.world.pellets.pelletsRemainingNotifier.value.toString();
     },
   );
 }

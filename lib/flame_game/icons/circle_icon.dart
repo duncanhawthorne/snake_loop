@@ -8,11 +8,11 @@ final Paint _pelletPaint = Paint()..color = Palette.text.color;
 
 Widget circleIcon() {
   return CustomPaint(
-      size: const Size(pacmanIconSize, pacmanIconSize),
+      size: const Size(circleIconSize, circleIconSize),
       painter: PacmanPainter());
 }
 
-const _pacmanRectStatusBarSize = pacmanIconSize;
+const _pacmanRectStatusBarSize = circleIconSize;
 final Rect _pacmanRectStatusBar = Rect.fromCenter(
     center: const Offset(
         _pacmanRectStatusBarSize / 2, _pacmanRectStatusBarSize / 2),
