@@ -36,7 +36,6 @@ import 'pacman_game.dart';
 ///  to.
 
 final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
-const double gravityScale = 0.5 * 0.5 * 50 * (30 / flameGameZoom);
 
 class PacmanWorld extends Forge2DWorld
     with
@@ -230,20 +229,18 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  double extraScale() {
-    return pow(1.1, min(10, level.number)).toDouble();
-  }
-
-  final _tmpGravity = Vector2.zero();
+  late final _levelSpeed =
+      0.5 * 0.5 * pow(1.1, min(10, level.number)).toDouble();
   final direction = Vector2.zero();
 
+  final _tmpGravity = Vector2.zero();
+  late final double _gravityScale = 50 * (30 / flameGameZoom) * _levelSpeed;
   void _setMazeAngle(double angle) {
     //using tmpGravity to avoid creating a new Vector2 on each update / frame
     //could instead directly do gravity = Vector2(calc, calc);
-
     _tmpGravity
-      ..x = -sin(angle) * gravityScale * extraScale()
-      ..y = cos(angle) * gravityScale * extraScale();
+      ..x = -sin(angle) * _gravityScale
+      ..y = cos(angle) * _gravityScale;
     direction.setFrom(_tmpGravity);
     //gravity = _tmpGravity;
     game.camera.viewfinder.angle = angle;

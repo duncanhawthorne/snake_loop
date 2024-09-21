@@ -33,7 +33,8 @@ class SnakeWrapper extends WrapperNoEvents
         ..y = (game.random.nextDouble() - 0.5) * maze.mazeHeight * 0.8;
       _safePos = true;
       for (SnakeBodyBit bit in snakeHead.snakeBitsList) {
-        if ((bit.position - _oneUsePosition).length < snakeHead.width) {
+        if ((bit.position - _oneUsePosition).length <
+            snakeHead.width * (1 + hitboxGenerosity)) {
           _safePos = false;
         }
       }

@@ -36,7 +36,7 @@ class SnakeHead extends CircleComponent
     add(CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.active,
-      radius: radius * (1 - 0.5),
+      radius: radius * (1 - hitboxGenerosity),
       position: Vector2.all(radius),
       anchor: Anchor.center,
     ));
@@ -66,6 +66,10 @@ class SnakeHead extends CircleComponent
     _snakeLastPosition.setFrom(position);
   }
 
+  bool startingPosition() {
+    return position.x == 0 && position.y == 0;
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -75,17 +79,26 @@ class SnakeHead extends CircleComponent
         !(game.overlays.isActive(GameScreen.loseDialogKey)) &&
         !game.world.gameWonOrLost) {
       position = position - world.direction * dt;
-      /*
-      if (position.x.abs() > maze.mazeWidth / 2 ||
-          position.y.abs() > maze.mazeHeight / 2) {
-        game.handleLoseGame();
-      }
-
-       */
-      if ((position - _snakeLastPosition).length > width * snakeGapFactor ||
-          snakeBitsList.isEmpty) {
-        _snakeLastPosition.setFrom(position);
-        world.snakeWrapper.add(SnakeBodyBit(position: position));
+      if (!startingPosition()) {
+        if (snakeBitsList.isEmpty) {
+          Vector2 targetPositionForNewSnakeBit = position;
+          _snakeLastPosition.setFrom(targetPositionForNewSnakeBit);
+          world.snakeWrapper
+              .add(SnakeBodyBit(position: targetPositionForNewSnakeBit));
+        } else if ((position - _snakeLastPosition).length >
+            width * snakeGapFactor) {
+          // rather than set new position at current position
+          // set the right distance away in that direction
+          // if device is lagging stops visual artifacts of missing frames
+          // showing as gaps in the snake body
+          Vector2 targetPositionForNewSnakeBit = _snakeLastPosition +
+              (position - _snakeLastPosition).normalized() *
+                  width *
+                  snakeGapFactor;
+          _snakeLastPosition.setFrom(targetPositionForNewSnakeBit);
+          world.snakeWrapper
+              .add(SnakeBodyBit(position: targetPositionForNewSnakeBit));
+        }
       }
       if (snakeBitsList.length > _maxSnakeBits) {
         snakeEnd.moveTo(snakeBitsList[1].position);

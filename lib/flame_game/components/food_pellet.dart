@@ -1,6 +1,8 @@
 import 'pellet.dart';
 
+const double hitboxGenerosity = 0.5;
+
 class Food extends Pellet {
   Food({required super.position})
-      : super(radiusFactor: 2, hitBoxRadiusFactor: (1 + 0.5));
+      : super(radiusFactor: 2, hitBoxRadiusFactor: (1 + hitboxGenerosity));
 }
