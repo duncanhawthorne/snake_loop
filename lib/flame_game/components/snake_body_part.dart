@@ -16,42 +16,42 @@ class SnakeBodyBit extends CircleComponent
       : super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
 
   SnakeWrapper snakeWrapper;
+  bool get isActive => _isActive;
+  bool _isActive = true;
 
   void activate({required Vector2 targetPosition}) {
-    if (!snakeWrapper.activeBodyBits.contains(this)) {
-      snakeWrapper.activeBodyBits.add(this);
-    }
-    snakeWrapper.spareBodyBits.remove(this);
+    _isActive = true;
+    //move it to the last position in bodyBits so order is right for activeBits
+    snakeWrapper.bodyBits.remove(this);
+    snakeWrapper.bodyBits.add(this);
     position.setFrom(targetPosition);
   }
 
   void deactivate() {
-    snakeWrapper.activeBodyBits.remove(this);
-    if (!snakeWrapper.spareBodyBits.contains(this)) {
-      snakeWrapper.spareBodyBits.add(this);
-    }
+    _isActive = false;
     position.setFrom(_offscreen);
   }
+
+  late final CircleHitbox _hitbox = CircleHitbox(
+    isSolid: true,
+    collisionType: CollisionType.passive,
+    radius: radius,
+    position: Vector2.all(radius),
+    anchor: Anchor.center,
+  );
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-
-    add(CircleHitbox(
-      isSolid: true,
-      collisionType: CollisionType.passive,
-      radius: radius,
-      position: Vector2.all(radius),
-      anchor: Anchor.center,
-    ));
+    add(_hitbox);
+    snakeWrapper.bodyBits.add(this);
     activate(targetPosition: position);
   }
 
   @override
   Future<void> onRemove() async {
     deactivate();
-    snakeWrapper.activeBodyBits.remove(this);
-    snakeWrapper.spareBodyBits.remove(this);
+    snakeWrapper.bodyBits.remove(this);
   }
 
   @override
@@ -71,7 +71,7 @@ class SnakeBodyBit extends CircleComponent
   }
 
   void _onCollideWithPellet(Pellet pellet) {
-    if (pellet is Food) {
+    if (pellet is Food && snakeWrapper.snakeNeck != this) {
       pellet.position = snakeWrapper.getSafePositionForFood();
       //dont increment score as not captured by head
     }
