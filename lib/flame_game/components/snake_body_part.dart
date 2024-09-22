@@ -21,6 +21,7 @@ class SnakeBodyBit extends CircleComponent
 
   void activate({required Vector2 targetPosition}) {
     _isActive = true;
+    _hitbox.collisionType = CollisionType.passive;
     //move it to the last position in bodyBits so order is right for activeBits
     snakeWrapper.bodyBits.remove(this);
     snakeWrapper.bodyBits.add(this);
@@ -29,6 +30,7 @@ class SnakeBodyBit extends CircleComponent
 
   void deactivate() {
     _isActive = false;
+    _hitbox.collisionType = CollisionType.inactive;
     position.setFrom(_offscreen);
   }
 
@@ -52,6 +54,7 @@ class SnakeBodyBit extends CircleComponent
   Future<void> onRemove() async {
     deactivate();
     snakeWrapper.bodyBits.remove(this);
+    super.onRemove();
   }
 
   @override

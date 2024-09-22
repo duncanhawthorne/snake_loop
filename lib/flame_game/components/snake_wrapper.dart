@@ -60,10 +60,8 @@ class SnakeWrapper extends WrapperNoEvents
   }
 
   void _snakeBitsReset() {
-    for (Component child in children) {
-      if (child is SnakeBodyBit) {
-        child.deactivate();
-      }
+    for (SnakeBodyBit bit in bodyBits) {
+      bit.deactivate();
     }
   }
 
