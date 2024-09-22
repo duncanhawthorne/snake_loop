@@ -7,7 +7,7 @@ import 'food_pellet.dart';
 import 'pellet.dart';
 import 'snake_wrapper.dart';
 
-final Vector2 offscreen =
+final Vector2 _offscreen =
     Vector2(maze.mazeWidth / 2 * 100, maze.mazeHeight / 2 * 100);
 
 class SnakeBodyBit extends CircleComponent
@@ -19,19 +19,19 @@ class SnakeBodyBit extends CircleComponent
             paint: snakePaint);
 
   void activate(Vector2 targetPosition) {
-    if (!world.snakeWrapper.snakeHead.snakeActiveBitsList.contains(this)) {
-      world.snakeWrapper.snakeHead.snakeActiveBitsList.add(this);
+    if (!world.snakeWrapper.snakeHead.activeBodyBits.contains(this)) {
+      world.snakeWrapper.snakeHead.activeBodyBits.add(this);
     }
-    world.snakeWrapper.snakeHead.snakeSpareBitsList.remove(this);
+    world.snakeWrapper.snakeHead.spareBitsList.remove(this);
     position.setFrom(targetPosition);
   }
 
   void deactivate() {
-    world.snakeWrapper.snakeHead.snakeActiveBitsList.remove(this);
-    if (!world.snakeWrapper.snakeHead.snakeSpareBitsList.contains(this)) {
-      world.snakeWrapper.snakeHead.snakeSpareBitsList.add(this);
+    world.snakeWrapper.snakeHead.activeBodyBits.remove(this);
+    if (!world.snakeWrapper.snakeHead.spareBitsList.contains(this)) {
+      world.snakeWrapper.snakeHead.spareBitsList.add(this);
     }
-    position.setFrom(offscreen);
+    position.setFrom(_offscreen);
   }
 
   @override
@@ -51,8 +51,8 @@ class SnakeBodyBit extends CircleComponent
   @override
   Future<void> onRemove() async {
     deactivate();
-    world.snakeWrapper.snakeHead.snakeActiveBitsList.remove(this);
-    world.snakeWrapper.snakeHead.snakeSpareBitsList.remove(this);
+    world.snakeWrapper.snakeHead.activeBodyBits.remove(this);
+    world.snakeWrapper.snakeHead.spareBitsList.remove(this);
   }
 
   @override
@@ -73,8 +73,8 @@ class SnakeBodyBit extends CircleComponent
 
   void _onCollideWithPellet(Pellet pellet) {
     if (pellet is Food) {
-      pellet.removeFromParent();
-      //world.snakeWrapper.snakeHead.addNewTargetPellet();
+      pellet.removeFromParent(); //which adds new pellet
+      //dont increment score
     }
   }
 }

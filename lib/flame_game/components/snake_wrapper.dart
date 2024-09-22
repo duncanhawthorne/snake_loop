@@ -23,23 +23,25 @@ class SnakeWrapper extends WrapperNoEvents
   final _oneUsePosition = Vector2.all(0);
   bool _safePos = false;
 
-  void addNewTargetPellet() {
-    //world.noEventsWrapper.children.where((item) => item is MiniPelletFood).length
-
+  Vector2 _safePositionForNewPellet() {
     _safePos = false;
     while (!_safePos) {
       _oneUsePosition
         ..x = (game.random.nextDouble() - 0.5) * maze.mazeHeight * 0.8
         ..y = (game.random.nextDouble() - 0.5) * maze.mazeHeight * 0.8;
       _safePos = true;
-      for (SnakeBodyBit bit in snakeHead.snakeActiveBitsList) {
+      for (SnakeBodyBit bit in snakeHead.activeBodyBits) {
         if ((bit.position - _oneUsePosition).length <
             snakeHead.width * (1 + hitboxGenerosity)) {
           _safePos = false;
         }
       }
     }
-    add(Food(position: _oneUsePosition));
+    return _oneUsePosition;
+  }
+
+  void addNewTargetPellet() {
+    add(Food(position: _safePositionForNewPellet()));
   }
 
   @override

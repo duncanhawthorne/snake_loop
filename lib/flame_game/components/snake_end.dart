@@ -15,11 +15,13 @@ class SnakeBodyEnd extends CircleComponent
         HasGameReference<PacmanGame>,
         IgnoreEvents,
         CollisionCallbacks {
-  SnakeBodyEnd({required super.position})
+  SnakeBodyEnd({required super.position, required this.snakeHead})
       : super(
             radius: maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2,
             anchor: Anchor.center,
             paint: snakePaint);
+
+  SnakeHead snakeHead;
 
   void moveTo(Vector2 targetPosition) {
     removeEffects(this);
@@ -29,9 +31,9 @@ class SnakeBodyEnd extends CircleComponent
 
   @override
   void update(double dt) {
-    if (!world.snakeWrapper.snakeHead.shouldSnakeMove) {
+    if (!snakeHead.shouldSnakeMove) {
       removeEffects(this);
-      position = world.snakeWrapper.snakeHead.position; //hide it
+      position = snakeHead.position; //hide it every frame
     }
   }
 }
