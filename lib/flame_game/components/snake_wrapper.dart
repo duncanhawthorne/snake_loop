@@ -16,7 +16,7 @@ import 'wrapper_no_events.dart';
 
 final Paint snakePaint = Paint()..color = Palette.seed.color;
 final double snakeRadius = maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2;
-final double distanceBetweenSnakeBits = snakeRadius * 1.02;
+final double distanceBetweenSnakeBits = snakeRadius * 2;
 
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {

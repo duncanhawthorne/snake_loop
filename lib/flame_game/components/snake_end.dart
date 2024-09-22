@@ -16,10 +16,11 @@ class SnakeBodyEnd extends CircleComponent
   SnakeBodyEnd({required super.position})
       : super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
 
-  void slideTo(Vector2 targetPosition) {
-    removeEffects(this);
+  void slideTo(Vector2 targetPosition, {onComplete}) {
+    //removeEffects(this);
     add(MoveToPositionEffect(targetPosition,
-        duration: distanceBetweenSnakeBits / world.direction.length));
+        duration: distanceBetweenSnakeBits / world.direction.length,
+        onComplete: onComplete));
   }
 
   void instantMoveTo(Vector2 targetPosition) {
