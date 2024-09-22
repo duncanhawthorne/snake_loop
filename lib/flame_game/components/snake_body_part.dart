@@ -12,24 +12,26 @@ final Vector2 _offscreen =
 
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
-  SnakeBodyBit({required super.position})
+  SnakeBodyBit({required super.position, required this.snakeWrapper})
       : super(
             radius: maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2,
             anchor: Anchor.center,
             paint: snakePaint);
 
-  void activate(Vector2 targetPosition) {
-    if (!world.snakeWrapper.snakeHead.activeBodyBits.contains(this)) {
-      world.snakeWrapper.snakeHead.activeBodyBits.add(this);
+  SnakeWrapper snakeWrapper;
+
+  void activate({required Vector2 targetPosition}) {
+    if (!snakeWrapper.activeBodyBits.contains(this)) {
+      snakeWrapper.activeBodyBits.add(this);
     }
-    world.snakeWrapper.snakeHead.spareBitsList.remove(this);
+    snakeWrapper.spareBodyBits.remove(this);
     position.setFrom(targetPosition);
   }
 
   void deactivate() {
-    world.snakeWrapper.snakeHead.activeBodyBits.remove(this);
-    if (!world.snakeWrapper.snakeHead.spareBitsList.contains(this)) {
-      world.snakeWrapper.snakeHead.spareBitsList.add(this);
+    snakeWrapper.activeBodyBits.remove(this);
+    if (!snakeWrapper.spareBodyBits.contains(this)) {
+      snakeWrapper.spareBodyBits.add(this);
     }
     position.setFrom(_offscreen);
   }
@@ -45,14 +47,14 @@ class SnakeBodyBit extends CircleComponent
       position: Vector2.all(radius),
       anchor: Anchor.center,
     ));
-    activate(position);
+    activate(targetPosition: position);
   }
 
   @override
   Future<void> onRemove() async {
     deactivate();
-    world.snakeWrapper.snakeHead.activeBodyBits.remove(this);
-    world.snakeWrapper.snakeHead.spareBitsList.remove(this);
+    snakeWrapper.activeBodyBits.remove(this);
+    snakeWrapper.spareBodyBits.remove(this);
   }
 
   @override
@@ -73,8 +75,8 @@ class SnakeBodyBit extends CircleComponent
 
   void _onCollideWithPellet(Pellet pellet) {
     if (pellet is Food) {
-      pellet.removeFromParent(); //which adds new pellet
-      //dont increment score
+      pellet.position = snakeWrapper.getSafePositionForNewPellet();
+      //dont increment score as not captured by head
     }
   }
 }

@@ -29,10 +29,4 @@ class Pellet extends CircleComponent
     ));
     //debugMode = true;
   }
-
-  @override
-  Future<void> onRemove() async {
-    world.snakeWrapper.addNewTargetPellet();
-    super.onRemove();
-  }
 }
