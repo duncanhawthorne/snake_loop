@@ -2,7 +2,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import '../../utils/helper.dart';
-import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
@@ -20,7 +19,7 @@ class SnakeHead extends CircleComponent
   SnakeHead({required super.position, required this.snakeWrapper})
       : super(
             paint: snakePaint,
-            radius: maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2,
+            radius: snakeRadius,
             anchor: Anchor.center,
             priority: 100);
 
@@ -83,7 +82,7 @@ class SnakeHead extends CircleComponent
   void _onCollideWithPellet(Pellet pellet) {
     if (pellet is Food) {
       snakeWrapper.extendSnake();
-      pellet.position = snakeWrapper.getSafePositionForNewPellet();
+      pellet.position = snakeWrapper.getSafePositionForFood();
       world.pellets.pelletsRemainingNotifier.value -= 1;
     }
   }

@@ -15,7 +15,8 @@ import 'snake_head.dart';
 import 'wrapper_no_events.dart';
 
 final Paint snakePaint = Paint()..color = Palette.seed.color;
-double snakeGapFactor = 1.02;
+final double snakeRadius = maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2;
+final double distanceBetweenSnakeBits = snakeRadius * 1.02;
 
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
@@ -37,7 +38,7 @@ class SnakeWrapper extends WrapperNoEvents
       !game.world.gameWonOrLost;
 
   final _oneUsePosition = Vector2.all(0);
-  Vector2 getSafePositionForNewPellet() {
+  Vector2 getSafePositionForFood() {
     bool safePos = false;
     safePos = false;
     while (!safePos) {
@@ -91,7 +92,7 @@ class SnakeWrapper extends WrapperNoEvents
     super.onLoad();
     add(snakeHead);
     add(snakeEnd);
-    add(Food(position: getSafePositionForNewPellet()));
+    add(Food(position: getSafePositionForFood()));
     game.camera.follow(snakeHead);
     reset();
   }
@@ -113,15 +114,14 @@ class SnakeWrapper extends WrapperNoEvents
       if (activeBodyBits.isEmpty) {
         _addSnakeBitAtPosition(snakeHead.position);
       } else if ((snakeHead.position - snakeNeck.position).length >
-          width * snakeGapFactor) {
+          distanceBetweenSnakeBits) {
         // rather than set new position at current position
         // set the right distance away in that direction
         // if device is lagging stops visual artifacts of missing frames
         // showing as gaps in the snake body
         Vector2 targetPositionForNewSnakeBit = snakeNeck.position +
             (snakeHead.position - snakeNeck.position).normalized() *
-                width *
-                snakeGapFactor;
+                distanceBetweenSnakeBits;
         _addSnakeBitAtPosition(targetPositionForNewSnakeBit);
       }
     } else {

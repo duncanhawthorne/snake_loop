@@ -13,10 +13,7 @@ final Vector2 _offscreen =
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
   SnakeBodyBit({required super.position, required this.snakeWrapper})
-      : super(
-            radius: maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2,
-            anchor: Anchor.center,
-            paint: snakePaint);
+      : super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
 
   SnakeWrapper snakeWrapper;
 
@@ -75,7 +72,7 @@ class SnakeBodyBit extends CircleComponent
 
   void _onCollideWithPellet(Pellet pellet) {
     if (pellet is Food) {
-      pellet.position = snakeWrapper.getSafePositionForNewPellet();
+      pellet.position = snakeWrapper.getSafePositionForFood();
       //dont increment score as not captured by head
     }
   }
