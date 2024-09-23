@@ -229,8 +229,7 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  late final _levelSpeed =
-      0.5 * 0.5 * pow(1.1, min(10, level.number)).toDouble();
+  late final _levelSpeed = 0.5 * 0.5 * pow(1.1, level.number).toDouble();
   final direction = Vector2.zero();
 
   final _tmpGravity = Vector2.zero();
