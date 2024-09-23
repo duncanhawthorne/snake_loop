@@ -34,6 +34,8 @@ class SnakeWrapper extends WrapperNoEvents
   int _snakeBitsLimit = 0;
   SnakeBodyBit? get snakeNeck => _activeBodyBits.lastOrNull;
 
+  final Food food = Food(position: Vector2(0, 0));
+
   bool get _activeGameplay =>
       game.isGameLive &&
       game.stopwatchMilliSeconds > 0 &&
@@ -46,8 +48,10 @@ class SnakeWrapper extends WrapperNoEvents
     safePos = false;
     while (!safePos) {
       _oneUsePosition
-        ..x = (game.random.nextDouble() - 0.5) * maze.mazeHeight * 0.8
-        ..y = (game.random.nextDouble() - 0.5) * maze.mazeHeight * 0.8;
+        ..x = (game.random.nextDouble() - 0.5) *
+            (maze.mazeWidth - 2 * maze.blockWidth - snakeRadius * 2)
+        ..y = (game.random.nextDouble() - 0.5) *
+            (maze.mazeHeight - 2 * maze.blockWidth - snakeRadius * 2);
       safePos = true;
       for (SnakeBodyBit bit in _activeBodyBits) {
         if ((bit.position - _oneUsePosition).length <
@@ -73,7 +77,7 @@ class SnakeWrapper extends WrapperNoEvents
   void reset() {
     snakeHead.reset();
     _snakeBitsReset();
-    snakeEnd.position = snakeHead.position;
+    snakeEnd.instantMoveTo(snakeHead.position);
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (world.level.number - 1);
     _snakeBitsLimit = 3;
@@ -84,7 +88,7 @@ class SnakeWrapper extends WrapperNoEvents
     super.onLoad();
     add(snakeHead);
     add(snakeEnd);
-    add(Food(position: getSafePositionForFood()));
+    add(food..position = getSafePositionForFood());
     game.camera.follow(snakeHead);
     reset();
   }
