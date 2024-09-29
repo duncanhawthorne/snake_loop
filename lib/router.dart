@@ -17,11 +17,11 @@ final router = GoRouter(
       builder: (context, state) {
         final level = _parseGameLevel(state.uri.queryParameters[levelUrlKey]);
         int mazeId = _parseMazeId(state.uri.queryParameters[mazeUrlKey]);
-        if (isTutorialLevel(level) && !isTutorialMaze(mazeId)) {
-          mazeId = tutorialMazeId;
+        if (level.isTutorial && !isTutorialMaze(mazeId)) {
+          mazeId = Maze.tutorialMazeId;
         }
-        if (isTutorialMaze(mazeId) && !isTutorialLevel(level)) {
-          mazeId = defaultMazeId;
+        if (isTutorialMaze(mazeId) && !level.isTutorial) {
+          mazeId = Maze.defaultMazeId;
         }
         return GameScreen(level: level, mazeId: mazeId);
       },
@@ -30,19 +30,19 @@ final router = GoRouter(
 );
 
 GameLevel _parseGameLevel(String? levelString) {
-  int levelNumberRaw = defaultLevelNum;
+  int levelNumberRaw = Levels.defaultLevelNum;
   try {
     levelNumberRaw = int.parse(levelString ?? levelNumberRaw.toString());
   } catch (e) {
     //stick with default
   }
-  return levelSelect(levelNumberRaw);
+  return levels.getLevel(levelNumberRaw);
 }
 
 int _parseMazeId(String? levelString) {
-  final mazeIdRaw = levelString ?? mazeNames[defaultMazeId];
+  final mazeIdRaw = levelString ?? mazeNames[Maze.defaultMazeId];
   return !mazeNames.containsValue(mazeIdRaw)
-      ? defaultMazeId
+      ? Maze.defaultMazeId
       : _reverseMap(mazeNames)[mazeIdRaw];
 }
 

@@ -95,11 +95,11 @@ Widget levelSelectorRow(BuildContext context, PacmanGame game,
 }
 
 Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
-  int fixedMazeId = !isTutorialLevel(levelSelect(levelNum)) &&
-          isTutorialMaze(maze.mazeId)
-      ? defaultMazeId
-      : isTutorialLevel(levelSelect(levelNum)) && !isTutorialMaze(maze.mazeId)
-          ? tutorialMazeId
+  GameLevel level = levels.getLevel(levelNum);
+  int fixedMazeId = !level.isTutorial && maze.isTutorial
+      ? Maze.defaultMazeId
+      : level.isTutorial && !maze.isTutorial
+          ? Maze.tutorialMazeId
           : maze.mazeId;
   return TextButton(
       style: game.level.number == levelNum
@@ -110,10 +110,12 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
             '/?$levelUrlKey=$levelNum&$mazeUrlKey=${mazeNames[fixedMazeId]}');
       },
       child: Text(
-          isTutorialLevel(levelSelect(levelNum))
-              ? (maxLevelToShow(game) == tutorialLevelNum ? "Tutorial" : "T")
+          level.isTutorial
+              ? (maxLevelToShow(game) == Levels.tutorialLevelNum
+                  ? "Tutorial"
+                  : "T")
               : '$levelNum',
-          style: game.world.playerProgress.levels.containsKey(levelNum)
+          style: game.world.playerProgress.ppLevels.containsKey(levelNum)
               ? textStyleBody
               : textStyleBodyDull));
 }
@@ -122,9 +124,7 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
   // ignore: dead_code
   bool showText = false && maxLevelToShowCache <= 2;
-  return true ||
-          maxLevelToShowCache == 1 ||
-          isTutorialLevel(levelSelect(game.level.number))
+  return true || maxLevelToShowCache == 1 || game.level.isTutorial
       ? const SizedBox.shrink()
       : bodyWidget(
           child: Column(
@@ -165,11 +165,11 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
 int maxLevelToShow(PacmanGame game) {
   return [
     game.level.number,
-    isTutorialMaze(maze.mazeId) || maze.mazeId == tutorialMazeId + 1
-        ? tutorialLevelNum - 1
-        : defaultLevelNum + 1,
+    maze.isTutorial || maze.mazeId == Maze.tutorialMazeId + 1
+        ? Levels.tutorialLevelNum - 1
+        : Levels.defaultLevelNum + 1,
     game.world.playerProgress.maxLevelCompleted + 1
-  ].reduce(max).clamp(0, maxLevel());
+  ].reduce(max).clamp(0, Levels.max);
 }
 
 Widget rotatedTitle() {

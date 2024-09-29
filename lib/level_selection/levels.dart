@@ -1,18 +1,28 @@
-final gameLevels = List.generate(
-    15 + 1,
-    (index) => _gameLevelAtIndex(index)));
+class Levels {
+  static const defaultLevelNum = 1;
+  static const tutorialLevelNum = 0;
+  static const max = 15;
 
-GameLevel _gameLevelAtIndex(index) {
-  GameLevel result = (
-          number: index,
-          maxAllowedDeaths: 3,
-          superPelletsEnabled: false,
-          multipleSpawningGhosts: true,
-          ghostSpawnTimerLength: 1,
-          homingGhosts: true,
-        );
-  return result;
+  static const _ghostSpawnTimerLengthPattern = [5, 3, 2, 1];
+
+  GameLevel getLevel(int levelNum) {
+    GameLevel result = (
+      number: levelNum,
+      maxAllowedDeaths: levelNum <= 0 ? 5 : 3,
+      superPelletsEnabled: levelNum <= 1 ? true : false,
+      multipleSpawningGhosts: levelNum <= 2 ? false : true,
+      ghostSpawnTimerLength: levelNum <= 2
+          ? -1
+          : _ghostSpawnTimerLengthPattern[
+              (levelNum - 3) % _ghostSpawnTimerLengthPattern.length],
+      homingGhosts: levelNum <= 6 ? false : true,
+      isTutorial: levelNum == tutorialLevelNum,
+    );
+    return result;
+  }
 }
+
+final levels = Levels();
 
 typedef GameLevel = ({
   int number,
@@ -21,21 +31,5 @@ typedef GameLevel = ({
   bool multipleSpawningGhosts,
   int ghostSpawnTimerLength,
   bool homingGhosts,
+  bool isTutorial,
 });
-
-GameLevel levelSelect(int levelNum) {
-  return gameLevels.firstWhere((level) => level.number == levelNum,
-      orElse: () =>
-          gameLevels.firstWhere((level) => level.number == defaultLevelNum));
-}
-
-bool isTutorialLevel(GameLevel level) {
-  return level.number == tutorialLevelNum;
-}
-
-int maxLevel() {
-  return gameLevels.last.number;
-}
-
-const defaultLevelNum = 1;
-const tutorialLevelNum = 0;
