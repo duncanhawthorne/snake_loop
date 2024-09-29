@@ -1,8 +1,9 @@
 class Levels {
-  static const defaultLevelNum = 1;
+  static const defaultLevelNum = firstRealLevel;
   static const tutorialLevelNum = 0;
   static const levelToShowInstructions = defaultLevelNum;
   static const max = 15;
+  static const firstRealLevel = 1;
 
   static const _ghostSpawnTimerLengthPattern = [5, 3, 2, 1];
 
