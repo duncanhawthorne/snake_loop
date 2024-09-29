@@ -41,11 +41,6 @@ class SnakeHead extends CircleComponent
     reset();
   }
 
-  @override
-  Future<void> onRemove() async {
-    super.onRemove();
-  }
-
   void reset() {
     position = Vector2(0, 0);
   }
