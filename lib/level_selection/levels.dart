@@ -1,13 +1,18 @@
 final gameLevels = List.generate(
-    16,
-    (index) => (
+    15 + 1,
+    (index) => _gameLevelAtIndex(index)));
+
+GameLevel _gameLevelAtIndex(index) {
+  GameLevel result = (
           number: index,
           maxAllowedDeaths: 3,
           superPelletsEnabled: false,
           multipleSpawningGhosts: true,
           ghostSpawnTimerLength: 1,
           homingGhosts: true,
-        ));
+        );
+  return result;
+}
 
 typedef GameLevel = ({
   int number,
