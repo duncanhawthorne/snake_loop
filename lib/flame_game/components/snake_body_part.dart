@@ -37,7 +37,7 @@ class SnakeBodyBit extends CircleComponent
   late final CircleHitbox _hitbox = CircleHitbox(
     isSolid: true,
     collisionType: CollisionType.passive,
-    radius: radius,
+    radius: radius * (1 - hitboxGenerosity),
     position: Vector2.all(radius),
     anchor: Anchor.center,
   );
