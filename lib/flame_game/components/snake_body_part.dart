@@ -1,6 +1,8 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
+import '../effects/move_to_effect.dart';
+import '../effects/remove_effects.dart';
 import '../maze.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
@@ -16,11 +18,26 @@ class SnakeBodyBit extends CircleComponent
       : super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
 
   SnakeWrapper snakeWrapper;
-  bool get isActive => _isActive;
-  bool _isActive = true;
+  bool get isActive => current == CharacterState.active;
+  bool get isMid => current == CharacterState.mid;
+  bool get isDeactive => current == CharacterState.deactive;
+
+  CharacterState current = CharacterState.active;
+
+  void slideTo(Vector2 targetPosition, {onComplete}) {
+    removeEffects(this);
+    add(MoveToPositionEffect(targetPosition,
+        duration: distanceBetweenSnakeBits / world.direction.length,
+        onComplete: onComplete));
+  }
+
+  void instantMoveTo(Vector2 targetPosition) {
+    removeEffects(this);
+    position = targetPosition;
+  }
 
   void activate({required Vector2 targetPosition}) {
-    _isActive = true;
+    current = CharacterState.active;
     _hitbox.collisionType = CollisionType.passive;
     //move it to the last position in bodyBits so order is right for activeBits
     snakeWrapper.bodyBits.remove(this);
@@ -28,8 +45,12 @@ class SnakeBodyBit extends CircleComponent
     position.setFrom(targetPosition);
   }
 
+  void midivate() {
+    current = CharacterState.mid;
+  }
+
   void deactivate() {
-    _isActive = false;
+    current = CharacterState.deactive;
     _hitbox.collisionType = CollisionType.inactive;
     position.setFrom(_offscreen);
   }
@@ -80,3 +101,5 @@ class SnakeBodyBit extends CircleComponent
     }
   }
 }
+
+enum CharacterState { active, mid, deactive }

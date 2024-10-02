@@ -68,7 +68,7 @@ class PacmanWorld extends Forge2DWorld
 
   bool get gameWonOrLost =>
       pellets.pelletsRemainingNotifier.value <= 0 ||
-      pacmans.numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
+      snakeWrapper.numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
 
   final Map<int, double?> _fingersLastDragAngle = {};
 

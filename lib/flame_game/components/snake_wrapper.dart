@@ -1,6 +1,5 @@
-import 'dart:ui';
-
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 
 import '../../style/palette.dart';
 import '../game_screen.dart';
@@ -9,7 +8,6 @@ import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'snake_body_part.dart';
-import 'snake_end.dart';
 import 'snake_head.dart';
 import 'wrapper_no_events.dart';
 
@@ -28,9 +26,12 @@ class SnakeWrapper extends WrapperNoEvents
   Iterable<SnakeBodyBit> get _activeBodyBits =>
       bodyBits.where((item) => item.isActive);
   Iterable<SnakeBodyBit> get _spareBodyBits =>
-      bodyBits.where((item) => !item.isActive);
+      bodyBits.where((item) => item.isDeactive);
+  Iterable<SnakeBodyBit> get _midBodyBits =>
+      bodyBits.where((item) => item.isMid);
 
-  late final SnakeBodyEnd snakeEnd = SnakeBodyEnd(position: Vector2(0, 0));
+  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier(0);
+
   int _snakeBitsLimit = 0;
   SnakeBodyBit? get snakeNeck => _activeBodyBits.lastOrNull;
 
@@ -77,17 +78,16 @@ class SnakeWrapper extends WrapperNoEvents
   void reset() {
     snakeHead.reset();
     _snakeBitsReset();
-    snakeEnd.instantMoveTo(snakeHead.position);
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (world.level.number - 1);
     _snakeBitsLimit = 3;
+    numberOfDeathsNotifier.value = 0;
   }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
     add(snakeHead);
-    add(snakeEnd);
     add(food..position = getSafePositionForFood());
     game.camera.follow(snakeHead);
     reset();
@@ -120,9 +120,11 @@ class SnakeWrapper extends WrapperNoEvents
 
   void _removeFromEndOfSnake() {
     if (_activeBodyBits.length > _snakeBitsLimit) {
-      _activeBodyBits.first.deactivate();
-      //new first after remove first above
-      snakeEnd.slideTo(_activeBodyBits.first.position);
+      final currentEnd = _activeBodyBits.elementAt(0);
+      final newEnd = _activeBodyBits.elementAt(0 + 1);
+      currentEnd.midivate();
+      currentEnd.slideTo(newEnd.position,
+          onComplete: () => currentEnd.deactivate());
     }
   }
 

@@ -120,11 +120,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void _winOrLoseGameListener() {
     assert(world.pellets.pelletsRemainingNotifier.value > 0 || !levelStarted);
-    world.pacmans.numberOfDeathsNotifier.addListener(() {
-      if (world.pacmans.numberOfDeathsNotifier.value >=
+    world.snakeWrapper.numberOfDeathsNotifier.addListener(() {
+      if (world.snakeWrapper.numberOfDeathsNotifier.value >=
               level.maxAllowedDeaths &&
           levelStarted) {
-        handleLoseGame();
+        _handleLoseGame();
       }
     });
     world.pellets.pelletsRemainingNotifier.addListener(() {
@@ -150,7 +150,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     }
   }
 
-  void handleLoseGame() {
+  void _handleLoseGame() {
     audioController.stopAllSfx();
     cleanDialogs();
     overlays.add(GameScreen.loseDialogKey);

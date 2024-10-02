@@ -10,7 +10,7 @@ class Levels {
   GameLevel getLevel(int levelNum) {
     GameLevel result = (
       number: levelNum,
-      maxAllowedDeaths: levelNum <= 0 ? 5 : 3,
+      maxAllowedDeaths: 1,
       superPelletsEnabled: levelNum <= 1 ? true : false,
       multipleSpawningGhosts: levelNum <= 2 ? false : true,
       ghostSpawnTimerLength: levelNum <= 2
