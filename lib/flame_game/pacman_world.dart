@@ -150,6 +150,9 @@ class PacmanWorld extends Forge2DWorld
         wrapper.reset();
       }
     }
+    if (kDebugMode) {
+      pellets.pelletsRemainingNotifier.value = 3;
+    }
   }
 
   final snakeWrapper = SnakeWrapper();
@@ -222,7 +225,9 @@ class PacmanWorld extends Forge2DWorld
       _setMazeAngle(game.camera.viewfinder.angle - angleDelta);
 
       if (!doingLevelResetFlourish) {
-        game.stopwatch.resume();
+        if (!gameWonOrLost) {
+          game.stopwatch.resume();
+        }
         ghosts.addSpawner();
         ghosts.sirenVolumeUpdatedTimer();
       }
