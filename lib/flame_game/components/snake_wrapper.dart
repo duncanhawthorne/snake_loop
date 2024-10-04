@@ -27,8 +27,6 @@ class SnakeWrapper extends WrapperNoEvents
       bodyBits.where((item) => item.isActive);
   Iterable<SnakeBodyBit> get _spareBodyBits =>
       bodyBits.where((item) => item.isDeactive);
-  Iterable<SnakeBodyBit> get _midBodyBits =>
-      bodyBits.where((item) => item.isMid);
 
   final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier(0);
 
