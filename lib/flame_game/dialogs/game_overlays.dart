@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../google_logic.dart';
+import '../../google/google.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
@@ -13,12 +13,14 @@ import '../icons/pacman_icons.dart';
 import '../pacman_game.dart';
 
 const double _statusWidgetHeightFactor = 1.0;
-const _clockSpacing = 10 * _statusWidgetHeightFactor;
-const _widgetSpacing = 15 * _statusWidgetHeightFactor;
-const _pacmanSpacing = 2 * _statusWidgetHeightFactor;
+const _widgetSpacing = 10 * _statusWidgetHeightFactor;
+const _clockSpacing = 8 * _statusWidgetHeightFactor;
+const _pacmanOuterSpacing = 8 * _statusWidgetHeightFactor;
+const _pacmanSpacing = 6 * _statusWidgetHeightFactor;
 const pacmanIconSize = 21 * _statusWidgetHeightFactor;
 const gIconSize = pacmanIconSize * 4 / 3;
 const circleIconSize = 10 * _statusWidgetHeightFactor;
+const _pelletsSpacing = 2 * _statusWidgetHeightFactor;
 
 Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   return Center(
@@ -53,7 +55,7 @@ Widget _topLeftWidget(BuildContext context, PacmanGame game) {
       _audioOnOffButtonWidget(context, game),
       game.level.isTutorial
           ? SizedBox.shrink()
-          : loginLogoutWidget(context, game),
+          : g.loginLogoutWidget(context, gIconSize, Palette.textColor),
     ],
   );
 }
@@ -82,15 +84,19 @@ Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
 
 // ignore: unused_element
 Widget _livesWidget(BuildContext context, PacmanGame game) {
-  return ValueListenableBuilder<int>(
-    valueListenable: game.world.pacmans.numberOfDeathsNotifier,
-    builder: (BuildContext context, int value, Widget? child) {
-      return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: _pacmanSpacing,
-          children: List.generate(game.level.maxAllowedDeaths,
-              (index) => animatedPacmanIcon(game, index)));
-    },
+  return Padding(
+    padding: const EdgeInsets.only(
+        left: _pacmanOuterSpacing, right: _pacmanOuterSpacing),
+    child: ValueListenableBuilder<int>(
+      valueListenable: game.world.pacmans.numberOfDeathsNotifier,
+      builder: (BuildContext context, int value, Widget? child) {
+        return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: _pacmanSpacing,
+            children: List.generate(game.level.maxAllowedDeaths,
+                (index) => animatedPacmanIcon(game, index)));
+      },
+    ),
   );
 }
 
@@ -100,7 +106,7 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
     builder: (BuildContext context, int value, Widget? child) {
       return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: _pacmanSpacing,
+          spacing: _pelletsSpacing,
           children: List.generate(
               min(20, game.world.pellets.pelletsRemainingNotifier.value),
               (index) => circleIcon()));
@@ -111,7 +117,7 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
 // ignore: unused_element
 Widget _clockWidget(PacmanGame game) {
   return Padding(
-    padding: const EdgeInsets.only(left: _clockSpacing),
+    padding: const EdgeInsets.only(left: _clockSpacing, right: _clockSpacing),
     child: StreamBuilder(
       stream: Stream.periodic(const Duration(milliseconds: 100)),
       builder: (context, snapshot) {
@@ -145,47 +151,6 @@ Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
         onPressed: () => settingsController.toggleAudioOn(),
         icon: Icon(audioOn ? Icons.volume_up : Icons.volume_off, color: color),
       );
-    },
-  );
-}
-
-Widget loginLogoutWidget(BuildContext context, PacmanGame game) {
-  return !gOn
-      ? SizedBox.shrink()
-      : ValueListenableBuilder<String>(
-          valueListenable: g.gUserNotifier,
-          builder: (context, audioOn, child) {
-            return !g.signedIn
-                ? loginButton(context, game)
-                : logoutButton(context, game);
-          });
-}
-
-Widget loginButton(BuildContext context, PacmanGame game) {
-  const bool newLoginButtons = false;
-  return newLoginButtons
-      // ignore: dead_code
-      ? g.platformAdaptiveSignInButton(context, game)
-      : lockStyleSignInButton(context, game);
-}
-
-Widget lockStyleSignInButton(BuildContext context, PacmanGame game) {
-  return IconButton(
-    icon: const Icon(Icons.lock, color: Palette.textColor),
-    onPressed: () {
-      g.signInSilentlyThenDirectly();
-    },
-  );
-}
-
-Widget logoutButton(BuildContext context, PacmanGame game) {
-  return IconButton(
-    icon: g.gUserIcon == G.gUserIconDefault
-        ? const Icon(Icons.face_outlined, color: Palette.textColor)
-        : CircleAvatar(
-            radius: gIconSize / 2, backgroundImage: NetworkImage(g.gUserIcon)),
-    onPressed: () {
-      g.signOutAndExtractDetails();
     },
   );
 }

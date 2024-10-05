@@ -6,53 +6,56 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../firebase/firebase_saves.dart';
-import '../google_logic.dart';
+import '../google/google.dart';
 import '../level_selection/levels.dart';
 import '../utils/helper.dart';
 
 class PlayerProgress extends ChangeNotifier {
   PlayerProgress() {
-    g.loadUser();
-    loadFromFirebaseOrFilesystem();
+    _userChangeListener();
   }
 
-  final Map<String, List<Map<String, int>>> _playerProgress = {"levels": []};
+  void _userChangeListener() {
+    _loadFromFirebaseOrFilesystem(); //initial
+    g.gUserNotifier.addListener(() {
+      _loadFromFirebaseOrFilesystem();
+    });
+  }
 
-  int get maxLevelCompleted => _playerProgress["levels"]!.isEmpty
+  final List<Map<String, int>> _playerProgressLevels = [];
+  late final Map<String, dynamic> _playerProgress = {
+    "levels": _playerProgressLevels
+  };
+
+  Iterable<int> get _levelNumsCompleted =>
+      _playerProgressLevels.map((item) => item["levelNum"] as int);
+
+  int get maxLevelCompleted => _playerProgressLevels.isEmpty
       ? Levels.tutorialLevelNum - 1
-      : _playerProgress["levels"]!
-          .map((item) => item["levelNum"] as int)
-          .reduce(max);
+      : _levelNumsCompleted.reduce(max);
 
   bool isComplete(int levelNum) {
-    return _playerProgress["levels"]!
-        .map((item) => item["levelNum"] as int)
-        .contains(levelNum);
+    return _levelNumsCompleted.contains(levelNum);
   }
 
   void saveLevelComplete(var currentGameState) {
+    debug(["saveWin"]);
     final Map<String, int> win = _cleanupWin(currentGameState);
     playerProgress._addWin(win);
     playerProgress._saveToFirebaseAndFilesystem();
-    debug(["saveWin"]);
   }
 
   void reset() {
-    _playerProgress.remove("levels");
-    _playerProgress["levels"] = [];
+    _playerProgressLevels.clear();
     playerProgress._saveToFirebaseAndFilesystem();
   }
 
   void _addWin(Map<String, int> win) {
-    if (!_playerProgress.keys.contains("levels")) {
-      _playerProgress["levels"] = [];
-    }
-    final List<Map<String, int>> saveFileLevels = _playerProgress["levels"]!;
-    Map? relevantSave = saveFileLevels
+    Map? relevantSave = _playerProgressLevels
         .where((item) => item["levelNum"] == win["levelNum"])
         .firstOrNull;
     if (relevantSave == null) {
-      saveFileLevels.add(win);
+      _playerProgressLevels.add(win);
     } else if (win["levelCompleteTime"]! < relevantSave["levelCompleteTime"]!) {
       for (String key in win.keys) {
         relevantSave[key] = win[key];
@@ -61,7 +64,7 @@ class PlayerProgress extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadFromFirebaseOrFilesystem() async {
+  Future<void> _loadFromFirebaseOrFilesystem() async {
     debug(["loadKeys"]);
     final prefs = await SharedPreferences.getInstance();
     String gameEncoded = "";
@@ -71,7 +74,7 @@ class PlayerProgress extends ChangeNotifier {
       gameEncoded = prefs.getString('game') ?? "";
     } else {
       // load from firebase
-      gameEncoded = await fBase.firebasePullPlayerProgress();
+      gameEncoded = await fBase.firebasePullPlayerProgress(g);
     }
     _loadFromEncoded(gameEncoded, true);
   }
@@ -85,7 +88,10 @@ class PlayerProgress extends ChangeNotifier {
 
     // if possible save to firebase
     if (FBase.firebaseOn && g.signedIn) {
-      fBase.firebasePushPlayerProgress(gameEncoded);
+      debug(["saveKeys gUser", g.gUser]);
+      fBase.firebasePushPlayerProgress(g, gameEncoded);
+    } else {
+      debug(["not signed in", g.gUser]);
     }
   }
 
