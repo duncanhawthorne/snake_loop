@@ -25,8 +25,6 @@ class SnakeWrapper extends WrapperNoEvents
   final List<SnakeBodyBit> bodyBits = [];
   Iterable<SnakeBodyBit> get _activeBodyBits =>
       bodyBits.where((item) => item.isActive);
-  Iterable<SnakeBodyBit> get _spareBodyBits =>
-      bodyBits.where((item) => item.isDeactive);
 
   final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier(0);
 
@@ -64,7 +62,7 @@ class SnakeWrapper extends WrapperNoEvents
 
   void _snakeBitsReset() {
     for (SnakeBodyBit bit in bodyBits) {
-      bit.deactivate();
+      bit.removeFromParent();
     }
   }
 
@@ -91,18 +89,11 @@ class SnakeWrapper extends WrapperNoEvents
     reset();
   }
 
-  void _addSnakeBitAtPosition(Vector2 targetPosition) {
-    if (_spareBodyBits.isEmpty) {
-      add(SnakeBodyBit(position: targetPosition, snakeWrapper: this));
-    } else {
-      _spareBodyBits.first.activate(targetPosition: targetPosition);
-    }
-  }
-
   void _addToStartOfSnake() {
     assert(!snakeHead.atStartingPosition);
     if (_activeBodyBits.isEmpty) {
-      _addSnakeBitAtPosition(snakeHead.position);
+      add(RecycledSnakeBodyBit(
+          position: snakeHead.position, snakeWrapper: this));
     } else if ((snakeHead.position - snakeNeck!.position).length >
         distanceBetweenSnakeBits) {
       // rather than set new position at current position
@@ -112,7 +103,8 @@ class SnakeWrapper extends WrapperNoEvents
       Vector2 targetPositionForNewSnakeBit = snakeNeck!.position +
           (snakeHead.position - snakeNeck!.position).normalized() *
               distanceBetweenSnakeBits;
-      _addSnakeBitAtPosition(targetPositionForNewSnakeBit);
+      add(RecycledSnakeBodyBit(
+          position: targetPositionForNewSnakeBit, snakeWrapper: this));
     }
   }
 
@@ -122,7 +114,7 @@ class SnakeWrapper extends WrapperNoEvents
       final newEnd = _activeBodyBits.elementAt(0 + 1);
       currentEnd.midivate();
       currentEnd.slideTo(newEnd.position,
-          onComplete: () => currentEnd.deactivate());
+          onComplete: () => currentEnd.removeFromParent());
     }
   }
 

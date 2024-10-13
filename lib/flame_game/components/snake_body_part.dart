@@ -3,14 +3,10 @@ import 'package:flame/components.dart';
 
 import '../effects/move_to_effect.dart';
 import '../effects/remove_effects.dart';
-import '../maze.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
 import 'snake_wrapper.dart';
-
-final Vector2 _offscreen =
-    Vector2(maze.mazeWidth / 2 * 100, maze.mazeHeight / 2 * 100);
 
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
@@ -36,23 +32,15 @@ class SnakeBodyBit extends CircleComponent
     position = targetPosition;
   }
 
-  void activate({required Vector2 targetPosition}) {
+  void activate() {
     current = CharacterState.active;
-    _hitbox.collisionType = CollisionType.passive;
     //move it to the last position in bodyBits so order is right for activeBits
     snakeWrapper.bodyBits.remove(this);
     snakeWrapper.bodyBits.add(this);
-    position.setFrom(targetPosition);
   }
 
   void midivate() {
     current = CharacterState.mid;
-  }
-
-  void deactivate() {
-    current = CharacterState.deactive;
-    _hitbox.collisionType = CollisionType.inactive;
-    position.setFrom(_offscreen);
   }
 
   late final CircleHitbox _hitbox = CircleHitbox(
@@ -64,16 +52,21 @@ class SnakeBodyBit extends CircleComponent
   );
 
   @override
+  Future<void> onMount() async {
+    super.onMount();
+    activate();
+  }
+
+  @override
   Future<void> onLoad() async {
     super.onLoad();
     add(_hitbox);
     snakeWrapper.bodyBits.add(this);
-    activate(targetPosition: position);
   }
 
   @override
   Future<void> onRemove() async {
-    deactivate();
+    current = CharacterState.deactive;
     snakeWrapper.bodyBits.remove(this);
     super.onRemove();
   }
@@ -103,3 +96,25 @@ class SnakeBodyBit extends CircleComponent
 }
 
 enum CharacterState { active, mid, deactive }
+
+final List<SnakeBodyBit> _allBits = [];
+Iterable<SnakeBodyBit> get _spareBits =>
+    _allBits.where((item) => item.isDeactive); //!item.isActive
+
+// ignore: non_constant_identifier_names
+SnakeBodyBit RecycledSnakeBodyBit(
+    {required Vector2 position, required SnakeWrapper snakeWrapper}) {
+  if (_spareBits.isEmpty) {
+    SnakeBodyBit newBit =
+        SnakeBodyBit(position: position, snakeWrapper: snakeWrapper);
+    _allBits.add(newBit);
+    return newBit;
+  } else {
+    SnakeBodyBit recycledBit = _spareBits.first;
+    recycledBit.activate(); // isActive = true;
+    assert(_spareBits.isEmpty || _spareBits.first != recycledBit);
+    recycledBit.position.setFrom(position);
+    recycledBit.snakeWrapper = snakeWrapper;
+    return recycledBit;
+  }
+}
