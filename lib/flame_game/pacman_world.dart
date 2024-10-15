@@ -56,21 +56,20 @@ class PacmanWorld extends Forge2DWorld
   /// progress if a level is finished.
   final PlayerProgress playerProgress;
 
-  final noEventsWrapper = WrapperNoEvents();
-  final pacmans = Pacmans();
-  final ghosts = Ghosts();
-  final pellets = PelletWrapper();
-  final _walls = WallWrapper();
-  final _tutorial = TutorialWrapper();
-  // ignore: unused_field
-  final _blocking = BlockingBarWrapper();
-  final List<WrapperNoEvents> wrappers = [];
+  final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
+  final Pacmans pacmans = Pacmans();
+  final Ghosts ghosts = Ghosts();
+  final PelletWrapper pellets = PelletWrapper();
+  final WallWrapper _walls = WallWrapper();
+  final TutorialWrapper _tutorial = TutorialWrapper();
+  final BlockingBarWrapper _blocking = BlockingBarWrapper();
+  final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
   bool get gameWonOrLost =>
       pellets.pelletsRemainingNotifier.value <= 0 ||
       snakeWrapper.numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
 
-  final Map<int, double?> _fingersLastDragAngle = {};
+  final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
 
   bool doingLevelResetFlourish = false;
   bool _cameraRotatableOnPacmanDeathFlourish = true;
@@ -79,7 +78,7 @@ class PacmanWorld extends Forge2DWorld
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
 
   void play(SfxType type) {
-    const soundOn = true; //!(windows && !kIsWeb);
+    const bool soundOn = true; //!(windows && !kIsWeb);
     if (soundOn) {
       game.audioController.playSfx(type);
     }
@@ -140,7 +139,7 @@ class PacmanWorld extends Forge2DWorld
     doingLevelResetFlourish = false;
   }
 
-  void reset({firstRun = false}) {
+  void reset({bool firstRun = false}) {
     _cameraAndTimersReset();
     game.audioController.stopSfx(SfxType.ghostsScared);
 
@@ -149,9 +148,6 @@ class PacmanWorld extends Forge2DWorld
         assert(wrapper.isLoaded);
         wrapper.reset();
       }
-    }
-    if (kDebugMode) {
-      pellets.pelletsRemainingNotifier.value = 3;
     }
   }
 
@@ -191,18 +187,18 @@ class PacmanWorld extends Forge2DWorld
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     game.resumeGame();
-    final eventVectorLengthProportion =
+    final double eventVectorLengthProportion =
         (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
-    final fingerCurrentDragAngle = atan2(
+    final double fingerCurrentDragAngle = atan2(
         event.canvasStartPosition.x - game.canvasSize.x / 2,
         event.canvasStartPosition.y - game.canvasSize.y / 2);
     if (_fingersLastDragAngle.containsKey(event.pointerId)) {
       if (_fingersLastDragAngle[event.pointerId] != null) {
-        final angleDelta = smallAngle(
+        final double angleDelta = smallAngle(
             fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!);
-        const maxSpinMultiplierRadius = 0.75;
-        final spinMultiplier =
+        const double maxSpinMultiplierRadius = 0.75;
+        final num spinMultiplier =
             4 * min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
 
         _tutorial.hide();
@@ -228,8 +224,9 @@ class PacmanWorld extends Forge2DWorld
         if (!gameWonOrLost) {
           game.stopwatch.resume();
         }
-        ghosts.addSpawner();
-        ghosts.sirenVolumeUpdatedTimer();
+        ghosts
+          ..addSpawner()
+          ..sirenVolumeUpdatedTimer();
       }
     }
   }
