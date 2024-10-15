@@ -18,15 +18,15 @@ final double distanceBetweenSnakeBits = snakeRadius * 2;
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
-  final priority = 1;
+  final int priority = 1;
 
   late final SnakeHead snakeHead =
       SnakeHead(position: Vector2(0, 0), snakeWrapper: this);
-  final List<SnakeBodyBit> bodyBits = [];
+  final List<SnakeBodyBit> bodyBits = <SnakeBodyBit>[];
   Iterable<SnakeBodyBit> get _activeBodyBits =>
-      bodyBits.where((item) => item.isActive);
+      bodyBits.where((SnakeBodyBit item) => item.isActive);
 
-  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier(0);
+  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
 
   int _snakeBitsLimit = 0;
   SnakeBodyBit? get snakeNeck => _activeBodyBits.lastOrNull;
@@ -39,7 +39,7 @@ class SnakeWrapper extends WrapperNoEvents
       !(game.overlays.isActive(GameScreen.loseDialogKey)) &&
       !game.world.gameWonOrLost;
 
-  final _oneUsePosition = Vector2.all(0);
+  final Vector2 _oneUsePosition = Vector2.all(0);
   Vector2 getSafePositionForFood() {
     bool safePos = false;
     safePos = false;
@@ -100,7 +100,7 @@ class SnakeWrapper extends WrapperNoEvents
       // set the right distance away in that direction
       // if device is lagging stops visual artifacts of missing frames
       // showing as gaps in the snake body
-      Vector2 targetPositionForNewSnakeBit = snakeNeck!.position +
+      final Vector2 targetPositionForNewSnakeBit = snakeNeck!.position +
           (snakeHead.position - snakeNeck!.position).normalized() *
               distanceBetweenSnakeBits;
       add(RecycledSnakeBodyBit(
@@ -110,11 +110,12 @@ class SnakeWrapper extends WrapperNoEvents
 
   void _removeFromEndOfSnake() {
     if (_activeBodyBits.length > _snakeBitsLimit) {
-      final currentEnd = _activeBodyBits.elementAt(0);
-      final newEnd = _activeBodyBits.elementAt(0 + 1);
-      currentEnd.midivate();
-      currentEnd.slideTo(newEnd.position,
-          onComplete: () => currentEnd.removeFromParent());
+      final SnakeBodyBit currentEnd = _activeBodyBits.elementAt(0);
+      final SnakeBodyBit newEnd = _activeBodyBits.elementAt(0 + 1);
+      currentEnd
+        ..midivate()
+        ..slideTo(newEnd.position,
+            onComplete: () => currentEnd.removeFromParent());
     }
   }
 

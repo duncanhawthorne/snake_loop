@@ -307,7 +307,7 @@ class Maze {
   static const String _kPacmanStart = "8";
   static const String _kCage = "9";
 
-  static const List<String> _borders = [
+  static const List<String> _borders = <String>[
     '4111111111111111111111111111114',
     '4144444444444444444444444444414',
     '4144444444444444444444444444414',
@@ -340,7 +340,7 @@ class Maze {
   ];
 
   // ignore: unused_field
-  static const List<String> _mazeP1Layout = [
+  static const List<String> _mazeP1Layout = <String>[
     '4111111111111111111111111111114',
     '4100000000000001000000000000014',
     '4100000000000001000000000000014',

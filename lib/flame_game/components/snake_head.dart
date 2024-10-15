@@ -35,7 +35,7 @@ class SnakeHead extends CircleComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     add(_hitbox);
     debugMode = false;
     reset();

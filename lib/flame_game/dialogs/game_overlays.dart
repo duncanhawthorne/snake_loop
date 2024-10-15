@@ -19,8 +19,8 @@ const double _pacmanOuterSpacing = 8 * _statusWidgetHeightFactor;
 const double _pacmanSpacing = 6 * _statusWidgetHeightFactor;
 const double pacmanIconSize = 21 * _statusWidgetHeightFactor;
 const double gIconSize = pacmanIconSize * 4 / 3;
-const circleIconSize = 10 * _statusWidgetHeightFactor;
-const _pelletsSpacing = 2 * _statusWidgetHeightFactor;
+const double circleIconSize = 10 * _statusWidgetHeightFactor;
+const double _pelletsSpacing = 2 * _statusWidgetHeightFactor;
 
 Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   return Center(
@@ -65,7 +65,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
     mainAxisAlignment: MainAxisAlignment.end,
     mainAxisSize: MainAxisSize.min,
     spacing: _widgetSpacing,
-    children: [
+    children: <Widget>[
       _pelletsWidget(context, game),
       _pelletsCounterWidget(game),
     ],
@@ -106,9 +106,9 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
       return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: _pelletsSpacing,
-          children: List.generate(
+          children: List<Widget>.generate(
               min(15, game.world.pellets.pelletsRemainingNotifier.value),
-              (index) => circleIcon()));
+              (int index) => circleIcon()));
     },
   );
 }

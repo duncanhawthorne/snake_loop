@@ -18,10 +18,11 @@ class Palette {
 
   static const MaterialAccentColor _yellow = Colors.yellowAccent;
   static const Color _black = Color(0xff000000);
+  // ignore: unused_field
   static const Color _blueMaze = Color(0xFF3B32D4);
   static const MaterialColor _red = Colors.red;
   static const Color _transp = Color(0x00000000);
   static const Color _white = Color(0xffffffff);
   static const MaterialColor _grey = Colors.grey;
-  static const _snakeGreen = Colors.greenAccent;
+  static const MaterialAccentColor _snakeGreen = Colors.greenAccent;
 }

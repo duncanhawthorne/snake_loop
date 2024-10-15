@@ -20,7 +20,7 @@ class SnakeBodyBit extends CircleComponent
 
   CharacterState current = CharacterState.active;
 
-  void slideTo(Vector2 targetPosition, {onComplete}) {
+  void slideTo(Vector2 targetPosition, {Function()? onComplete}) {
     removeEffects(this);
     add(MoveToPositionEffect(targetPosition,
         duration: distanceBetweenSnakeBits / world.direction.length,
@@ -59,7 +59,7 @@ class SnakeBodyBit extends CircleComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     add(_hitbox);
     snakeWrapper.bodyBits.add(this);
   }
@@ -97,20 +97,21 @@ class SnakeBodyBit extends CircleComponent
 
 enum CharacterState { active, mid, deactive }
 
-final List<SnakeBodyBit> _allBits = [];
+final List<SnakeBodyBit> _allBits = <SnakeBodyBit>[];
 Iterable<SnakeBodyBit> get _spareBits =>
-    _allBits.where((item) => item.isDeactive); //!item.isActive
+    _allBits.where((SnakeBodyBit item) => item.isDeactive); //!item.isActive
 
 // ignore: non_constant_identifier_names
 SnakeBodyBit RecycledSnakeBodyBit(
     {required Vector2 position, required SnakeWrapper snakeWrapper}) {
   if (_spareBits.isEmpty) {
-    SnakeBodyBit newBit =
+    final SnakeBodyBit newBit =
         SnakeBodyBit(position: position, snakeWrapper: snakeWrapper);
     _allBits.add(newBit);
     return newBit;
   } else {
-    SnakeBodyBit recycledBit = _spareBits.first;
+    final SnakeBodyBit recycledBit = _spareBits.first;
+    // ignore: cascade_invocations
     recycledBit.activate(); // isActive = true;
     assert(_spareBits.isEmpty || _spareBits.first != recycledBit);
     recycledBit.position.setFrom(position);
