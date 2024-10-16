@@ -48,7 +48,7 @@ class SnakeHead extends CircleComponent
   bool get atStartingPosition => position.x == 0 && position.y == 0;
 
   void move(double dt) {
-    position = position - world.direction * dt;
+    position.addScaled(world.direction, -dt);
   }
 
   @override
