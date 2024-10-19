@@ -116,6 +116,8 @@ SnakeBodyBit RecycledSnakeBodyBit(
     assert(_spareBits.isEmpty || _spareBits.first != recycledBit);
     recycledBit.position.setFrom(position);
     recycledBit.snakeWrapper = snakeWrapper;
+    recycledBit
+        .add(MoveToPositionEffect(position)); //FIXME fixes hitbox but shouldn't be necessary
     return recycledBit;
   }
 }

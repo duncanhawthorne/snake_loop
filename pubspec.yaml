@@ -1,5 +1,5 @@
-name: pacman_roll
-description: Pacman ROLL
+name: snake_loop
+description: Snake LOOP
 
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
