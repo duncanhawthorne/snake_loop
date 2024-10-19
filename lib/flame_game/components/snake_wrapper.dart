@@ -75,7 +75,7 @@ class SnakeWrapper extends WrapperNoEvents
     snakeHead.reset();
     _snakeBitsReset();
     world.pellets.pelletsRemainingNotifier.value =
-        1 + 2 * (world.level.number - 1);
+        1 + 2 * (game.level.number - 1);
     _snakeBitsLimit = 3;
     numberOfDeathsNotifier.value = 0;
   }
