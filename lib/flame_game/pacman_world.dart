@@ -128,6 +128,9 @@ class PacmanWorld extends Forge2DWorld
 
     if (!firstRun) {
       for (final WrapperNoEvents wrapper in wrappers) {
+        if (wrapper == _walls) {
+          continue; //no need to reset, stops a flash on screen
+        }
         assert(wrapper.isLoaded);
         wrapper.reset();
       }
