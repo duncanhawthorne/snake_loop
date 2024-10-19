@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import '../flame_game/pacman_game.dart';
+
 class Levels {
   static const int tutorialLevelNum = 0;
   static const int firstRealLevel = 1;
@@ -6,6 +10,8 @@ class Levels {
   static const int defaultLevelNum = firstRealLevel;
 
   static const List<int> _ghostSpawnTimerLengthPattern = <int>[5, 3, 2, 1];
+
+  static const double _levelSpeedFactor = 50 * (30 / flameGameZoom) * 0.25;
 
   GameLevel getLevel(int levelNum) {
     final GameLevel result = (
@@ -20,6 +26,7 @@ class Levels {
       homingGhosts:
           levelNum <= 2 + _ghostSpawnTimerLengthPattern.length ? false : true,
       isTutorial: levelNum == tutorialLevelNum,
+      levelSpeed: _levelSpeedFactor * pow(1.1, levelNum).toDouble()
     );
     return result;
   }
@@ -35,4 +42,5 @@ typedef GameLevel = ({
   int ghostSpawnTimerLength,
   bool homingGhosts,
   bool isTutorial,
+  double levelSpeed,
 });
