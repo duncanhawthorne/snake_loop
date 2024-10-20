@@ -117,7 +117,7 @@ SnakeBodyBit RecycledSnakeBodyBit(
     recycledBit.position.setFrom(position);
     recycledBit.snakeWrapper = snakeWrapper;
     recycledBit
-        .add(MoveToPositionEffect(position)); //FIXME fixes hitbox but shouldn't be necessary
+        .add(MoveToPositionEffect(position), duration: 0); //FIXME fixes hitbox but shouldn't be necessary
     return recycledBit;
   }
 }
