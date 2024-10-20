@@ -114,10 +114,9 @@ SnakeBodyBit RecycledSnakeBodyBit(
     // ignore: cascade_invocations
     recycledBit.activate(); // isActive = true;
     assert(_spareBits.isEmpty || _spareBits.first != recycledBit);
-    recycledBit.position.setFrom(position);
-    recycledBit.snakeWrapper = snakeWrapper;
-    recycledBit
-        .add(MoveToPositionEffect(position), duration: 0); //FIXME fixes hitbox but shouldn't be necessary
+    recycledBit..position.setFrom(position)
+    ..snakeWrapper = snakeWrapper
+    ..add(MoveToPositionEffect(position, duration: 0)); //FIXME fixes hitbox but shouldn't be necessary
     return recycledBit;
   }
 }
