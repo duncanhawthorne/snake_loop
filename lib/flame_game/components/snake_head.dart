@@ -64,7 +64,8 @@ class SnakeHead extends CircleComponent
     if (other is Pellet) {
       _onCollideWithPellet(other);
     } else if (other is SnakeBodyBit) {
-      if (other != snakeWrapper.snakeNeck) {
+      if (other.current != CharacterState.slidingToAddToNeck &&
+          other != snakeWrapper.snakeNeck) {
         // don't count collisions with snakeBit just added
         snakeWrapper.numberOfDeathsNotifier.value++;
         debug("trail intersect");

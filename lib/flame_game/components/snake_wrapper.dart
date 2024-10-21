@@ -25,11 +25,12 @@ class SnakeWrapper extends WrapperNoEvents
   final List<SnakeBodyBit> bodyBits = <SnakeBodyBit>[];
   Iterable<SnakeBodyBit> get _activeBodyBits =>
       bodyBits.where((SnakeBodyBit item) => item.isActive);
+  bool neckSlideInProgress = false;
 
   final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
 
   int _snakeBitsLimit = 0;
-  SnakeBodyBit? get snakeNeck => _activeBodyBits.lastOrNull;
+  SnakeBodyBit? snakeNeck;
 
   final Food food = Food(position: Vector2(0, 0));
 
@@ -74,6 +75,8 @@ class SnakeWrapper extends WrapperNoEvents
   void reset() {
     snakeHead.reset();
     _snakeBitsReset();
+    snakeNeck = null;
+    neckSlideInProgress = false;
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (game.level.number - 1);
     _snakeBitsLimit = 3;
@@ -92,19 +95,12 @@ class SnakeWrapper extends WrapperNoEvents
   void _addToStartOfSnake() {
     assert(!snakeHead.atStartingPosition);
     if (_activeBodyBits.isEmpty) {
-      add(RecycledSnakeBodyBit(
-          position: snakeHead.position, snakeWrapper: this));
-    } else if ((snakeHead.position - snakeNeck!.position).length >
-        distanceBetweenSnakeBits) {
-      // rather than set new position at current position
-      // set the right distance away in that direction
-      // if device is lagging stops visual artifacts of missing frames
-      // showing as gaps in the snake body
-      final Vector2 targetPositionForNewSnakeBit = snakeNeck!.position +
-          (snakeHead.position - snakeNeck!.position).normalized() *
-              distanceBetweenSnakeBits;
-      add(RecycledSnakeBodyBit(
-          position: targetPositionForNewSnakeBit, snakeWrapper: this));
+      add(SnakeBodyBit(position: snakeHead.position, snakeWrapper: this)
+        ..becomeNeck());
+    } else if (!neckSlideInProgress) {
+      neckSlideInProgress = true;
+      add(SnakeBodyBit(position: snakeHead.position, snakeWrapper: this)
+        ..current = CharacterState.slidingToAddToNeck);
     }
   }
 
@@ -113,7 +109,7 @@ class SnakeWrapper extends WrapperNoEvents
       final SnakeBodyBit currentEnd = _activeBodyBits.elementAt(0);
       final SnakeBodyBit newEnd = _activeBodyBits.elementAt(0 + 1);
       currentEnd
-        ..midivate()
+        ..current = CharacterState.slidingToRemove
         ..slideTo(newEnd.position,
             onComplete: () => currentEnd.removeFromParent());
     }

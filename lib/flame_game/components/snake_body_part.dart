@@ -6,6 +6,7 @@ import '../effects/remove_effects.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
+import 'snake_head.dart';
 import 'snake_wrapper.dart';
 
 class SnakeBodyBit extends CircleComponent
@@ -15,10 +16,14 @@ class SnakeBodyBit extends CircleComponent
 
   SnakeWrapper snakeWrapper;
   bool get isActive => current == CharacterState.active;
-  bool get isMid => current == CharacterState.mid;
   bool get isDeactive => current == CharacterState.deactive;
 
-  CharacterState current = CharacterState.active;
+  CharacterState _current = CharacterState.slidingToAddToNeck;
+  CharacterState get current => _current;
+  set current(CharacterState x) => <void>{
+        //debug(x),
+        _current = x
+      };
 
   void slideTo(Vector2 targetPosition, {Function()? onComplete}) {
     removeEffects(this);
@@ -39,13 +44,9 @@ class SnakeBodyBit extends CircleComponent
     snakeWrapper.bodyBits.add(this);
   }
 
-  void midivate() {
-    current = CharacterState.mid;
-  }
-
   late final CircleHitbox _hitbox = CircleHitbox(
     isSolid: true,
-    collisionType: CollisionType.passive,
+    collisionType: CollisionType.inactive,
     radius: radius * (1 - hitboxGenerosity),
     position: Vector2.all(radius),
     anchor: Anchor.center,
@@ -54,7 +55,6 @@ class SnakeBodyBit extends CircleComponent
   @override
   Future<void> onMount() async {
     super.onMount();
-    activate();
   }
 
   @override
@@ -62,6 +62,36 @@ class SnakeBodyBit extends CircleComponent
     await super.onLoad();
     add(_hitbox);
     snakeWrapper.bodyBits.add(this);
+  }
+
+  void becomeNeck() {
+    activate();
+    snakeWrapper
+      ..snakeNeck = this
+      ..neckSlideInProgress = false;
+    _hitbox.collisionType = CollisionType.passive;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (current == CharacterState.slidingToAddToNeck) {
+      assert(snakeWrapper.snakeNeck != null);
+      final vsPosition = snakeWrapper.snakeNeck?.position ?? Vector2(0, 0);
+      final SnakeHead snakeHead = snakeWrapper.snakeHead;
+      if (snakeHead.position.distanceTo(vsPosition) <
+          distanceBetweenSnakeBits) {
+        //track
+        position = snakeHead.position;
+      } else {
+        //land
+        final Vector2 targetPositionForNewSnakeBit = vsPosition +
+            (snakeHead.position - vsPosition).normalized() *
+                distanceBetweenSnakeBits;
+        position = targetPositionForNewSnakeBit;
+        becomeNeck();
+      }
+    }
   }
 
   @override
@@ -95,7 +125,7 @@ class SnakeBodyBit extends CircleComponent
   }
 }
 
-enum CharacterState { active, mid, deactive }
+enum CharacterState { active, slidingToRemove, slidingToAddToNeck, deactive }
 
 final List<SnakeBodyBit> _allBits = <SnakeBodyBit>[];
 Iterable<SnakeBodyBit> get _spareBits =>
@@ -114,9 +144,11 @@ SnakeBodyBit RecycledSnakeBodyBit(
     // ignore: cascade_invocations
     recycledBit.activate(); // isActive = true;
     assert(_spareBits.isEmpty || _spareBits.first != recycledBit);
-    recycledBit..position.setFrom(position)
-    ..snakeWrapper = snakeWrapper
-    ..add(MoveToPositionEffect(position, duration: 0)); //FIXME fixes hitbox but shouldn't be necessary
+    recycledBit
+      ..position.setFrom(position)
+      ..snakeWrapper = snakeWrapper
+      ..add(MoveToPositionEffect(position,
+          duration: 0)); //FIXME fixes hitbox but shouldn't be necessary
     return recycledBit;
   }
 }
