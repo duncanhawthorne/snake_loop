@@ -82,7 +82,7 @@ Widget levelSelectorReal(BuildContext context, PacmanGame game) {
     child: Column(
         spacing: 8,
         children: List<Widget>.generate(
-            maxLevelToShowCache ~/ 5 + 1 + 1,
+            maxLevelToShowCache ~/ 5 + 1,
             (int rowIndex) => levelSelectorRow(
                 context, game, maxLevelToShowCache, rowIndex))),
   );
@@ -98,7 +98,7 @@ Widget levelSelectorRow(BuildContext context, PacmanGame game,
     ...List<Widget>.generate(
         max(0, min(5, maxLevelToShowCache - rowIndex * 5 + 5)),
         (int colIndex) =>
-            levelButtonSingle(context, game, rowIndex * 5 + colIndex + 1 - 5))
+            levelButtonSingle(context, game, rowIndex * 5 + colIndex + 1))
   ]);
 }
 
