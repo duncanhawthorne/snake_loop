@@ -61,7 +61,9 @@ class SnakeBodyBit extends CircleComponent
   Future<void> onLoad() async {
     await super.onLoad();
     add(_hitbox);
-    snakeWrapper.bodyBits.add(this);
+    if (!snakeWrapper.bodyBits.contains(this)) {
+      snakeWrapper.bodyBits.add(this);
+    }
   }
 
   void becomeNeck() {
