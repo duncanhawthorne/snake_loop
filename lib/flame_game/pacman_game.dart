@@ -79,7 +79,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       (stopwatch.current * 1000).toInt() +
       min(level.maxAllowedDeaths - 1,
               world.pacmans.numberOfDeathsNotifier.value) *
-          _deathPenaltyMillis;
+          _deathPenaltyMillis *
+          (level.isTutorial ? 0 : 1);
   bool get levelStarted => stopwatchMilliSeconds > 0;
 
   bool get isGameLive =>
@@ -143,7 +144,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       if (world.pellets.pelletsRemainingNotifier.value == 0) {
         world.resetAfterGameWin();
         stopwatch.pause();
-        if (stopwatchMilliSeconds > 0 * 1000) {
+        if (stopwatchMilliSeconds > 0 * 1000 && !level.isTutorial) {
           fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
         }
         playerProgress.saveLevelComplete(_getCurrentGameState());

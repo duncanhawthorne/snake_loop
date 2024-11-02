@@ -52,9 +52,7 @@ Widget _topLeftWidget(BuildContext context, PacmanGame game) {
     spacing: _widgetSpacing,
     children: <Widget>[
       _mainMenuButtonWidget(context, game),
-      game.level.isTutorial
-          ? const SizedBox.shrink()
-          : g.loginLogoutWidget(context, gIconSize, Palette.textColor),
+      g.loginLogoutWidget(context, gIconSize, Palette.textColor),
     ],
   );
 }
@@ -92,7 +90,8 @@ Widget _livesWidget(BuildContext context, PacmanGame game) {
         return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             spacing: _pacmanSpacing,
-            children: List<Widget>.generate(game.level.maxAllowedDeaths,
+            children: List<Widget>.generate(
+                game.level.infLives ? 1 : game.level.maxAllowedDeaths,
                 (int index) => animatedPacmanIcon(game, index)));
       },
     ),
@@ -111,6 +110,13 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
               (int index) => circleIcon()));
     },
   );
+}
+
+// ignore: unused_element
+Widget _infintyWidget(BuildContext context, PacmanGame game) {
+  return !game.level.infLives
+      ? const SizedBox.shrink()
+      : Text("∞", style: TextStyle(color: Palette.pacman.color));
 }
 
 // ignore: unused_element
