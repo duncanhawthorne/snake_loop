@@ -77,7 +77,8 @@ class SnakeBodyBit extends CircleComponent
     super.update(dt);
     if (current == CharacterState.slidingToAddToNeck) {
       assert(snakeWrapper.snakeNeck != null);
-      final vsPosition = snakeWrapper.snakeNeck?.position ?? Vector2(0, 0);
+      final Vector2 vsPosition =
+          snakeWrapper.snakeNeck?.position ?? Vector2(0, 0);
       final SnakeHead snakeHead = snakeWrapper.snakeHead;
       if (snakeHead.position.distanceTo(vsPosition) <
           distanceBetweenSnakeBits) {
