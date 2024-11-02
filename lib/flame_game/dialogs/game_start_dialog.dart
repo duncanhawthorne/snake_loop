@@ -96,7 +96,7 @@ Widget levelSelectorRow(BuildContext context, PacmanGame game,
         ? resetWidget(context, game)
         : const SizedBox.shrink(),
     ...List<Widget>.generate(
-        max(0, min(5, maxLevelToShowCache - rowIndex * 5 + 5)),
+        max(0, min(5, maxLevelToShowCache - rowIndex * 5)),
         (int colIndex) =>
             levelButtonSingle(context, game, rowIndex * 5 + colIndex + 1))
   ]);
