@@ -108,6 +108,7 @@ class SnakeWrapper extends WrapperNoEvents
     if (_activeBodyBits.length > _snakeBitsLimit) {
       final SnakeBodyBit currentEnd = _activeBodyBits.elementAt(0);
       final SnakeBodyBit newEnd = _activeBodyBits.elementAt(0 + 1);
+      assert(currentEnd != newEnd); //ensure elements not repeated in list
       currentEnd
         ..current = CharacterState.slidingToRemove
         ..slideTo(newEnd.position,
