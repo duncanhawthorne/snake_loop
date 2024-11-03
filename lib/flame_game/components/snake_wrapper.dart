@@ -99,7 +99,8 @@ class SnakeWrapper extends WrapperNoEvents
         ..becomeNeck());
     } else if (!neckSlideInProgress) {
       neckSlideInProgress = true;
-      add(SnakeBodyBit(position: snakeHead.position, snakeWrapper: this)
+      add(SnakeBodyBit(
+          position: snakeHead.position, snakeWrapper: this, oneBack: snakeNeck)
         ..current = CharacterState.slidingToAddToNeck);
     }
   }

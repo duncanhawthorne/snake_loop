@@ -7,16 +7,19 @@ import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
 import 'snake_head.dart';
+import 'snake_line_part.dart';
 import 'snake_wrapper.dart';
 
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
-  SnakeBodyBit({required super.position, required this.snakeWrapper})
+  SnakeBodyBit(
+      {required super.position, required this.snakeWrapper, this.oneBack})
       : super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
 
   SnakeWrapper snakeWrapper;
   bool get isActive => current == CharacterState.active;
   bool get isDeactive => current == CharacterState.deactive;
+  SnakeBodyBit? oneBack;
 
   CharacterState _current = CharacterState.slidingToAddToNeck;
   CharacterState get current => _current;
@@ -61,6 +64,9 @@ class SnakeBodyBit extends CircleComponent
   Future<void> onLoad() async {
     await super.onLoad();
     add(_hitbox);
+    if (oneBack != null) {
+      parent?.add(SnakeLineBit(oneForward: this, oneBack: oneBack!));
+    }
     if (!snakeWrapper.bodyBits.contains(this)) {
       snakeWrapper.bodyBits.add(this);
     }
