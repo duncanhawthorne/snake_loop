@@ -60,12 +60,15 @@ class SnakeBodyBit extends CircleComponent
     super.onMount();
   }
 
+  SnakeLineBit? forwardLineBit;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     add(_hitbox);
     if (oneBack != null) {
-      parent?.add(SnakeLineBit(oneForward: this, oneBack: oneBack!));
+      forwardLineBit = SnakeLineBit(oneForward: this, oneBack: oneBack!);
+      parent!.add(forwardLineBit!);
     }
     if (!snakeWrapper.bodyBits.contains(this)) {
       snakeWrapper.bodyBits.add(this);
@@ -78,6 +81,11 @@ class SnakeBodyBit extends CircleComponent
       ..snakeNeck = this
       ..neckSlideInProgress = false;
     _hitbox.collisionType = CollisionType.passive;
+  }
+
+  void fixLineBits() {
+    forwardLineBit?.fixPosition();
+    oneBack?.forwardLineBit?.fixPosition();
   }
 
   @override
@@ -101,12 +109,15 @@ class SnakeBodyBit extends CircleComponent
         becomeNeck();
       }
     }
+    fixLineBits();
   }
 
   @override
   Future<void> onRemove() async {
     current = CharacterState.deactive;
     snakeWrapper.bodyBits.remove(this);
+    oneBack = null; //to help garbage collector
+    forwardLineBit = null; //to help garbage collector
     super.onRemove();
   }
 
