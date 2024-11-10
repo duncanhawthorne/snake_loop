@@ -26,7 +26,6 @@ class SnakeLineBit extends RectangleComponent
   @override
   void onLoad() {
     super.onLoad();
-    opacity = 0.5;
     height = snakeRadius * 2;
   }
 
