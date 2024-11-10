@@ -20,7 +20,7 @@ class SnakeBodyBit extends CircleComponent
   bool get isActive => current == CharacterState.active;
   bool get isDeactive => current == CharacterState.deactive;
   SnakeBodyBit? oneBack;
-  SnakeLineBit? forwardLineBit;
+  SnakeLineBit? backwardLineBit;
 
   CharacterState _current = CharacterState.slidingToAddToNeck;
   CharacterState get current => _current;
@@ -66,12 +66,20 @@ class SnakeBodyBit extends CircleComponent
     await super.onLoad();
     add(_hitbox);
     if (oneBack != null) {
-      forwardLineBit = SnakeLineBit(oneForward: this, oneBack: oneBack!);
-      parent!.add(forwardLineBit!);
+      backwardLineBit = SnakeLineBit(oneForward: this, oneBack: oneBack!);
+      parent!.add(backwardLineBit!);
     }
     if (!snakeWrapper.bodyBits.contains(this)) {
       snakeWrapper.bodyBits.add(this);
     }
+  }
+
+  void becomeSlidingToAddToNeck() {
+    snakeWrapper
+      ..snakeBitSlidingToNeck = this
+      ..neckSlideInProgress = true;
+    snakeWrapper.snakeNeck?.oneForward ??= this;
+    current = CharacterState.slidingToAddToNeck;
   }
 
   void becomeNeck() {
@@ -82,47 +90,73 @@ class SnakeBodyBit extends CircleComponent
     _hitbox.collisionType = CollisionType.passive;
   }
 
-  void fixLineBits() {
-    forwardLineBit?.fixPosition();
-    oneBack?.forwardLineBit?.fixPosition();
+  void becomeSlidingToRemove() {
+    snakeWrapper.snakeBitSlidingToRemove = this;
+    current = CharacterState.slidingToRemove;
   }
 
-  void updatePositionAsNeck() {
+  void fixLineBits() {
+    backwardLineBit?.fixPosition();
+    oneForward?.backwardLineBit?.fixPosition();
+    oneBack?.backwardLineBit?.fixPosition();
+  }
+
+  void updatePositionAsSlidingToAddToNeck() {
     if (current == CharacterState.slidingToAddToNeck) {
       assert(snakeWrapper.snakeNeck != null);
-      final Vector2 vsPosition =
-          snakeWrapper.snakeNeck?.position ?? Vector2(0, 0);
-      final SnakeHead snakeHead = snakeWrapper.snakeHead;
-      if (snakeHead.position.distanceTo(vsPosition) <
-          distanceBetweenSnakeBits) {
-        //track
-        position = snakeHead.position;
-      } else {
-        //land
-        final Vector2 targetPositionForNewSnakeBit = vsPosition +
-            (snakeHead.position - vsPosition).normalized() *
-                distanceBetweenSnakeBits;
-        position = targetPositionForNewSnakeBit;
-        becomeNeck();
+      if (snakeWrapper.snakeNeck != null) {
+        final SnakeHead snakeHead = snakeWrapper.snakeHead;
+        final SnakeBodyBit snakeNeck = snakeWrapper.snakeNeck!;
+        if (snakeHead.position.distanceTo(snakeNeck.position) <
+            distanceBetweenSnakeBits) {
+          //track
+          position = snakeHead.position;
+        } else {
+          //land
+          final Vector2 targetPosition = snakeNeck.position +
+              (snakeHead.position - snakeNeck.position).normalized() *
+                  distanceBetweenSnakeBits;
+          position = targetPosition;
+          becomeNeck();
+        }
       }
+      fixLineBits();
     }
   }
 
-  @override
-  void update(double dt) {
-    super.update(dt);
-    updatePositionAsNeck();
-    fixLineBits();
+  SnakeBodyBit? _snakeNeckAtFirstTest;
+  SnakeBodyBit? oneForward;
+  void updatePositionAsSlidingToRemove() {
+    if (current == CharacterState.slidingToRemove) {
+      _snakeNeckAtFirstTest ??= snakeWrapper.snakeNeck!;
+      if (_snakeNeckAtFirstTest != snakeWrapper.snakeNeck) {
+        position = oneForward!.position;
+        removeFromParent();
+      } else {
+        if (oneForward != null && snakeWrapper.snakeNeck != null) {
+          final SnakeHead snakeHead = snakeWrapper.snakeHead;
+          final SnakeBodyBit snakeNeck = snakeWrapper.snakeNeck!;
+          final double neckDistance =
+              snakeHead.position.distanceTo(snakeNeck.position);
+          final Vector2 targetPosition = oneForward!.position +
+              (position - oneForward!.position).normalized() *
+                  (distanceBetweenSnakeBits - neckDistance);
+          position = targetPosition;
+        }
+      }
+      fixLineBits();
+    }
   }
 
   @override
   Future<void> onRemove() async {
     current = CharacterState.deactive;
     snakeWrapper.bodyBits.remove(this);
-    forwardLineBit?.oneForward.oneBack = null; //to help garbage collector
-    oneBack = null; //to help garbage collector
-    forwardLineBit = null; //to help garbage collector
     super.onRemove();
+    backwardLineBit?.fixPosition();
+    backwardLineBit?.removeFromParent();
+    oneBack = null; //to help garbage collector
+    backwardLineBit = null; //to help garbage collector
   }
 
   @override

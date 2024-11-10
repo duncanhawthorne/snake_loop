@@ -31,6 +31,8 @@ class SnakeWrapper extends WrapperNoEvents
 
   int _snakeBitsLimit = 0;
   SnakeBodyBit? snakeNeck;
+  SnakeBodyBit? snakeBitSlidingToNeck;
+  SnakeBodyBit? snakeBitSlidingToRemove;
 
   final Food food = Food(position: Vector2(0, 0));
 
@@ -76,6 +78,8 @@ class SnakeWrapper extends WrapperNoEvents
     snakeHead.reset();
     _snakeBitsReset();
     snakeNeck = null;
+    snakeBitSlidingToNeck = null;
+    snakeBitSlidingToRemove = null;
     neckSlideInProgress = false;
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (game.level.number - 1);
@@ -98,22 +102,17 @@ class SnakeWrapper extends WrapperNoEvents
       add(SnakeBodyBit(position: snakeHead.position, snakeWrapper: this)
         ..becomeNeck());
     } else if (!neckSlideInProgress) {
-      neckSlideInProgress = true;
       add(SnakeBodyBit(
           position: snakeHead.position, snakeWrapper: this, oneBack: snakeNeck)
-        ..current = CharacterState.slidingToAddToNeck);
+        ..becomeSlidingToAddToNeck());
     }
   }
 
+  bool get tooManyBits => _activeBodyBits.length > _snakeBitsLimit;
+
   void _removeFromEndOfSnake() {
-    if (_activeBodyBits.length > _snakeBitsLimit) {
-      final SnakeBodyBit currentEnd = _activeBodyBits.elementAt(0);
-      final SnakeBodyBit newEnd = _activeBodyBits.elementAt(0 + 1);
-      assert(currentEnd != newEnd); //ensure elements not repeated in list
-      currentEnd
-        ..current = CharacterState.slidingToRemove
-        ..slideTo(newEnd.position,
-            onComplete: () => currentEnd.removeFromParent());
+    if (tooManyBits) {
+      _activeBodyBits.elementAt(0).becomeSlidingToRemove();
     }
   }
 
@@ -124,6 +123,8 @@ class SnakeWrapper extends WrapperNoEvents
     if (_activeGameplay) {
       snakeHead.move(dt);
       _addToStartOfSnake();
+      snakeBitSlidingToNeck?.updatePositionAsSlidingToAddToNeck();
+      snakeBitSlidingToRemove?.updatePositionAsSlidingToRemove();
       _removeFromEndOfSnake();
     }
   }
