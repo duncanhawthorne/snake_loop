@@ -20,6 +20,7 @@ class SnakeBodyBit extends CircleComponent
   bool get isActive => current == CharacterState.active;
   bool get isDeactive => current == CharacterState.deactive;
   SnakeBodyBit? oneBack;
+  SnakeLineBit? forwardLineBit;
 
   CharacterState _current = CharacterState.slidingToAddToNeck;
   CharacterState get current => _current;
@@ -60,8 +61,6 @@ class SnakeBodyBit extends CircleComponent
     super.onMount();
   }
 
-  SnakeLineBit? forwardLineBit;
-
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -88,9 +87,7 @@ class SnakeBodyBit extends CircleComponent
     oneBack?.forwardLineBit?.fixPosition();
   }
 
-  @override
-  void update(double dt) {
-    super.update(dt);
+  void updatePositionAsNeck() {
     if (current == CharacterState.slidingToAddToNeck) {
       assert(snakeWrapper.snakeNeck != null);
       final Vector2 vsPosition =
@@ -109,6 +106,12 @@ class SnakeBodyBit extends CircleComponent
         becomeNeck();
       }
     }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    updatePositionAsNeck();
     fixLineBits();
   }
 
@@ -116,6 +119,7 @@ class SnakeBodyBit extends CircleComponent
   Future<void> onRemove() async {
     current = CharacterState.deactive;
     snakeWrapper.bodyBits.remove(this);
+    forwardLineBit?.oneForward.oneBack = null; //to help garbage collector
     oneBack = null; //to help garbage collector
     forwardLineBit = null; //to help garbage collector
     super.onRemove();
