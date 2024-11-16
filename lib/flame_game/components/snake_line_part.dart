@@ -12,11 +12,13 @@ final Paint _snakeLinePaint = Paint()..color = Palette.seed.color;
 // ignore: unused_element
 final Paint _snakeLinePaintDebug = Paint()..color = Palette.warning.color;
 
+const double _offscreen = 10000;
+
 class SnakeLineBit extends RectangleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {
   SnakeLineBit({required this.oneForward, required this.oneBack})
       : super(
-            position: Vector2(0, 0),
+            position: Vector2(_offscreen, _offscreen),
             size: Vector2(1, 1),
             anchor: Anchor.center,
             paint: _snakeLinePaint,
@@ -36,7 +38,7 @@ class SnakeLineBit extends RectangleComponent
         !oneBack.isMounted ||
         oneForward.isRemoving ||
         oneBack.isRemoving) {
-      position.setAll(10000);
+      position.setAll(_offscreen);
       width = 0;
       removeFromParent();
     } else {
