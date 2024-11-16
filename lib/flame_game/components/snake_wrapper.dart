@@ -9,11 +9,13 @@ import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_head.dart';
+import 'snake_line_part.dart';
 import 'wrapper_no_events.dart';
 
 final Paint snakePaint = Paint()..color = Palette.seed.color;
 final double snakeRadius = maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2;
-final double distanceBetweenSnakeBits = snakeRadius * 2;
+final int _snakeBitsOverlaps = 3;
+final double distanceBetweenSnakeBits = snakeRadius * 2 / _snakeBitsOverlaps;
 
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
@@ -67,10 +69,15 @@ class SnakeWrapper extends WrapperNoEvents
     for (SnakeBodyBit bit in bodyBits) {
       bit.removeFromParent();
     }
+    for (Component child in children) {
+      if (child is SnakeLineBit) {
+        child.removeFromParent();
+      }
+    }
   }
 
   void extendSnake() {
-    _snakeBitsLimit += 4;
+    _snakeBitsLimit += 4 * _snakeBitsOverlaps;
   }
 
   @override
@@ -83,7 +90,7 @@ class SnakeWrapper extends WrapperNoEvents
     neckSlideInProgress = false;
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (game.level.number - 1);
-    _snakeBitsLimit = 3;
+    _snakeBitsLimit = 3 * _snakeBitsOverlaps;
     numberOfDeathsNotifier.value = 0;
   }
 

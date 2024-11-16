@@ -9,6 +9,8 @@ import 'snake_body_part.dart';
 import 'snake_wrapper.dart';
 
 final Paint _snakeLinePaint = Paint()..color = Palette.seed.color;
+// ignore: unused_element
+final Paint _snakeLinePaintDebug = Paint()..color = Palette.warning.color;
 
 class SnakeLineBit extends RectangleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {
@@ -34,7 +36,7 @@ class SnakeLineBit extends RectangleComponent
         !oneBack.isMounted ||
         oneForward.isRemoving ||
         oneBack.isRemoving) {
-      position.setAll(0);
+      position.setAll(10000);
       width = 0;
       removeFromParent();
     } else {
