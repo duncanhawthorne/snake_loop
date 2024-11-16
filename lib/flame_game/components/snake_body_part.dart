@@ -23,6 +23,7 @@ class SnakeBodyBit extends CircleComponent
   bool get isDeactive => current == CharacterState.deactive;
   SnakeBodyBit? oneBack;
   SnakeLineBit? backwardLineBit;
+  int numberId = 0;
 
   CharacterState _current = CharacterState.slidingToAddToNeck;
   CharacterState get current => _current;
@@ -59,11 +60,6 @@ class SnakeBodyBit extends CircleComponent
   );
 
   @override
-  Future<void> onMount() async {
-    super.onMount();
-  }
-
-  @override
   Future<void> onLoad() async {
     await super.onLoad();
     add(_hitbox);
@@ -77,6 +73,11 @@ class SnakeBodyBit extends CircleComponent
   }
 
   void becomeSlidingToAddToNeck() {
+    if (snakeWrapper.snakeBitSlidingToNeck == null) {
+      numberId = 0;
+    } else {
+      numberId = snakeWrapper.snakeBitSlidingToNeck!.numberId + 1;
+    }
     snakeWrapper
       ..snakeBitSlidingToNeck = this
       ..neckSlideInProgress = true;
@@ -89,7 +90,7 @@ class SnakeBodyBit extends CircleComponent
     snakeWrapper
       ..snakeNeck = this
       ..neckSlideInProgress = false;
-    _hitbox.collisionType = CollisionType.passive;
+    //_hitbox.collisionType = CollisionType.passive;
   }
 
   void becomeSlidingToRemove() {
@@ -147,6 +148,21 @@ class SnakeBodyBit extends CircleComponent
         }
       }
       fixLineBits();
+    }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (numberId % snakeBitsOverlaps == 0 &&
+        _hitbox.collisionType == CollisionType.inactive) {
+      if (snakeWrapper.snakeBitSlidingToNeck != null &&
+          numberId <
+              snakeWrapper.snakeBitSlidingToNeck!.numberId -
+                  snakeBitsOverlaps * 2) {
+        //far enough away so not overlapping with head still
+        _hitbox.collisionType = CollisionType.passive;
+      }
     }
   }
 

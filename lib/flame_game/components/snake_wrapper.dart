@@ -14,8 +14,8 @@ import 'wrapper_no_events.dart';
 
 final Paint snakePaint = Paint()..color = Palette.seed.color;
 final double snakeRadius = maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2;
-final int _snakeBitsOverlaps = 3;
-final double distanceBetweenSnakeBits = snakeRadius * 2 / _snakeBitsOverlaps;
+final int snakeBitsOverlaps = 3;
+final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
 
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
@@ -77,7 +77,7 @@ class SnakeWrapper extends WrapperNoEvents
   }
 
   void extendSnake() {
-    _snakeBitsLimit += 4 * _snakeBitsOverlaps;
+    _snakeBitsLimit += 4 * snakeBitsOverlaps;
   }
 
   @override
@@ -90,7 +90,7 @@ class SnakeWrapper extends WrapperNoEvents
     neckSlideInProgress = false;
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (game.level.number - 1);
-    _snakeBitsLimit = 3 * _snakeBitsOverlaps;
+    _snakeBitsLimit = 3 * snakeBitsOverlaps;
     numberOfDeathsNotifier.value = 0;
   }
 
