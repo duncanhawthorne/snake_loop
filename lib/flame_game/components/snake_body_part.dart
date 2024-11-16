@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
@@ -92,6 +94,7 @@ class SnakeBodyBit extends CircleComponent
 
   void becomeSlidingToRemove() {
     snakeWrapper.snakeBitSlidingToRemove = this;
+    _snakeNeckWhenStartedSliding ??= snakeWrapper.snakeNeck!;
     current = CharacterState.slidingToRemove;
   }
 
@@ -124,23 +127,22 @@ class SnakeBodyBit extends CircleComponent
     }
   }
 
-  SnakeBodyBit? _snakeNeckAtFirstTest;
+  SnakeBodyBit? _snakeNeckWhenStartedSliding;
   SnakeBodyBit? oneForward;
   void updatePositionAsSlidingToRemove() {
     if (current == CharacterState.slidingToRemove) {
-      _snakeNeckAtFirstTest ??= snakeWrapper.snakeNeck!;
-      if (_snakeNeckAtFirstTest != snakeWrapper.snakeNeck) {
+      if (oneForward == null) {
+        removeFromParent();
+      } else if (_snakeNeckWhenStartedSliding != snakeWrapper.snakeNeck) {
         position = oneForward!.position;
         removeFromParent();
       } else {
-        if (oneForward != null && snakeWrapper.snakeNeck != null) {
-          final SnakeHead snakeHead = snakeWrapper.snakeHead;
-          final SnakeBodyBit snakeNeck = snakeWrapper.snakeNeck!;
-          final double neckDistance =
-              snakeHead.position.distanceTo(snakeNeck.position);
+        if (oneForward != null && _snakeNeckWhenStartedSliding != null) {
+          final double neckDistance = snakeWrapper.snakeHead.position
+              .distanceTo(_snakeNeckWhenStartedSliding!.position);
           final Vector2 targetPosition = oneForward!.position +
               (position - oneForward!.position).normalized() *
-                  (distanceBetweenSnakeBits - neckDistance);
+                  max(0, distanceBetweenSnakeBits - neckDistance);
           position = targetPosition;
         }
       }
