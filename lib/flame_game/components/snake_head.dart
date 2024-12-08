@@ -70,7 +70,7 @@ class SnakeHead extends CircleComponent
         snakeWrapper.numberOfDeathsNotifier.value++;
         debug("trail intersect");
       }
-    } else if (other is MazeWallRectangleVisual) {
+    } else if (other is WallRectangleVisual) {
       snakeWrapper.numberOfDeathsNotifier.value++;
     }
   }

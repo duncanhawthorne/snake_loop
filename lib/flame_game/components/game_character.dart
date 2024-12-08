@@ -14,12 +14,12 @@ import 'clones.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 
-final Paint highQualityPaint = Paint()
+final Paint _highQualityPaint = Paint()
   ..filterQuality = FilterQuality.high
 //..color = const Color.fromARGB(255, 255, 255, 255)
   ..isAntiAlias = true;
 
-final Vector2 kVector2Zero = Vector2.zero();
+final Vector2 _kVector2Zero = Vector2.zero();
 
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
@@ -28,10 +28,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
         IgnoreEvents,
         HasWorldReference<PacmanWorld>,
         HasGameReference<PacmanGame> {
-  GameCharacter({super.position, super.priority = 1, this.original})
+  GameCharacter({super.position, this.original})
       : super(
             size: maze.spriteSize,
-            paint: highQualityPaint,
+            paint: _highQualityPaint,
             anchor: Anchor.center);
 
   late final PhysicsBall _ball = PhysicsBall(position: position);
@@ -42,24 +42,26 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   double get _spinParity =>
       _ball.body.linearVelocity.x.abs() > _ball.body.linearVelocity.y.abs()
-          ? world.gravity.y.sign * _ball.body.linearVelocity.x.sign
-          : -world.gravity.x.sign * _ball.body.linearVelocity.y.sign;
+          ? world.gravityYSign * _ball.body.linearVelocity.x.sign
+          : -world.gravityXSign * _ball.body.linearVelocity.y.sign;
 
   bool get typical =>
       connectedToBall &&
       current != CharacterState.dead &&
       current != CharacterState.spawning;
 
-  CollisionType get collisionType => this is Pacman || this is PacmanClone
+  CollisionType get _collisionType => this is Pacman || this is PacmanClone
       ? CollisionType.active
       : CollisionType.passive;
 
-  bool get isClone => this is PacmanClone || this is GhostClone;
+  late final bool isClone = this is PacmanClone || this is GhostClone;
 
-  GameCharacter? clone;
-  GameCharacter? original;
+  late final GameCharacter? clone;
+  late final GameCharacter? original;
   late final CircleHitbox hitbox =
-      CircleHitbox(isSolid: true, collisionType: collisionType);
+      CircleHitbox(isSolid: true, collisionType: _collisionType);
+
+  late final double radius = size.x / 2;
 
   void loadStubAnimationsOnDebugMode() {
     // works around changes made in flame 1.19
@@ -88,7 +90,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void setPositionStill(Vector2 targetLoc) {
     _ball
       ..position = targetLoc
-      ..velocity = kVector2Zero;
+      ..velocity = _kVector2Zero;
     position.setFrom(targetLoc);
     _connectToBall();
   }
@@ -107,13 +109,13 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     connectedToBall = true;
     _ball.setDynamic();
     assert(!isClone); //not called on clones
-    hitbox.collisionType = collisionType;
+    hitbox.collisionType = _collisionType;
   }
 
   void _oneFrameOfPhysics(double dt) {
     if (connectedToBall) {
       position.setFrom(_ball.position);
-      angle += speed * dt / (size.x / 2) * _spinParity;
+      angle += speed * dt / radius * _spinParity;
     }
   }
 
@@ -147,18 +149,19 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     super.onRemove();
   }
 
-  void _addRemoveClone(GameCharacter? clone) {
-    if (clone != null) {
+  void _addRemoveClone() {
+    if (!isClone) {
       //i.e. no cascade of clones
-      assert(clone.isClone);
+      assert(clone != null);
+      assert(clone!.isClone);
       assert(!isClone);
-      if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth / 2) {
-        if (!clone.isMounted) {
-          parent!.add(clone);
+      if (position.x.abs() > maze.cloneThreshold) {
+        if (!clone!.isMounted) {
+          parent!.add(clone!);
         }
       } else {
-        if (clone.isMounted) {
-          clone.removeFromParent();
+        if (clone!.isMounted) {
+          clone!.removeFromParent();
         }
       }
     }
@@ -168,7 +171,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void update(double dt) {
     //note, this function is also run for clones
     _oneFrameOfPhysics(dt);
-    _addRemoveClone(clone);
+    _addRemoveClone();
     super.update(dt);
   }
 }

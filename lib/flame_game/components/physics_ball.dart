@@ -12,13 +12,10 @@ const bool _kVerticalPortalsEnabled = false;
 class PhysicsBall extends BodyComponent with IgnoreEvents {
   PhysicsBall({
     required Vector2 position,
-    double? radius,
   }) : super(
             fixtureDefs: <FixtureDef>[
               FixtureDef(
-                CircleShape()
-                  ..radius =
-                      radius ?? maze.spriteWidth / 2 * _radiusScaleFactor,
+                CircleShape(radius: maze.spriteWidth / 2 * _radiusScaleFactor),
                 restitution: 0.0,
                 friction: _useForgePhysicsBallRotation ? 1 : 0,
                 userData: PhysicsBall,
@@ -42,6 +39,10 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   set position(Vector2 pos) => <void>{
         _instantSetPosition ? _setPositionNow(pos) : _setPositionNextFrame(pos)
       };
+
+  bool get _outsideMazeBounds =>
+      position.x.abs() > maze.mazeHalfWidth ||
+      (_kVerticalPortalsEnabled && position.y.abs() > maze.mazeHalfHeight);
 
   final Vector2 _oneTimeManualPosition = Vector2(0, 0);
   bool _oneTimeManualPositionSet = false;
@@ -77,18 +78,19 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   }
 
   final Vector2 _oneTimeManualPortalPosition = Vector2.zero();
+
+  Vector2 _teleportedPosition() {
+    _oneTimeManualPortalPosition.setValues(
+        _smallMod(position.x, maze.mazeWidth),
+        !_kVerticalPortalsEnabled
+            ? position.y
+            : _smallMod(position.y, maze.mazeHeight));
+    return _oneTimeManualPortalPosition;
+  }
+
   void _moveThroughPipePortal() {
-    if (_subConnectedBall) {
-      if (position.x.abs() > maze.mazeWidth / 2 ||
-          (_kVerticalPortalsEnabled &&
-              position.y.abs() > maze.mazeHeight / 2)) {
-        _oneTimeManualPortalPosition.setValues(
-            _smallMod(position.x, maze.mazeWidth),
-            !_kVerticalPortalsEnabled
-                ? position.y
-                : _smallMod(position.y, maze.mazeHeight));
-        position = _oneTimeManualPortalPosition;
-      }
+    if (_subConnectedBall && _outsideMazeBounds) {
+      position = _teleportedPosition();
     }
   }
 

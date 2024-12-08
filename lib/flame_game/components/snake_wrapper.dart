@@ -36,7 +36,9 @@ class SnakeWrapper extends WrapperNoEvents
   SnakeBodyBit? snakeBitSlidingToNeck;
   SnakeBodyBit? snakeBitSlidingToRemove;
 
-  final Food food = Food(position: Vector2(0, 0));
+  late final Food food = Food(
+      position: Vector2(0, 0),
+      pelletsRemainingNotifier: world.pellets.pelletsRemainingNotifier);
 
   bool get _activeGameplay =>
       game.isGameLive &&
