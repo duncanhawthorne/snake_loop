@@ -158,7 +158,7 @@ class PacmanWorld extends Forge2DWorld
         game.isLive &&
         game.openingScreenCleared &&
         !game.playbackMode) {
-      setMazeAngle(game.camera.viewfinder.angle + angleDelta);
+      setMazeAngle(game.camera.viewfinder.angle - angleDelta);
       if (!doingLevelResetFlourish && !game.isWonOrLost) {
         game.startRegularItems();
       }

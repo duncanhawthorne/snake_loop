@@ -84,7 +84,8 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: _pelletsSpacing,
           children: List<Widget>.generate(
-              min(15, game.world.pellets.pelletsRemainingNotifier.value),
+              max(0,
+                  min(15, game.world.pellets.pelletsRemainingNotifier.value)),
               (int index) => circleIcon()));
     },
   );

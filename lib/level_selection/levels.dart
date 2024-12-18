@@ -8,7 +8,7 @@ class Levels {
   static const int maxLevel = 15;
   static const int levelToShowInstructions = defaultLevelNum;
   static const int playbackModeLevel = -4;
-  static const int defaultLevelNum = playbackModeLevel;
+  static const int defaultLevelNum = firstRealLevel;
 
   static const List<int> _ghostSpawnTimerLengthPattern = <int>[5, 3, 2, 1];
 
