@@ -27,7 +27,11 @@ class Ghost extends GameCharacter {
       [int size = 1]) async {
     return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(
-        <Sprite>[await game.loadSprite(_ghostSpritePaths[ghostID % 3]!)],
+        <Sprite>[
+          await game.loadSprite(game.level.numStartingGhosts == 1
+              ? _ghostSpritePaths[0]!
+              : _ghostSpritePaths[ghostID % 3]!)
+        ],
         stepTime: double.infinity,
       ),
       CharacterState.scared: SpriteAnimation.spriteList(
@@ -53,7 +57,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScared() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       if (current != CharacterState.dead &&
           current != CharacterState.spawning) {
         // if dead, need to continue dead animation without physics applying,
@@ -64,7 +68,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScaredToScaredIsh() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       if (current == CharacterState.scared) {
         current = CharacterState.scaredIsh;
       }
@@ -72,7 +76,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScaredIshToNormal() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       if (current == CharacterState.scaredIsh) {
         current = CharacterState.normal;
       }
@@ -80,7 +84,7 @@ class Ghost extends GameCharacter {
   }
 
   void setDead() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       current = CharacterState.dead; //stops further interactions
       if (game.level.multipleSpawningGhosts) {
         removeFromParent();
@@ -95,12 +99,12 @@ class Ghost extends GameCharacter {
   }
 
   void _setSpawning() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       current = CharacterState.spawning; //stops further interactions
       disconnectFromBall(spawning: true);
       add(MoveToPositionEffect(
           game.level.homingGhosts
-              ? world.pacmans.pacmanList[0].position
+              ? world.pacmans.ghostHomingTarget
               : maze.ghostStart,
           onComplete: () =>
               <void>{bringBallToSprite(), current = world.ghosts.current}));

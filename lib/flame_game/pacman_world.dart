@@ -48,10 +48,6 @@ class PacmanWorld extends Forge2DWorld
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
-  bool get gameWonOrLost =>
-      pellets.pelletsRemainingNotifier.value <= 0 ||
-      snakeWrapper.numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths;
-
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
 
   bool doingLevelResetFlourish = false;
@@ -82,7 +78,7 @@ class PacmanWorld extends Forge2DWorld
   void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
     game.audioController.stopSfx(SfxType.ghostsScared);
-    if (!gameWonOrLost) {
+    if (!game.isWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
         _cameraRotatableOnPacmanDeathFlourish = false;
         dyingPacman.resetSlideAfterDeath();
@@ -100,7 +96,7 @@ class PacmanWorld extends Forge2DWorld
   void _resetInstantAfterPacmanDeath() {
     // ignore: dead_code
     if (true || doingLevelResetFlourish) {
-      // must test doingLevelResetFlourish
+      // originally thought must test doingLevelResetFlourish
       // as could have been removed by reset during delay x 2
       // but this code is only run from resetSlide,
       // so if we have got here (accidentally) then resetSlide has run
@@ -113,7 +109,11 @@ class PacmanWorld extends Forge2DWorld
       pacmans.resetInstantAfterPacmanDeath();
       ghosts.resetInstantAfterPacmanDeath();
       _cameraAndTimersReset();
-      game.pauseEngineIfNoActivity();
+      if (game.playbackMode) {
+        game.reset();
+      } else {
+        game.pauseEngineIfNoActivity();
+      }
     }
   }
 
@@ -121,7 +121,7 @@ class PacmanWorld extends Forge2DWorld
     //stop any rotation effect added to camera
     //note, still leaves flourish variable hot, so fix below
     removeEffects(game.camera.viewfinder);
-    _setMazeAngle(0);
+    setMazeAngle(0);
     _cameraRotatableOnPacmanDeathFlourish = true;
     doingLevelResetFlourish = false;
   }
@@ -132,10 +132,10 @@ class PacmanWorld extends Forge2DWorld
 
     if (!firstRun) {
       for (final WrapperNoEvents wrapper in wrappers) {
+        assert(wrapper.isLoaded, wrapper);
         if (wrapper == _walls) {
           continue; //no need to reset, stops a flash on screen
         }
-        assert(wrapper.isLoaded);
         wrapper.reset();
       }
     }
@@ -188,8 +188,9 @@ class PacmanWorld extends Forge2DWorld
         final double angleDelta = smallAngle(
             fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!);
         const double maxSpinMultiplierRadius = 0.75;
-        final double spinMultiplier =
-            4 * min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
+        final double spinMultiplier = 4 *
+            game.level.spinSpeedFactor *
+            min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
 
         _tutorial.hide();
         _moveMazeAngleByDelta(angleDelta * spinMultiplier);
@@ -207,37 +208,30 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void _moveMazeAngleByDelta(double angleDelta) {
-    if (_cameraRotatableOnPacmanDeathFlourish && game.isGameLive) {
-      _setMazeAngle(game.camera.viewfinder.angle - angleDelta);
-
-      if (!doingLevelResetFlourish) {
-        if (!gameWonOrLost) {
-          game.stopwatch.resume();
-        }
-        ghosts
-          ..addSpawner()
-          ..sirenVolumeUpdatedTimer();
+    if (_cameraRotatableOnPacmanDeathFlourish &&
+        game.isLive &&
+        game.openingScreenCleared &&
+        !game.playbackMode) {
+      setMazeAngle(game.camera.viewfinder.angle + angleDelta);
+      if (!doingLevelResetFlourish && !game.isWonOrLost) {
+        game.startRegularItems();
       }
     }
   }
 
-  final Vector2 direction = Vector2.zero();
-
-  final Vector2 _tmpGravity = Vector2.zero();
+  final Vector2 downDirection = Vector2.zero();
   double gravityXSign = 0;
   double gravityYSign = 0;
-  void _setMazeAngle(double angle) {
-    //using tmpGravity to avoid creating a new Vector2 on each update / frame
-    //could instead directly do gravity = Vector2(calc, calc);
-    _tmpGravity
+
+  void setMazeAngle(double angle) {
+    game.recordAngle(angle);
+    game.camera.viewfinder.angle = angle;
+    downDirection
       ..setValues(-sin(angle), cos(angle))
       ..scale(game.level.levelSpeed);
-    /*
-    gravity = _tmpGravity;
-    gravityXSign = gravity.x.sign;
-    gravityYSign = gravity.y.sign;
-     */
-    direction.setFrom(_tmpGravity);
-    game.camera.viewfinder.angle = angle;
+
+    gravity = downDirection;
+    gravityXSign = gravity.x.sign; //as referred to every frame
+    gravityYSign = gravity.y.sign; //as referred to every frame
   }
 }

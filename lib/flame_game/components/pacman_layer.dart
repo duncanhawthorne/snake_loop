@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -15,14 +18,14 @@ class Pacmans extends WrapperNoEvents {
   final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
   final ValueNotifier<int> pacmanDyingNotifier = ValueNotifier<int>(0);
 
-  int numberAlivePacman() {
-    if (pacmanList.isEmpty) {
-      return 0;
-    }
-    return pacmanList
-        .map((Pacman pacman) => pacman.current != CharacterState.dead ? 1 : 0)
-        .reduce((int value, int element) => value + element);
-  }
+  bool get pacmanDeathIsFinalPacman =>
+      !multipleSpawningPacmans || pacmanList.length == 1 || !anyAlivePacman;
+
+  Vector2 get ghostHomingTarget => pacmanList[0].position;
+
+  bool get anyAlivePacman => pacmanList
+      .where((Pacman pacman) => pacman.current != CharacterState.dead)
+      .isNotEmpty;
 
   void resetInstantAfterPacmanDeath() {
     assert(pacmanList.length == 1);
@@ -30,7 +33,7 @@ class Pacmans extends WrapperNoEvents {
   }
 
   @override
-  void reset({bool mazeResize = false}) {
+  Future<void> reset({bool mazeResize = false}) async {
     for (final Pacman pacman in pacmanList) {
       pacman.removeFromParent();
     }
@@ -42,6 +45,6 @@ class Pacmans extends WrapperNoEvents {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    reset();
+    unawaited(reset());
   }
 }

@@ -35,7 +35,7 @@ class SnakeBodyBit extends CircleComponent
   void slideTo(Vector2 targetPosition, {Function()? onComplete}) {
     removeEffects(this);
     add(MoveToPositionEffect(targetPosition,
-        duration: distanceBetweenSnakeBits / world.direction.length,
+        duration: distanceBetweenSnakeBits / world.downDirection.length,
         onComplete: onComplete));
   }
 

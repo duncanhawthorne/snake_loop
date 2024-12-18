@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
@@ -41,10 +43,10 @@ class SnakeWrapper extends WrapperNoEvents
       pelletsRemainingNotifier: world.pellets.pelletsRemainingNotifier);
 
   bool get _activeGameplay =>
-      game.isGameLive &&
+      game.isLive &&
       game.stopwatchMilliSeconds > 0 &&
       !(game.overlays.isActive(GameScreen.loseDialogKey)) &&
-      !game.world.gameWonOrLost;
+      !game.isWonOrLost;
 
   final Vector2 _oneUsePosition = Vector2.all(0);
   Vector2 getSafePositionForFood() {
@@ -83,7 +85,7 @@ class SnakeWrapper extends WrapperNoEvents
   }
 
   @override
-  void reset() {
+  Future<void> reset() async {
     snakeHead.reset();
     _snakeBitsReset();
     snakeNeck = null;
@@ -102,7 +104,7 @@ class SnakeWrapper extends WrapperNoEvents
     add(snakeHead);
     add(food..position = getSafePositionForFood());
     game.camera.follow(snakeHead);
-    reset();
+    unawaited(reset());
   }
 
   void _addToStartOfSnake() {

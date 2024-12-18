@@ -15,7 +15,7 @@ class TutorialWrapper extends WrapperNoEvents
   @override
   void start() {
     Future<void>.delayed(_tutorialDelay, () {
-      if (!game.levelStarted &&
+      if (!game.stopwatchStarted &&
           !_tutorialEverManuallyHidden &&
           game.level.number == Levels.levelToShowInstructions) {
         //if user hasn't worked out how to start by now, give a prompt
@@ -32,13 +32,13 @@ class TutorialWrapper extends WrapperNoEvents
   }
 
   @override
-  void reset() {
+  Future<void> reset() async {
     game.overlays.remove(GameScreen.tutorialDialogKey);
   }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    reset();
+    unawaited(reset());
   }
 }
