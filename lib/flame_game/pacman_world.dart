@@ -9,9 +9,6 @@ import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
 import 'components/blocking_bar_layer.dart';
-import 'components/ghost_layer.dart';
-import 'components/pacman.dart';
-import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/snake_wrapper.dart';
 import 'components/tutorial_layer.dart';
@@ -39,8 +36,6 @@ final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 class PacmanWorld extends Forge2DWorld
     with HasGameReference<PacmanGame>, DragCallbacks {
   final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
-  final Pacmans pacmans = Pacmans();
-  final Ghosts ghosts = Ghosts();
   final PelletWrapper pellets = PelletWrapper();
   final WallWrapper _walls = WallWrapper();
   final TutorialWrapper _tutorial = TutorialWrapper();
@@ -66,55 +61,6 @@ class PacmanWorld extends Forge2DWorld
   void resetAfterGameWin() {
     game.audioController.stopSfx(SfxType.ghostsScared);
     play(SfxType.endMusic);
-    ghosts.resetAfterGameWin();
-  }
-
-  static const bool _slideCharactersAfterPacmanDeath = true;
-
-  void resetAfterPacmanDeath(Pacman dyingPacman) {
-    _resetSlideAfterPacmanDeath(dyingPacman);
-  }
-
-  void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
-    //reset ghost scared status. Shouldn't be relevant as just died
-    game.audioController.stopSfx(SfxType.ghostsScared);
-    if (!game.isWonOrLost) {
-      if (_slideCharactersAfterPacmanDeath) {
-        _cameraRotatableOnPacmanDeathFlourish = false;
-        dyingPacman.resetSlideAfterDeath();
-        ghosts.resetSlideAfterPacmanDeath();
-        resetSlideAngle(game.camera.viewfinder,
-            onComplete: _resetInstantAfterPacmanDeath);
-      } else {
-        _resetInstantAfterPacmanDeath();
-      }
-    } else {
-      doingLevelResetFlourish = false;
-    }
-  }
-
-  void _resetInstantAfterPacmanDeath() {
-    // ignore: dead_code
-    if (true || doingLevelResetFlourish) {
-      // originally thought must test doingLevelResetFlourish
-      // as could have been removed by reset during delay x 2
-      // but this code is only run from resetSlide,
-      // so if we have got here (accidentally) then resetSlide has run
-      // and rotation will be wrong
-      // so should clean up anyway
-      if (game.level.infLives) {
-        pacmans.numberOfDeathsNotifier.value = 0;
-        pacmans.pacmanDyingNotifier.value = 0;
-      }
-      pacmans.resetInstantAfterPacmanDeath();
-      ghosts.resetInstantAfterPacmanDeath();
-      _cameraAndTimersReset();
-      if (game.playbackMode) {
-        game.reset();
-      } else {
-        game.pauseEngineIfNoActivity();
-      }
-    }
   }
 
   void _cameraAndTimersReset() {

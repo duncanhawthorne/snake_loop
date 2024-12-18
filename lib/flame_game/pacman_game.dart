@@ -84,7 +84,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       (level.isTutorial
           ? 0
           : min(level.maxAllowedDeaths - 1,
-                  world.pacmans.numberOfDeathsNotifier.value) *
+                  world.snakeWrapper.numberOfDeathsNotifier.value) *
               _deathPenaltyMillis);
 
   bool stopwatchStarted = false;
@@ -162,16 +162,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void startRegularItems() {
     stopwatchStarted = true; //once per reset
     stopwatch.resume();
-    world.ghosts
-      ..addSpawner()
-      ..sirenVolumeUpdaterTimer();
   }
 
   void stopRegularItems() {
     stopwatch.pause();
-    world.ghosts
-      ..removeSpawner()
-      ..cancelSirenVolumeUpdaterTimer();
   }
 
   void _lifecycleChangeListener() {
@@ -303,7 +297,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       } else if (stopwatch.isRunning()) {
         //some game activity has happened, no need to pause, just cancel timer
         timer.cancel();
-      } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {
+      } else if (!world.isMounted || !world.snakeWrapper.isLoaded) {
         //core components haven't loaded yet, so wait before start frame count
         _framesRendered = 0;
       } else if (_framesRendered <= 5) {

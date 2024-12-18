@@ -9,14 +9,11 @@ import '../../style/dialog.dart';
 import '../../style/palette.dart';
 import '../game_screen.dart';
 import '../icons/circle_icon.dart';
-import '../icons/pacman_icons.dart';
 import '../pacman_game.dart';
 
 const double _statusWidgetHeightFactor = 1.0;
 const double _widgetSpacing = 8 * _statusWidgetHeightFactor;
 const double _clockSpacing = 8 * _statusWidgetHeightFactor;
-const double _pacmanOuterSpacing = 8 * _statusWidgetHeightFactor;
-const double _pacmanSpacing = 6 * _statusWidgetHeightFactor;
 const double pacmanIconSize = 21 * _statusWidgetHeightFactor;
 const double gIconSize = pacmanIconSize * 4 / 3;
 const double circleIconSize = 10 * _statusWidgetHeightFactor;
@@ -76,25 +73,6 @@ Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
       game.playbackMode ? null : game.toggleOverlay(GameScreen.startDialogKey);
     },
     icon: const Icon(Icons.menu, color: Palette.textColor),
-  );
-}
-
-// ignore: unused_element
-Widget _livesWidget(BuildContext context, PacmanGame game) {
-  return Padding(
-    padding: const EdgeInsets.only(
-        left: _pacmanOuterSpacing, right: _pacmanOuterSpacing),
-    child: ValueListenableBuilder<int>(
-      valueListenable: game.world.pacmans.numberOfDeathsNotifier,
-      builder: (BuildContext context, int value, Widget? child) {
-        return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: _pacmanSpacing,
-            children: List<Widget>.generate(
-                game.level.infLives ? 1 : game.level.maxAllowedDeaths,
-                (int index) => animatedPacmanIcon(game, index)));
-      },
-    ),
   );
 }
 
