@@ -5,9 +5,9 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
+import '../utils/constants.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/snake_wrapper.dart';
@@ -31,14 +31,13 @@ import 'pacman_game.dart';
 ///  `game`, which is a reference to the game class that the world is attached
 ///  to.
 
-final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
-
 class PacmanWorld extends Forge2DWorld
     with HasGameReference<PacmanGame>, DragCallbacks {
   final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
   final PelletWrapper pellets = PelletWrapper();
   final WallWrapper _walls = WallWrapper();
   final TutorialWrapper _tutorial = TutorialWrapper();
+
   // ignore: unused_field
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
@@ -59,7 +58,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void resetAfterGameWin() {
-    game.audioController.stopSfx(SfxType.ghostsScared);
+    game.audioController.stopSound(SfxType.ghostsScared);
     play(SfxType.endMusic);
   }
 
@@ -74,7 +73,7 @@ class PacmanWorld extends Forge2DWorld
 
   void reset({bool firstRun = false}) {
     _cameraAndTimersReset();
-    game.audioController.stopSfx(SfxType.ghostsScared);
+    game.audioController.stopSound(SfxType.ghostsScared);
 
     if (!firstRun) {
       for (final WrapperNoEvents wrapper in wrappers) {
@@ -110,7 +109,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    if (_iOSWeb) {
+    if (isiOSWeb) {
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
       _fingersLastDragAngle[event.pointerId] = atan2(
@@ -138,7 +137,6 @@ class PacmanWorld extends Forge2DWorld
             game.level.spinSpeedFactor *
             min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
 
-        _tutorial.hide();
         _moveMazeAngleByDelta(angleDelta * spinMultiplier);
       }
       _fingersLastDragAngle[event.pointerId] = fingerCurrentDragAngle;
@@ -166,8 +164,9 @@ class PacmanWorld extends Forge2DWorld
   }
 
   final Vector2 downDirection = Vector2.zero();
-  double gravityXSign = 0;
-  double gravityYSign = 0;
+
+  static const bool _updateGravityOnRotation = false;
+  Vector2 gravitySign = Vector2(0, 0);
 
   void setMazeAngle(double angle) {
     game.recordAngle(angle);
@@ -176,10 +175,9 @@ class PacmanWorld extends Forge2DWorld
       ..setValues(-sin(angle), cos(angle))
       ..scale(game.level.levelSpeed);
 
-    /*
-    gravity = downDirection;
-    gravityXSign = gravity.x.sign; //as referred to every frame
-    gravityYSign = gravity.y.sign; //as referred to every frame
-	*/
+    if (_updateGravityOnRotation) {
+      gravity = downDirection;
+      gravitySign.setValues(gravity.x.sign, gravity.y.sign); //used every frame
+    }
   }
 }

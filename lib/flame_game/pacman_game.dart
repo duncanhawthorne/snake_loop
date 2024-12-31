@@ -83,8 +83,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       (stopwatch.current * 1000).toInt() +
       (level.isTutorial
           ? 0
-          : min(level.maxAllowedDeaths - 1,
-                  world.snakeWrapper.numberOfDeathsNotifier.value) *
+          : min(level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
               _deathPenaltyMillis);
 
   bool stopwatchStarted = false;
@@ -94,9 +93,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   bool get openingScreenCleared =>
       !(!stopwatchStarted && overlays.isActive(GameScreen.startDialogKey));
 
+  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
+
   bool get isWonOrLost =>
-      world.pellets.pelletsRemainingNotifier.value <= 0 ||
-      world.snakeWrapper.numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
+          world.pellets.pelletsRemainingNotifier.value <= 0 ||
+      numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
 
   final Random random = Random();
 
@@ -112,7 +113,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       recordedMovesLive
           .add(<double>[(stopwatchMilliSeconds).toDouble(), angle]);
       if (recordedMovesLive.length % 100 == 0) {
-        debug(recordedMovesLive);
+        logGlobal(recordedMovesLive);
       }
     }
   }
@@ -124,12 +125,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         playbackModeCounter++;
         startRegularItems();
       }
-      while (playbackModeCounter < storedMoves.length &&
+      while (!world.doingLevelResetFlourish &&
+          playbackModeCounter < storedMoves.length &&
           stopwatchMilliSeconds > storedMoves[playbackModeCounter][0]) {
         world.setMazeAngle(storedMoves[playbackModeCounter][1]);
         playbackModeCounter++;
       }
-      if (stopwatchMilliSeconds > 20000) {
+      if (!world.doingLevelResetFlourish && stopwatchMilliSeconds > 20000) {
         reset(); //if stuck, reset
       }
     }
@@ -151,20 +153,31 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void pauseGame() {
     pause(); //timeScale = 0;
     pauseEngine();
+    regularItemsStarted = false; //so restart things next time
     //stopwatch.pause(); //shouldn't be necessary given timeScale = 0
   }
 
   void resumeGame() {
-    resume(); //timeScale = 1.0;
-    resumeEngine();
+    if (paused) {
+      regularItemsStarted = false; //so restart things next time
+      audioController.soLoudWorkaround();
+      resume(); //timeScale = 1.0;
+      resumeEngine();
+    }
   }
 
+  bool regularItemsStarted = false;
   void startRegularItems() {
-    stopwatchStarted = true; //once per reset
-    stopwatch.resume();
+    if (!regularItemsStarted) {
+      audioController.soLoudWorkaround();
+      regularItemsStarted = true;
+      stopwatchStarted = true; //once per reset
+      stopwatch.resume();
+    }
   }
 
   void stopRegularItems() {
+    regularItemsStarted = false;
     stopwatch.pause();
   }
 
@@ -178,9 +191,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void _winOrLoseGameListener() {
     assert(!stopwatchStarted); //so no instant trigger of listeners
-    world.snakeWrapper.numberOfDeathsNotifier.addListener(() {
-      if (world.snakeWrapper.numberOfDeathsNotifier.value >=
-              level.maxAllowedDeaths &&
+    numberOfDeathsNotifier.addListener(() {
+      if (numberOfDeathsNotifier.value >= level.maxAllowedDeaths &&
           stopwatchStarted &&
           !playbackMode) {
         assert(isWonOrLost);
@@ -199,13 +211,15 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     });
   }
 
+  static const int _minRecordableWinTimeMillis = 0 * 1000;
   void _handleWinGame() {
     assert(isWonOrLost);
     assert(!stopwatch.isRunning());
     assert(stopwatchStarted);
     if (world.pellets.pelletsRemainingNotifier.value == 0) {
       world.resetAfterGameWin();
-      if (stopwatchMilliSeconds > 0 * 1000 && !level.isTutorial) {
+      if (stopwatchMilliSeconds > _minRecordableWinTimeMillis &&
+          !level.isTutorial) {
         fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
       }
       playerProgress.saveLevelComplete(_getCurrentGameState());
@@ -217,7 +231,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void _handleLoseGame() {
     assert(isWonOrLost);
     assert(stopwatchStarted);
-    audioController.stopAllSfx();
+    audioController.stopAllSounds();
     cleanDialogs();
     overlays.add(GameScreen.loseDialogKey);
   }
@@ -228,7 +242,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       ..remove(GameScreen.loseDialogKey)
       ..remove(GameScreen.wonDialogKey)
       ..remove(GameScreen.tutorialDialogKey)
-      ..remove(GameScreen.resetDialogKey);
+      ..remove(GameScreen.resetDialogKey)
+      ..remove(GameScreen.debugDialogKey);
   }
 
   void toggleOverlay(String overlayKey) {
@@ -248,6 +263,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
+    //audioController.soLoudReset();
     playbackModeCounter = -1;
     playbackMode = !recordMode && level.number == Levels.playbackModeLevel;
     recordedMovesLive.clear();
@@ -277,6 +293,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void start() {
+    audioController.soLoudWorkaround();
     //resumeEngine();
     pauseEngineIfNoActivity();
     world.start();
@@ -340,7 +357,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     cleanDialogs();
-    audioController.stopAllSfx();
+    await audioController.stopAllSounds();
     super.onRemove();
   }
 }

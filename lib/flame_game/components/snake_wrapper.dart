@@ -31,8 +31,6 @@ class SnakeWrapper extends WrapperNoEvents
       bodyBits.where((SnakeBodyBit item) => item.isActive);
   bool neckSlideInProgress = false;
 
-  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
-
   int _snakeBitsLimit = 0;
   SnakeBodyBit? snakeNeck;
   SnakeBodyBit? snakeBitSlidingToNeck;
@@ -95,7 +93,7 @@ class SnakeWrapper extends WrapperNoEvents
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (game.level.number - 1);
     _snakeBitsLimit = 3 * snakeBitsOverlaps;
-    numberOfDeathsNotifier.value = 0;
+    game.numberOfDeathsNotifier.value = 0;
   }
 
   @override

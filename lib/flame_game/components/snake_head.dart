@@ -67,11 +67,11 @@ class SnakeHead extends CircleComponent
       if (other.current != CharacterState.slidingToAddToNeck &&
           other != snakeWrapper.snakeNeck) {
         // don't count collisions with snakeBit just added
-        snakeWrapper.numberOfDeathsNotifier.value++;
-        debug("trail intersect");
+        game.numberOfDeathsNotifier.value++;
+        logGlobal("trail intersect");
       }
     } else if (other is WallRectangleVisual) {
-      snakeWrapper.numberOfDeathsNotifier.value++;
+      game.numberOfDeathsNotifier.value++;
     }
   }
 
