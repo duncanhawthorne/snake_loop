@@ -176,8 +176,10 @@ class PacmanWorld extends Forge2DWorld
       ..setValues(-sin(angle), cos(angle))
       ..scale(game.level.levelSpeed);
 
+    /*
     gravity = downDirection;
     gravityXSign = gravity.x.sign; //as referred to every frame
     gravityYSign = gravity.y.sign; //as referred to every frame
+	*/
   }
 }
