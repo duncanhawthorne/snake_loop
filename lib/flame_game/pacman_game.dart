@@ -49,7 +49,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         HasQuadTreeCollisionDetection,
         SingleGameInstance,
         HasTimeScale {
-  PacmanGame({
+  PacmanGame._({
     required this.level,
     required int mazeId,
     required this.playerProgress,
@@ -63,6 +63,32 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         ) {
     this.mazeId = mazeId;
   }
+
+  factory PacmanGame({
+    required GameLevel level,
+    required int mazeId,
+    required PlayerProgress playerProgress,
+    required AudioController audioController,
+    required AppLifecycleStateNotifier appLifecycleStateNotifier,
+  }) {
+    if (_instance == null) {
+      _instance = PacmanGame._(
+          level: level,
+          mazeId: mazeId,
+          playerProgress: playerProgress,
+          audioController: audioController,
+          appLifecycleStateNotifier: appLifecycleStateNotifier);
+    } else {
+      _instance!
+        ..level = level
+        ..mazeId = mazeId
+        ..reset(firstRun: false, showStartDialog: true);
+    }
+    return _instance!;
+  }
+
+  ///ensures singleton [PacmanGame]
+  static PacmanGame? _instance;
 
   /// What the properties of the level that is played has.
   GameLevel level;
@@ -101,19 +127,19 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final Random random = Random();
 
-  late int playbackModeCounter;
+  late int _playbackModeCounter;
   bool playbackMode = false;
 
   // ignore: dead_code
-  static const bool recordMode = false && kDebugMode;
-  List<List<double>> recordedMovesLive = <List<double>>[];
+  static const bool _recordMode = false && kDebugMode;
+  final List<List<double>> _recordedMovesLive = <List<double>>[];
 
   void recordAngle(double angle) {
-    if (recordMode && !playbackMode) {
-      recordedMovesLive
+    if (_recordMode && !playbackMode) {
+      _recordedMovesLive
           .add(<double>[(stopwatchMilliSeconds).toDouble(), angle]);
-      if (recordedMovesLive.length % 100 == 0) {
-        logGlobal(recordedMovesLive);
+      if (_recordedMovesLive.length % 100 == 0) {
+        logGlobal(_recordedMovesLive);
       }
     }
   }
@@ -121,15 +147,15 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void playbackAngles() {
     if (playbackMode && isLive && _framesRendered > 30) {
       // && isLive && overlays.isActive(GameScreen.startDialogKey)
-      if (playbackModeCounter == -1) {
-        playbackModeCounter++;
+      if (_playbackModeCounter == -1) {
+        _playbackModeCounter++;
         startRegularItems();
       }
       while (!world.doingLevelResetFlourish &&
-          playbackModeCounter < storedMoves.length &&
-          stopwatchMilliSeconds > storedMoves[playbackModeCounter][0]) {
-        world.setMazeAngle(storedMoves[playbackModeCounter][1]);
-        playbackModeCounter++;
+          _playbackModeCounter < storedMoves.length &&
+          stopwatchMilliSeconds > storedMoves[_playbackModeCounter][0]) {
+        world.setMazeAngle(storedMoves[_playbackModeCounter][1]);
+        _playbackModeCounter++;
       }
       if (!world.doingLevelResetFlourish && stopwatchMilliSeconds > 20000) {
         reset(); //if stuck, reset
@@ -160,7 +186,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void resumeGame() {
     if (paused) {
       regularItemsStarted = false; //so restart things next time
-      audioController.soLoudWorkaround();
+      audioController.workaroundiOSSafariAudioOnUserInteraction();
       resume(); //timeScale = 1.0;
       resumeEngine();
     }
@@ -169,7 +195,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   bool regularItemsStarted = false;
   void startRegularItems() {
     if (!regularItemsStarted) {
-      audioController.soLoudWorkaround();
+      audioController.workaroundiOSSafariAudioOnUserInteraction();
       regularItemsStarted = true;
       stopwatchStarted = true; //once per reset
       stopwatch.resume();
@@ -264,9 +290,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
     //audioController.soLoudReset();
-    playbackModeCounter = -1;
-    playbackMode = !recordMode && level.number == Levels.playbackModeLevel;
-    recordedMovesLive.clear();
+    _playbackModeCounter = -1;
+    playbackMode = !_recordMode && level.number == Levels.playbackModeLevel;
+    _recordedMovesLive.clear();
     pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
     cleanDialogs();
@@ -293,7 +319,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void start() {
-    audioController.soLoudWorkaround();
+    audioController.workaroundiOSSafariAudioOnUserInteraction();
     //resumeEngine();
     pauseEngineIfNoActivity();
     world.start();
