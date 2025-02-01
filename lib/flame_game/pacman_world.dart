@@ -12,6 +12,7 @@ import 'components/blocking_bar_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/snake_wrapper.dart';
 import 'components/tutorial_layer.dart';
+import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
 import 'effects/remove_effects.dart';
@@ -51,6 +52,7 @@ class PacmanWorld extends Forge2DWorld
 
   // ignore: unused_field
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
+  final MovingWallWrapper _movingWalls = MovingWallWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
@@ -106,11 +108,15 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  static const bool _enableMovingWalls = false;
   @override
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
     wrappers.addAll(<WrapperNoEvents>[snakeWrapper, _walls, _tutorial]);
+    if (_enableMovingWalls) {
+      wrappers.add(_movingWalls);
+    }
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
@@ -177,7 +183,7 @@ class PacmanWorld extends Forge2DWorld
   final Vector2 downDirection = Vector2.zero();
 
   static const bool _updateGravityOnRotation = false;
-  Vector2 gravitySign = Vector2(0, 0);
+  final Vector2 gravitySign = Vector2(0, 0);
 
   void setMazeAngle(double angle) {
     game.recordAngle(angle);

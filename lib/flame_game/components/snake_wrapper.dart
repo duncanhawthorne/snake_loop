@@ -9,13 +9,14 @@ import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
+import 'pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_head.dart';
 import 'snake_line_part.dart';
 import 'wrapper_no_events.dart';
 
 final Paint snakePaint = Paint()..color = Palette.seed.color;
-final double snakeRadius = maze.spriteWidth / 2 * Maze.pelletScaleFactor * 2;
+final double snakeRadius = maze.spriteWidth / 2 * pelletScaleFactor * 2;
 final int snakeBitsOverlaps = 3;
 final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
 
