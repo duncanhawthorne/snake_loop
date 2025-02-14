@@ -461,7 +461,7 @@ class AudioController {
         assert(!_hiddenBlockPlay());
         clearSources();
         await soLoud.init();
-        soLoud.isInitialized;
+        assert(soLoud.isInitialized);
         _log.fine("soLoud now initialised");
         unawaited(_preloadSfx());
       }

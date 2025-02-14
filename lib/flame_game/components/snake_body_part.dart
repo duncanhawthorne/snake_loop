@@ -142,7 +142,7 @@ class SnakeBodyBit extends CircleComponent
     parent!.add(_backwardLineBit!);
   }
 
-  void syncRemovalActions() {
+  void _syncRemovalActions() {
     if (PacmanGame.stepDebug) {
       paint = snakeWarningPaint;
     }
@@ -156,13 +156,13 @@ class SnakeBodyBit extends CircleComponent
 
   @override
   void removeFromParent() {
-    syncRemovalActions();
+    _syncRemovalActions();
     super.removeFromParent();
   }
 
   @override
   Future<void> onRemove() async {
-    syncRemovalActions();
+    _syncRemovalActions();
     super.onRemove();
   }
 
@@ -189,5 +189,3 @@ class SnakeBodyBit extends CircleComponent
     }
   }
 }
-
-enum CharacterState { active, slidingToRemove, slidingToAddToNeck, deactive }
