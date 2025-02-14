@@ -21,7 +21,7 @@ class SnakeHead extends CircleComponent
             paint: snakePaint,
             radius: snakeRadius,
             anchor: Anchor.center,
-            priority: 100);
+            priority: PacmanGame.stepDebug ? -1 : 100);
 
   SnakeWrapper snakeWrapper;
 

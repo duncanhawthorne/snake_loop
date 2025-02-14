@@ -16,6 +16,8 @@ import 'snake_line_part.dart';
 import 'wrapper_no_events.dart';
 
 final Paint snakePaint = Paint()..color = Palette.seed.color;
+final Paint snakeWarningPaint = Paint()..color = Palette.warning.color;
+final Paint snakeTextPaint = Paint()..color = Palette.text.color;
 final double snakeRadius = maze.spriteWidth / 2 * pelletScaleFactor * 2;
 final int snakeBitsOverlaps = 3;
 final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
@@ -31,16 +33,17 @@ class SnakeWrapper extends WrapperNoEvents
   final List<SnakeBodyBit> bodyBits = <SnakeBodyBit>[];
   final List<SnakeBodyBit> spareBodyBits = <SnakeBodyBit>[];
 
-  SnakeBodyBit? get snakeBitSlidingToNeck =>
+  SnakeBodyBit? get _snakeBitSlidingToNeck =>
       bodyBits.isEmpty ? null : bodyBits[bodyBits.length - 1];
   SnakeBodyBit? get snakeNeck =>
       bodyBits.length < 2 ? null : bodyBits[bodyBits.length - 2];
-  SnakeBodyBit? get snakeBitSlidingToRemove => bodyBits[0];
+  SnakeBodyBit? get _snakeBitSlidingToRemove => bodyBits[0];
 
-  bool get _tooManyBits => bodyBits.length > snakeBitsLimit;
-  bool get snakeBitsMissing => bodyBits.length < 2;
+  bool get tooManyBits => bodyBits.length > _snakeBitsLimit;
+  bool get tooFewBits => bodyBits.length < _snakeBitsLimit;
+  bool get _snakeBitsMissing => bodyBits.length < 2;
 
-  int snakeBitsLimit = 0;
+  int _snakeBitsLimit = 0;
 
   late final Food food = Food(
       position: Vector2(0, 0),
@@ -74,7 +77,7 @@ class SnakeWrapper extends WrapperNoEvents
   }
 
   void extendSnake() {
-    snakeBitsLimit += 4 * snakeBitsOverlaps;
+    _snakeBitsLimit += 4 * snakeBitsOverlaps;
   }
 
   void _activateNthHitbox() {
@@ -87,10 +90,10 @@ class SnakeWrapper extends WrapperNoEvents
 
   void _topUpSpares() {
     for (int i = 0; i < 10 - spareBodyBits.length; i++) {
-      final SnakeBodyBit x =
+      final SnakeBodyBit spareBit =
           SnakeBodyBit(position: offscreen, snakeWrapper: this);
-      spareBodyBits.add(x);
-      add(x);
+      spareBodyBits.add(spareBit);
+      add(spareBit);
     }
   }
 
@@ -102,7 +105,7 @@ class SnakeWrapper extends WrapperNoEvents
 
   void addToStartOfSnake() {
     assert(!snakeHead.atStartingPosition);
-    if (_tooManyBits) {
+    if (tooManyBits) {
       return;
     }
     _getSpare().position = snakeHead.position;
@@ -110,10 +113,10 @@ class SnakeWrapper extends WrapperNoEvents
   }
 
   void _snakeBitsReset() {
-    for (SnakeBodyBit bit in bodyBits) {
+    for (SnakeBodyBit bit in bodyBits.toList()) {
       bit.removeFromParent();
     }
-    for (Component child in children) {
+    for (Component child in children.toList()) {
       if (child is SnakeLineBit) {
         child.removeFromParent();
       }
@@ -126,7 +129,7 @@ class SnakeWrapper extends WrapperNoEvents
     _snakeBitsReset();
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (game.level.number - 1);
-    snakeBitsLimit = 3 * snakeBitsOverlaps;
+    _snakeBitsLimit = 3 * snakeBitsOverlaps;
     game.numberOfDeathsNotifier.value = 0;
   }
 
@@ -136,7 +139,6 @@ class SnakeWrapper extends WrapperNoEvents
     add(snakeHead);
     add(food..position = getSafePositionForFood());
     game.camera.follow(snakeHead);
-    //topUpSpares();
     await reset();
   }
 
@@ -145,12 +147,14 @@ class SnakeWrapper extends WrapperNoEvents
     super.update(dt);
     if (_activeGameplay) {
       snakeHead.move(dt);
-      if (snakeBitsMissing) {
-        addToStartOfSnake();
+      while (_snakeBitsMissing) {
         addToStartOfSnake();
       }
-      snakeBitSlidingToNeck?.updatePositionAsSlidingToNeck();
-      snakeBitSlidingToRemove?.updatePositionAsSlidingToRemove();
+      _snakeBitSlidingToNeck?.updatePositionAsSlidingToNeck();
+      while (tooManyBits) {
+        _snakeBitSlidingToRemove?.updatePositionAsSlidingToRemove();
+      }
+      _snakeBitSlidingToRemove?.updatePositionAsSlidingToRemove();
     }
   }
 }

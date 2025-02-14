@@ -33,7 +33,7 @@ import 'pacman_game.dart';
 ///  to.
 
 class PacmanWorld extends Forge2DWorld
-    with HasGameReference<PacmanGame>, DragCallbacks {
+    with HasGameReference<PacmanGame>, DragCallbacks, TapCallbacks {
   PacmanWorld._();
 
   factory PacmanWorld() {
@@ -121,6 +121,14 @@ class PacmanWorld extends Forge2DWorld
       noEventsWrapper.add(wrapper);
     }
     reset(firstRun: true);
+  }
+
+  @override
+  void onTapDown(TapDownEvent event) {
+    super.onTapDown(event);
+    if (PacmanGame.stepDebug && game.paused) {
+      game.stepEngine();
+    }
   }
 
   @override

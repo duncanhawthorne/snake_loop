@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+
 import '../flame_game/pacman_game.dart';
 
 class Levels {
@@ -12,7 +14,8 @@ class Levels {
 
   static const List<int> _ghostSpawnTimerLengthPattern = <int>[5, 3, 2, 1];
 
-  static const double _levelSpeedFactor = 50 * (30 / flameGameZoom);
+  static const double _levelSpeedFactor =
+      50 * (30 / flameGameZoom) * (kDebugMode ? 1 : 1);
 
   double _tutorialFactor(int levelNum) {
     return levelNum >= 1

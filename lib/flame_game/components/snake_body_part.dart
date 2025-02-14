@@ -4,7 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
-import '../../utils/helper.dart';
+import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
@@ -24,7 +24,8 @@ class SnakeBodyBit extends CircleComponent
   SnakeWrapper snakeWrapper;
   SnakeBodyBit? _oneBack;
   SnakeBodyBit? _oneForward;
-  SnakeLineBit? _backwardLineBit;
+  late SnakeLineBit? _backwardLineBit =
+      SnakeLineBit(oneForward: this, oneBack: null);
   int numberId = 0;
 
   late final CircleHitbox _hitbox = CircleHitbox(
@@ -56,6 +57,9 @@ class SnakeBodyBit extends CircleComponent
         distanceBetweenSnakeBits) {
       //track
       position = snakeHead.position;
+      if (PacmanGame.stepDebug) {
+        paint = snakeTextPaint;
+      }
     } else {
       //land
       _landed = true;
@@ -63,18 +67,20 @@ class SnakeBodyBit extends CircleComponent
           (snakeHead.position - snakeNeck.position).normalized() *
               distanceBetweenSnakeBits;
       position = targetPosition;
+      if (PacmanGame.stepDebug) {
+        paint = snakePaint;
+      }
       snakeWrapper.addToStartOfSnake();
     }
     _fixLineBits();
   }
 
   void updatePositionAsSlidingToRemove() {
-    if (snakeWrapper.bodyBits.length < snakeWrapper.snakeBitsLimit) {
+    if (snakeWrapper.tooFewBits) {
       //add more bits to snake, no action to end of snake
       return;
     }
-    if (snakeWrapper.bodyBits.length > snakeWrapper.snakeBitsLimit &&
-        snakeWrapper.bodyBits.indexOf(this) == 0) {
+    if (snakeWrapper.tooManyBits && snakeWrapper.bodyBits.indexOf(this) == 0) {
       position = offscreen;
       removeFromParent();
     } else {
@@ -85,6 +91,9 @@ class SnakeBodyBit extends CircleComponent
             (position - _oneForward!.position).normalized() *
                 max(0, distanceBetweenSnakeBits - neckDistance);
         position = targetPosition;
+        if (PacmanGame.stepDebug) {
+          paint = snakeTextPaint;
+        }
       }
     }
     _fixLineBits();
@@ -102,10 +111,7 @@ class SnakeBodyBit extends CircleComponent
 
   void _makeLineSegment() {
     if (_oneBack != null) {
-      _backwardLineBit = SnakeLineBit(oneForward: this, oneBack: _oneBack!);
-      parent!.add(_backwardLineBit!);
-    } else {
-      logGlobal("on load null");
+      _backwardLineBit!.oneBack = _oneBack!;
     }
   }
 
@@ -133,17 +139,31 @@ class SnakeBodyBit extends CircleComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    parent!.add(_backwardLineBit!);
   }
 
-  @override
-  Future<void> onRemove() async {
+  void syncRemovalActions() {
+    if (PacmanGame.stepDebug) {
+      paint = snakeWarningPaint;
+    }
     _oneForward?._oneBack = null;
     snakeWrapper.bodyBits.remove(this);
-    super.onRemove();
     _backwardLineBit?.fixPosition();
     _backwardLineBit?.removeFromParent();
     _oneBack = null; //to help garbage collector
     _backwardLineBit = null; //to help garbage collector
+  }
+
+  @override
+  void removeFromParent() {
+    syncRemovalActions();
+    super.removeFromParent();
+  }
+
+  @override
+  Future<void> onRemove() async {
+    syncRemovalActions();
+    super.onRemove();
   }
 
   @override
