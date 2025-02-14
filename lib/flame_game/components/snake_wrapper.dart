@@ -19,6 +19,7 @@ final Paint snakePaint = Paint()..color = Palette.seed.color;
 final double snakeRadius = maze.spriteWidth / 2 * pelletScaleFactor * 2;
 final int snakeBitsOverlaps = 3;
 final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
+Vector2 offscreen = Vector2(400, 400);
 
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
@@ -28,14 +29,18 @@ class SnakeWrapper extends WrapperNoEvents
   late final SnakeHead snakeHead =
       SnakeHead(position: Vector2(0, 0), snakeWrapper: this);
   final List<SnakeBodyBit> bodyBits = <SnakeBodyBit>[];
-  Iterable<SnakeBodyBit> get _activeBodyBits =>
-      bodyBits.where((SnakeBodyBit item) => item.isActive);
-  bool neckSlideInProgress = false;
+  final List<SnakeBodyBit> spareBodyBits = <SnakeBodyBit>[];
 
-  int _snakeBitsLimit = 0;
-  SnakeBodyBit? snakeNeck;
-  SnakeBodyBit? snakeBitSlidingToNeck;
-  SnakeBodyBit? snakeBitSlidingToRemove;
+  SnakeBodyBit? get snakeBitSlidingToNeck =>
+      bodyBits.isEmpty ? null : bodyBits[bodyBits.length - 1];
+  SnakeBodyBit? get snakeNeck =>
+      bodyBits.length < 2 ? null : bodyBits[bodyBits.length - 2];
+  SnakeBodyBit? get snakeBitSlidingToRemove => bodyBits[0];
+
+  bool get _tooManyBits => bodyBits.length > snakeBitsLimit;
+  bool get snakeBitsMissing => bodyBits.length < 2;
+
+  int snakeBitsLimit = 0;
 
   late final Food food = Food(
       position: Vector2(0, 0),
@@ -58,7 +63,7 @@ class SnakeWrapper extends WrapperNoEvents
         ..y = (game.random.nextDouble() - 0.5) *
             (maze.mazeHeight - 2 * maze.blockWidth - snakeRadius * 2);
       safePos = true;
-      for (SnakeBodyBit bit in _activeBodyBits) {
+      for (SnakeBodyBit bit in bodyBits) {
         if ((bit.position - _oneUsePosition).length <
             snakeHead.width * (1 + hitboxGenerosity)) {
           safePos = false;
@@ -66,6 +71,42 @@ class SnakeWrapper extends WrapperNoEvents
       }
     }
     return _oneUsePosition;
+  }
+
+  void extendSnake() {
+    snakeBitsLimit += 4 * snakeBitsOverlaps;
+  }
+
+  void _activateNthHitbox() {
+    const int multy = 3;
+    if (bodyBits.length > snakeBitsOverlaps * multy) {
+      //far enough away from snakeHead
+      bodyBits[bodyBits.length - snakeBitsOverlaps * multy].activateHitbox();
+    }
+  }
+
+  void _topUpSpares() {
+    for (int i = 0; i < 10 - spareBodyBits.length; i++) {
+      final SnakeBodyBit x =
+          SnakeBodyBit(position: offscreen, snakeWrapper: this);
+      spareBodyBits.add(x);
+      add(x);
+    }
+  }
+
+  SnakeBodyBit _getSpare() {
+    _topUpSpares();
+    final SnakeBodyBit newBit = spareBodyBits[0]..activate();
+    return newBit;
+  }
+
+  void addToStartOfSnake() {
+    assert(!snakeHead.atStartingPosition);
+    if (_tooManyBits) {
+      return;
+    }
+    _getSpare().position = snakeHead.position;
+    _activateNthHitbox();
   }
 
   void _snakeBitsReset() {
@@ -79,21 +120,13 @@ class SnakeWrapper extends WrapperNoEvents
     }
   }
 
-  void extendSnake() {
-    _snakeBitsLimit += 4 * snakeBitsOverlaps;
-  }
-
   @override
   Future<void> reset() async {
     snakeHead.reset();
     _snakeBitsReset();
-    snakeNeck = null;
-    snakeBitSlidingToNeck = null;
-    snakeBitSlidingToRemove = null;
-    neckSlideInProgress = false;
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (game.level.number - 1);
-    _snakeBitsLimit = 3 * snakeBitsOverlaps;
+    snakeBitsLimit = 3 * snakeBitsOverlaps;
     game.numberOfDeathsNotifier.value = 0;
   }
 
@@ -103,39 +136,21 @@ class SnakeWrapper extends WrapperNoEvents
     add(snakeHead);
     add(food..position = getSafePositionForFood());
     game.camera.follow(snakeHead);
-    unawaited(reset());
-  }
-
-  void _addToStartOfSnake() {
-    assert(!snakeHead.atStartingPosition);
-    if (_activeBodyBits.isEmpty) {
-      add(SnakeBodyBit(position: snakeHead.position, snakeWrapper: this)
-        ..becomeNeck());
-    } else if (!neckSlideInProgress) {
-      add(SnakeBodyBit(
-          position: snakeHead.position, snakeWrapper: this, oneBack: snakeNeck)
-        ..becomeSlidingToAddToNeck());
-    }
-  }
-
-  bool get tooManyBits => _activeBodyBits.length > _snakeBitsLimit;
-
-  void _removeFromEndOfSnake() {
-    if (tooManyBits) {
-      _activeBodyBits.elementAt(0).becomeSlidingToRemove();
-    }
+    //topUpSpares();
+    await reset();
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-
     if (_activeGameplay) {
       snakeHead.move(dt);
-      _addToStartOfSnake();
-      snakeBitSlidingToNeck?.updatePositionAsSlidingToAddToNeck();
+      if (snakeBitsMissing) {
+        addToStartOfSnake();
+        addToStartOfSnake();
+      }
+      snakeBitSlidingToNeck?.updatePositionAsSlidingToNeck();
       snakeBitSlidingToRemove?.updatePositionAsSlidingToRemove();
-      _removeFromEndOfSnake();
     }
   }
 }

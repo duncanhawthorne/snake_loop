@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 
-import '../effects/move_to_effect.dart';
-import '../effects/remove_effects.dart';
+import '../../utils/helper.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
@@ -15,41 +15,17 @@ import 'snake_wrapper.dart';
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
   SnakeBodyBit(
-      {required super.position, required this.snakeWrapper, this.oneBack})
-      : super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
+      {required super.position,
+      required this.snakeWrapper,
+      SnakeBodyBit? oneBack})
+      : _oneBack = oneBack,
+        super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
 
   SnakeWrapper snakeWrapper;
-  bool get isActive => current == CharacterState.active;
-  bool get isDeactive => current == CharacterState.deactive;
-  SnakeBodyBit? oneBack;
-  SnakeLineBit? backwardLineBit;
+  SnakeBodyBit? _oneBack;
+  SnakeBodyBit? _oneForward;
+  SnakeLineBit? _backwardLineBit;
   int numberId = 0;
-
-  CharacterState _current = CharacterState.slidingToAddToNeck;
-  CharacterState get current => _current;
-  set current(CharacterState x) => <void>{
-        //debug(x),
-        _current = x
-      };
-
-  void slideTo(Vector2 targetPosition, {Function()? onComplete}) {
-    removeEffects(this);
-    add(MoveToPositionEffect(targetPosition,
-        duration: distanceBetweenSnakeBits / world.downDirection.length,
-        onComplete: onComplete));
-  }
-
-  void instantMoveTo(Vector2 targetPosition) {
-    removeEffects(this);
-    position = targetPosition;
-  }
-
-  void activate() {
-    current = CharacterState.active;
-    //move it to the last position in bodyBits so order is right for activeBits
-    snakeWrapper.bodyBits.remove(this);
-    snakeWrapper.bodyBits.add(this);
-  }
 
   late final CircleHitbox _hitbox = CircleHitbox(
     isSolid: true,
@@ -59,122 +35,115 @@ class SnakeBodyBit extends CircleComponent
     anchor: Anchor.center,
   );
 
+  void _fixLineBits() {
+    _backwardLineBit?.fixPosition();
+    _oneForward?._backwardLineBit?.fixPosition();
+    _oneBack?._backwardLineBit?.fixPosition();
+  }
+
+  bool _landed = false;
+
+  void updatePositionAsSlidingToNeck() {
+    if (_landed) {
+      return;
+    }
+    if (snakeWrapper.snakeNeck == null) {
+      return;
+    }
+    final SnakeHead snakeHead = snakeWrapper.snakeHead;
+    final SnakeBodyBit snakeNeck = snakeWrapper.snakeNeck!;
+    if (snakeHead.position.distanceTo(snakeNeck.position) <
+        distanceBetweenSnakeBits) {
+      //track
+      position = snakeHead.position;
+    } else {
+      //land
+      _landed = true;
+      final Vector2 targetPosition = snakeNeck.position +
+          (snakeHead.position - snakeNeck.position).normalized() *
+              distanceBetweenSnakeBits;
+      position = targetPosition;
+      snakeWrapper.addToStartOfSnake();
+    }
+    _fixLineBits();
+  }
+
+  void updatePositionAsSlidingToRemove() {
+    if (snakeWrapper.bodyBits.length < snakeWrapper.snakeBitsLimit) {
+      //add more bits to snake, no action to end of snake
+      return;
+    }
+    if (snakeWrapper.bodyBits.length > snakeWrapper.snakeBitsLimit &&
+        snakeWrapper.bodyBits.indexOf(this) == 0) {
+      position = offscreen;
+      removeFromParent();
+    } else {
+      if (_oneForward != null && snakeWrapper.snakeNeck != null) {
+        final double neckDistance = snakeWrapper.snakeHead.position
+            .distanceTo(snakeWrapper.snakeNeck!.position);
+        final Vector2 targetPosition = _oneForward!.position +
+            (position - _oneForward!.position).normalized() *
+                max(0, distanceBetweenSnakeBits - neckDistance);
+        position = targetPosition;
+      }
+    }
+    _fixLineBits();
+  }
+
+  bool get _willGetHitBox => numberId % snakeBitsOverlaps == 0;
+
+  void activateHitbox() {
+    if (_willGetHitBox) {
+      //only done for every n bits
+      _hitbox.collisionType = CollisionType.passive;
+      _hitbox.debugColor = Colors.red;
+    }
+  }
+
+  void _makeLineSegment() {
+    if (_oneBack != null) {
+      _backwardLineBit = SnakeLineBit(oneForward: this, oneBack: _oneBack!);
+      parent!.add(_backwardLineBit!);
+    } else {
+      logGlobal("on load null");
+    }
+  }
+
+  void activate() {
+    final List<SnakeBodyBit> bodyBits = snakeWrapper.bodyBits;
+    // ignore: cascade_invocations
+    bodyBits.add(this);
+    if (bodyBits.length == 1) {
+      _oneBack = null;
+      numberId = 0;
+    } else {
+      _oneBack = bodyBits[bodyBits.length - 2];
+      _oneBack!._oneForward = this;
+
+      numberId = _oneBack!.numberId + 1;
+    }
+    if (_willGetHitBox) {
+      add(_hitbox);
+    }
+    _oneForward = null;
+    _makeLineSegment();
+    snakeWrapper.spareBodyBits.remove(this);
+  }
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    add(_hitbox);
-    if (oneBack != null) {
-      backwardLineBit = SnakeLineBit(oneForward: this, oneBack: oneBack!);
-      parent!.add(backwardLineBit!);
-    }
-    if (!snakeWrapper.bodyBits.contains(this)) {
-      snakeWrapper.bodyBits.add(this);
-    }
-  }
-
-  void becomeSlidingToAddToNeck() {
-    if (snakeWrapper.snakeBitSlidingToNeck == null) {
-      numberId = 0;
-    } else {
-      numberId = snakeWrapper.snakeBitSlidingToNeck!.numberId + 1;
-    }
-    snakeWrapper
-      ..snakeBitSlidingToNeck = this
-      ..neckSlideInProgress = true;
-    snakeWrapper.snakeNeck?.oneForward ??= this;
-    current = CharacterState.slidingToAddToNeck;
-  }
-
-  void becomeNeck() {
-    activate();
-    snakeWrapper
-      ..snakeNeck = this
-      ..neckSlideInProgress = false;
-    //_hitbox.collisionType = CollisionType.passive;
-  }
-
-  void becomeSlidingToRemove() {
-    snakeWrapper.snakeBitSlidingToRemove = this;
-    _snakeNeckWhenStartedSliding ??= snakeWrapper.snakeNeck!;
-    current = CharacterState.slidingToRemove;
-  }
-
-  void fixLineBits() {
-    backwardLineBit?.fixPosition();
-    oneForward?.backwardLineBit?.fixPosition();
-    oneBack?.backwardLineBit?.fixPosition();
-  }
-
-  void updatePositionAsSlidingToAddToNeck() {
-    if (current == CharacterState.slidingToAddToNeck) {
-      assert(snakeWrapper.snakeNeck != null);
-      if (snakeWrapper.snakeNeck != null) {
-        final SnakeHead snakeHead = snakeWrapper.snakeHead;
-        final SnakeBodyBit snakeNeck = snakeWrapper.snakeNeck!;
-        if (snakeHead.position.distanceTo(snakeNeck.position) <
-            distanceBetweenSnakeBits) {
-          //track
-          position = snakeHead.position;
-        } else {
-          //land
-          final Vector2 targetPosition = snakeNeck.position +
-              (snakeHead.position - snakeNeck.position).normalized() *
-                  distanceBetweenSnakeBits;
-          position = targetPosition;
-          becomeNeck();
-        }
-      }
-      fixLineBits();
-    }
-  }
-
-  SnakeBodyBit? _snakeNeckWhenStartedSliding;
-  SnakeBodyBit? oneForward;
-  void updatePositionAsSlidingToRemove() {
-    if (current == CharacterState.slidingToRemove) {
-      if (oneForward == null) {
-        removeFromParent();
-      } else if (_snakeNeckWhenStartedSliding != snakeWrapper.snakeNeck) {
-        position = oneForward!.position;
-        removeFromParent();
-      } else {
-        if (oneForward != null && _snakeNeckWhenStartedSliding != null) {
-          final double neckDistance = snakeWrapper.snakeHead.position
-              .distanceTo(_snakeNeckWhenStartedSliding!.position);
-          final Vector2 targetPosition = oneForward!.position +
-              (position - oneForward!.position).normalized() *
-                  max(0, distanceBetweenSnakeBits - neckDistance);
-          position = targetPosition;
-        }
-      }
-      fixLineBits();
-    }
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    if (numberId % snakeBitsOverlaps == 0 &&
-        _hitbox.collisionType == CollisionType.inactive) {
-      if (snakeWrapper.snakeBitSlidingToNeck != null &&
-          numberId <
-              snakeWrapper.snakeBitSlidingToNeck!.numberId -
-                  snakeBitsOverlaps * 2) {
-        //far enough away so not overlapping with head still
-        _hitbox.collisionType = CollisionType.passive;
-      }
-    }
   }
 
   @override
   Future<void> onRemove() async {
-    current = CharacterState.deactive;
+    _oneForward?._oneBack = null;
     snakeWrapper.bodyBits.remove(this);
     super.onRemove();
-    backwardLineBit?.fixPosition();
-    backwardLineBit?.removeFromParent();
-    oneBack = null; //to help garbage collector
-    backwardLineBit = null; //to help garbage collector
+    _backwardLineBit?.fixPosition();
+    _backwardLineBit?.removeFromParent();
+    _oneBack = null; //to help garbage collector
+    _backwardLineBit = null; //to help garbage collector
   }
 
   @override
@@ -202,29 +171,3 @@ class SnakeBodyBit extends CircleComponent
 }
 
 enum CharacterState { active, slidingToRemove, slidingToAddToNeck, deactive }
-
-final List<SnakeBodyBit> _allBits = <SnakeBodyBit>[];
-Iterable<SnakeBodyBit> get _spareBits =>
-    _allBits.where((SnakeBodyBit item) => item.isDeactive); //!item.isActive
-
-// ignore: non_constant_identifier_names
-SnakeBodyBit RecycledSnakeBodyBit(
-    {required Vector2 position, required SnakeWrapper snakeWrapper}) {
-  if (_spareBits.isEmpty) {
-    final SnakeBodyBit newBit =
-        SnakeBodyBit(position: position, snakeWrapper: snakeWrapper);
-    _allBits.add(newBit);
-    return newBit;
-  } else {
-    final SnakeBodyBit recycledBit = _spareBits.first;
-    // ignore: cascade_invocations
-    recycledBit.activate(); // isActive = true;
-    assert(_spareBits.isEmpty || _spareBits.first != recycledBit);
-    recycledBit
-      ..position.setFrom(position)
-      ..snakeWrapper = snakeWrapper
-      ..add(MoveToPositionEffect(position,
-          duration: 0)); //FIXME fixes hitbox but shouldn't be necessary
-    return recycledBit;
-  }
-}
