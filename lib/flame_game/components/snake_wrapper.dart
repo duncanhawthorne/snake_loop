@@ -57,7 +57,6 @@ class SnakeWrapper extends WrapperNoEvents
   final Vector2 _volatileV2 = Vector2.all(0);
   Vector2 getSafePositionForFood() {
     bool safePos = false;
-    safePos = false;
     while (!safePos) {
       _volatileV2
         ..x = (game.random.nextDouble() - 0.5) *
@@ -66,7 +65,7 @@ class SnakeWrapper extends WrapperNoEvents
             (maze.mazeHeight - 2 * maze.blockWidth - snakeRadius * 2);
       safePos = true;
       for (SnakeBodyBit bit in bodyBits) {
-        if ((bit.position - _volatileV2).length <
+        if ((bit.position.distanceTo(_volatileV2)) <
             snakeHead.width * (1 + hitboxGenerosity)) {
           safePos = false;
         }
