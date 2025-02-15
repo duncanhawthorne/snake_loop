@@ -19,8 +19,9 @@ final Vector2 _startSize = Vector2(1, 1);
 
 class SnakeLineBit extends RectangleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {
-  SnakeLineBit({required this.oneForward, required this.oneBack})
-      : super(
+  SnakeLineBit({required SnakeBodyBit oneForward, required this.oneBack})
+      : _oneForward = oneForward,
+        super(
             position: _offscreenV,
             size: _startSize,
             anchor: Anchor.center,
@@ -29,9 +30,9 @@ class SnakeLineBit extends RectangleComponent
             priority: PacmanGame.stepDebug ? 1000 : -10);
 
   SnakeBodyBit? oneBack;
-  final SnakeBodyBit oneForward;
-  late final Vector2 forwardPosition = oneForward.position;
-  bool active = true;
+  final SnakeBodyBit _oneForward;
+  late final Vector2 _forwardPosition = _oneForward.position;
+  bool _active = true;
 
   @override
   void onLoad() {
@@ -39,9 +40,9 @@ class SnakeLineBit extends RectangleComponent
     height = snakeRadius * (PacmanGame.stepDebug ? 0.5 : 2);
   }
 
-  void hide() {
-    if (active) {
-      active = false;
+  void _hide() {
+    if (_active) {
+      _active = false;
       oneBack = null;
       position.setAll(_offscreen);
       width = 0;
@@ -49,18 +50,18 @@ class SnakeLineBit extends RectangleComponent
   }
 
   void fixPosition() {
-    if (oneBack == null || !oneForward.active || !oneBack!.active) {
-      hide();
+    if (oneBack == null || !_oneForward.active || !oneBack!.active) {
+      _hide();
     } else {
-      active = true;
+      _active = true;
       final Vector2 backwardPosition = oneBack!.position;
       position
-        ..setFrom(forwardPosition)
+        ..setFrom(_forwardPosition)
         ..add(backwardPosition)
         ..scale(0.5);
-      width = forwardPosition.distanceTo(backwardPosition);
-      angle = atan2(forwardPosition.y - backwardPosition.y,
-          forwardPosition.x - backwardPosition.x);
+      width = _forwardPosition.distanceTo(backwardPosition);
+      angle = atan2(_forwardPosition.y - backwardPosition.y,
+          _forwardPosition.x - backwardPosition.x);
     }
   }
 }
