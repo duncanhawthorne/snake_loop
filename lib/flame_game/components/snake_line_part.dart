@@ -29,7 +29,8 @@ class SnakeLineBit extends RectangleComponent
             priority: PacmanGame.stepDebug ? 1000 : -10);
 
   SnakeBodyBit? oneBack;
-  SnakeBodyBit oneForward;
+  final SnakeBodyBit oneForward;
+  late final Vector2 forwardPosition = oneForward.position;
   bool active = true;
 
   @override
@@ -52,13 +53,14 @@ class SnakeLineBit extends RectangleComponent
       hide();
     } else {
       active = true;
+      final Vector2 backwardPosition = oneBack!.position;
       position
-        ..setFrom(oneForward.position)
-        ..add(oneBack!.position)
-        ..scale(1 / 2);
-      width = oneForward.position.distanceTo(oneBack!.position);
-      angle = atan2(oneForward.position.y - oneBack!.position.y,
-          oneForward.position.x - oneBack!.position.x);
+        ..setFrom(forwardPosition)
+        ..add(backwardPosition)
+        ..scale(0.5);
+      width = forwardPosition.distanceTo(backwardPosition);
+      angle = atan2(forwardPosition.y - backwardPosition.y,
+          forwardPosition.x - backwardPosition.x);
     }
   }
 }

@@ -40,12 +40,6 @@ class SnakeBodyBit extends CircleComponent
     anchor: Anchor.center,
   );
 
-  void _fixLineBits() {
-    _backwardLineBit.fixPosition();
-    _oneForward?._backwardLineBit.fixPosition();
-    _oneBack?._backwardLineBit.fixPosition();
-  }
-
   bool _landed = false;
 
   void updatePositionAsSlidingToNeck() {
@@ -77,7 +71,7 @@ class SnakeBodyBit extends CircleComponent
       }
       snakeWrapper.addToStartOfSnake();
     }
-    _fixLineBits();
+    _backwardLineBit.fixPosition();
   }
 
   void updatePositionAsSlidingToRemove() {
@@ -102,7 +96,7 @@ class SnakeBodyBit extends CircleComponent
         }
       }
     }
-    _fixLineBits();
+    _oneForward?._backwardLineBit.fixPosition();
   }
 
   bool get _willGetHitBox => numberId % snakeBitsOverlaps == 0;
@@ -115,15 +109,10 @@ class SnakeBodyBit extends CircleComponent
     }
   }
 
-  void _makeLineSegment() {
-    if (_oneBack != null) {
-      _backwardLineBit.oneBack = _oneBack!;
-    }
-  }
-
   void activate() {
     _landed = false;
     active = true;
+    assert(_oneForward == null);
     final List<SnakeBodyBit> bodyBits = snakeWrapper.bodyBits;
     // ignore: cascade_invocations
     bodyBits.add(this);
@@ -134,12 +123,11 @@ class SnakeBodyBit extends CircleComponent
       _oneBack = bodyBits[bodyBits.length - 2];
       _oneBack!._oneForward = this;
       numberId = _oneBack!.numberId + 1;
+      _backwardLineBit.oneBack = _oneBack!;
     }
     if (_willGetHitBox) {
       add(_hitbox);
     }
-    _oneForward = null;
-    _makeLineSegment();
     snakeWrapper.spareBodyBits.remove(this);
   }
 
@@ -151,19 +139,19 @@ class SnakeBodyBit extends CircleComponent
 
   void _syncRemovalActions() {
     active = false;
+    snakeWrapper.bodyBits.remove(this);
     if (PacmanGame.stepDebug) {
       paint = snakeWarningPaint;
     }
     _oneForward?._oneBack = null;
-    snakeWrapper.bodyBits.remove(this);
     _backwardLineBit.oneBack = null;
-    _backwardLineBit.fixPosition();
-    _oneBack = null; //to help garbage collector
-    _hitbox.collisionType = CollisionType.inactive;
     _hitbox
-      ..removeFromParent()
-      ..debugColor = Colors.yellow;
-    _fixLineBits();
+      ..collisionType = CollisionType.inactive
+      ..debugColor = Colors.yellow
+      ..removeFromParent();
+    _oneForward?._backwardLineBit.fixPosition();
+    _oneForward = null;
+    _oneBack = null;
   }
 
   void removeToSpares() {
