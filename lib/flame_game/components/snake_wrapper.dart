@@ -12,7 +12,6 @@ import 'food_pellet.dart';
 import 'pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_head.dart';
-import 'snake_line_part.dart';
 import 'wrapper_no_events.dart';
 
 final Paint snakePaint = Paint()..color = Palette.seed.color;
@@ -114,12 +113,7 @@ class SnakeWrapper extends WrapperNoEvents
 
   void _snakeBitsReset() {
     for (SnakeBodyBit bit in bodyBits.toList()) {
-      bit.removeFromParent();
-    }
-    for (Component child in children.toList()) {
-      if (child is SnakeLineBit) {
-        child.removeFromParent();
-      }
+      bit.removeToSpares();
     }
   }
 

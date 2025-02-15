@@ -37,18 +37,26 @@ class SnakeLineBit extends RectangleComponent
     height = snakeRadius * (PacmanGame.stepDebug ? 0.5 : 2);
   }
 
+  void hide() {
+    oneBack = null;
+    position.setAll(_offscreen);
+    width = 0;
+  }
+
   void fixPosition() {
     if (oneBack == null) {
-      position.setAll(_offscreen);
+      hide();
       return;
     }
-    if (!oneForward.isMounted ||
+    if (!oneForward.active ||
+        !oneBack!.active ||
+        !oneForward.isMounted ||
         !oneBack!.isMounted ||
         oneForward.isRemoving ||
-        oneBack!.isRemoving) {
-      position.setAll(_offscreen);
-      width = 0;
-      removeFromParent();
+        oneBack!.isRemoving ||
+        !oneForward.snakeWrapper.contains(oneForward) ||
+        !oneForward.snakeWrapper.contains(oneBack!)) {
+      hide();
     } else {
       position
         ..setFrom(oneForward.position)

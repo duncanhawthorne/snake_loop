@@ -24,9 +24,10 @@ class SnakeBodyBit extends CircleComponent
   SnakeWrapper snakeWrapper;
   SnakeBodyBit? _oneBack;
   SnakeBodyBit? _oneForward;
-  late SnakeLineBit? _backwardLineBit =
+  late final SnakeLineBit _backwardLineBit =
       SnakeLineBit(oneForward: this, oneBack: null);
   int numberId = 0;
+  bool active = false;
 
   late final CircleHitbox _hitbox = CircleHitbox(
     isSolid: true,
@@ -37,9 +38,9 @@ class SnakeBodyBit extends CircleComponent
   );
 
   void _fixLineBits() {
-    _backwardLineBit?.fixPosition();
-    _oneForward?._backwardLineBit?.fixPosition();
-    _oneBack?._backwardLineBit?.fixPosition();
+    _backwardLineBit.fixPosition();
+    _oneForward?._backwardLineBit.fixPosition();
+    _oneBack?._backwardLineBit.fixPosition();
   }
 
   bool _landed = false;
@@ -82,7 +83,7 @@ class SnakeBodyBit extends CircleComponent
     }
     if (snakeWrapper.tooManyBits && snakeWrapper.bodyBits.indexOf(this) == 0) {
       position = offscreen;
-      removeFromParent();
+      removeToSpares();
     } else {
       if (_oneForward != null && snakeWrapper.snakeNeck != null) {
         final double neckDistance = snakeWrapper.snakeHead.position
@@ -111,11 +112,13 @@ class SnakeBodyBit extends CircleComponent
 
   void _makeLineSegment() {
     if (_oneBack != null) {
-      _backwardLineBit!.oneBack = _oneBack!;
+      _backwardLineBit.oneBack = _oneBack!;
     }
   }
 
   void activate() {
+    _landed = false;
+    active = true;
     final List<SnakeBodyBit> bodyBits = snakeWrapper.bodyBits;
     // ignore: cascade_invocations
     bodyBits.add(this);
@@ -125,7 +128,6 @@ class SnakeBodyBit extends CircleComponent
     } else {
       _oneBack = bodyBits[bodyBits.length - 2];
       _oneBack!._oneForward = this;
-
       numberId = _oneBack!.numberId + 1;
     }
     if (_willGetHitBox) {
@@ -139,19 +141,30 @@ class SnakeBodyBit extends CircleComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    parent!.add(_backwardLineBit!);
+    parent!.add(_backwardLineBit);
   }
 
   void _syncRemovalActions() {
+    active = false;
     if (PacmanGame.stepDebug) {
       paint = snakeWarningPaint;
     }
     _oneForward?._oneBack = null;
     snakeWrapper.bodyBits.remove(this);
-    _backwardLineBit?.fixPosition();
-    _backwardLineBit?.removeFromParent();
+    _backwardLineBit.oneBack = null;
+    _backwardLineBit.fixPosition();
     _oneBack = null; //to help garbage collector
-    _backwardLineBit = null; //to help garbage collector
+    _hitbox.collisionType = CollisionType.inactive;
+    _hitbox
+      ..removeFromParent()
+      ..debugColor = Colors.yellow;
+    _fixLineBits();
+  }
+
+  void removeToSpares() {
+    _syncRemovalActions();
+    snakeWrapper.spareBodyBits.add(this);
+    position = offscreen;
   }
 
   @override
