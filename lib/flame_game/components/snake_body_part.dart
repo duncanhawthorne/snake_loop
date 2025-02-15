@@ -74,9 +74,16 @@ class SnakeBodyBit extends CircleComponent
     _backwardLineBit.fixPosition();
   }
 
+  bool _extendMode = false;
   void updatePositionAsSlidingToRemove() {
     if (snakeWrapper.tooFewBits) {
       //add more bits to snake, no action to end of snake
+      _extendMode = true;
+      return;
+    }
+    if (_extendMode) {
+      //first time in extend mode don't reposition end else end will jump back
+      _extendMode = false;
       return;
     }
     if (snakeWrapper.tooManyBits && snakeWrapper.bodyBits.indexOf(this) == 0) {
