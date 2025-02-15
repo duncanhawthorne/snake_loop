@@ -5,6 +5,7 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
 import '../utils/constants.dart';
@@ -108,13 +109,13 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  static const bool _enableMovingWalls = false;
+  static const bool enableMovingWalls = true && kDebugMode;
   @override
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
     wrappers.addAll(<WrapperNoEvents>[snakeWrapper, _walls, _tutorial]);
-    if (_enableMovingWalls) {
+    if (enableMovingWalls) {
       wrappers.add(_movingWalls);
     }
     for (final WrapperNoEvents wrapper in wrappers) {
