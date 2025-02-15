@@ -108,32 +108,42 @@ class SnakeBodyBit extends CircleComponent
 
   bool get _willGetHitBox => numberId % snakeBitsOverlaps == 0;
 
-  void activateHitbox() {
-    if (_willGetHitBox) {
-      //only done for every n bits
-      _hitbox.collisionType = CollisionType.passive;
-      _hitbox.debugColor = Colors.red;
+  void activateHitbox(bool activate) {
+    if (activate) {
+      if (_willGetHitBox) {
+        //only done for every n bits
+        _hitbox
+          ..debugColor = Colors.red
+          ..collisionType = CollisionType.passive;
+      }
+    } else {
+      _hitbox
+        ..debugColor = Colors.yellow
+        ..collisionType = CollisionType.inactive
+        ..removeFromParent();
     }
   }
 
   void activate() {
     _landed = false;
     active = true;
-    assert(_oneForward == null);
+    assert(_oneForward == null); //can't be anything in front of new bit
+    assert(_oneBack == null); //hasn't been set yet
     final List<SnakeBodyBit> bodyBits = snakeWrapper.bodyBits;
-    // ignore: cascade_invocations
-    bodyBits.add(this);
-    if (bodyBits.length == 1) {
+    if (bodyBits.isEmpty) {
+      //first bit
       _oneBack = null;
       numberId = 0;
     } else {
-      _oneBack = bodyBits[bodyBits.length - 2];
+      _oneBack = bodyBits.last;
       _oneBack!._oneForward = this;
       numberId = _oneBack!.numberId + 1;
-      _backwardLineBit.oneBack = _oneBack!;
     }
+    _backwardLineBit.oneBack = _oneBack; //could be null
+    bodyBits.add(this);
     if (_willGetHitBox) {
-      add(_hitbox);
+      add(_hitbox); //load now so ready, activate later
+      assert(_hitbox.collisionType == CollisionType.inactive);
     }
     snakeWrapper.spareBodyBits.remove(this);
   }
@@ -144,38 +154,38 @@ class SnakeBodyBit extends CircleComponent
     parent!.add(_backwardLineBit);
   }
 
-  void _syncRemovalActions() {
+  void _deactivate() {
     active = false;
     snakeWrapper.bodyBits.remove(this);
     if (PacmanGame.stepDebug) {
       paint = snakeWarningPaint;
     }
+    activateHitbox(false);
     _oneForward?._oneBack = null;
-    _backwardLineBit.oneBack = null;
-    _hitbox
-      ..collisionType = CollisionType.inactive
-      ..debugColor = Colors.yellow
-      ..removeFromParent();
+    _oneForward?._backwardLineBit.oneBack = null;
     _oneForward?._backwardLineBit.fixPosition();
+    assert(_backwardLineBit.oneBack == null);
+    _backwardLineBit.oneBack = null;
     _oneForward = null;
+    assert(_oneBack == null);
     _oneBack = null;
   }
 
   void removeToSpares() {
-    _syncRemovalActions();
+    _deactivate();
     snakeWrapper.spareBodyBits.add(this);
     position = offscreen;
   }
 
   @override
   void removeFromParent() {
-    _syncRemovalActions();
+    _deactivate();
     super.removeFromParent();
   }
 
   @override
   Future<void> onRemove() async {
-    _syncRemovalActions();
+    _deactivate();
     super.onRemove();
   }
 

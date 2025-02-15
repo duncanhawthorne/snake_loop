@@ -79,11 +79,14 @@ class SnakeWrapper extends WrapperNoEvents
     _snakeBitsLimit += 4 * snakeBitsOverlaps;
   }
 
-  void _activateNthHitbox() {
-    const int multy = 3;
-    if (bodyBits.length > snakeBitsOverlaps * multy) {
+  void _activateMiddleBodyHitbox() {
+    const int numberOfLengthsUntilActiveHitbox = 3;
+    if (bodyBits.length >
+        snakeBitsOverlaps * numberOfLengthsUntilActiveHitbox) {
       //far enough away from snakeHead
-      bodyBits[bodyBits.length - snakeBitsOverlaps * multy].activateHitbox();
+      bodyBits[bodyBits.length -
+              snakeBitsOverlaps * numberOfLengthsUntilActiveHitbox]
+          .activateHitbox(true);
     }
   }
 
@@ -108,7 +111,7 @@ class SnakeWrapper extends WrapperNoEvents
       return;
     }
     _getSpare().position = snakeHead.position;
-    _activateNthHitbox();
+    _activateMiddleBodyHitbox();
   }
 
   void _snakeBitsReset() {
