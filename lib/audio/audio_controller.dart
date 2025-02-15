@@ -13,7 +13,7 @@ import '../utils/constants.dart';
 import '../utils/helper.dart';
 import 'sounds.dart';
 
-const bool _isAudioSystemEnabled = true;
+const bool _isAudioSystemEnabled = false;
 
 const bool _useSoLoudInDebug = true;
 final bool _platformForSoLoud = ((kDebugMode && _useSoLoudInDebug) || isiOSWeb);
