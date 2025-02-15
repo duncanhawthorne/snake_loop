@@ -30,6 +30,7 @@ class SnakeLineBit extends RectangleComponent
 
   SnakeBodyBit? oneBack;
   SnakeBodyBit oneForward;
+  bool active = true;
 
   @override
   void onLoad() {
@@ -38,32 +39,23 @@ class SnakeLineBit extends RectangleComponent
   }
 
   void hide() {
-    oneBack = null;
-    position.setAll(_offscreen);
-    width = 0;
+    if (active) {
+      active = false;
+      oneBack = null;
+      position.setAll(_offscreen);
+      width = 0;
+    }
   }
 
   void fixPosition() {
-    if (oneBack == null) {
-      hide();
-      return;
-    }
-    if (!oneForward.active ||
-        !oneBack!.active ||
-        !oneForward.isMounted ||
-        !oneBack!.isMounted ||
-        oneForward.isRemoving ||
-        oneBack!.isRemoving ||
-        !oneForward.snakeWrapper.contains(oneForward) ||
-        !oneForward.snakeWrapper.contains(oneBack!)) {
+    if (oneBack == null || !oneForward.active || !oneBack!.active) {
       hide();
     } else {
+      active = true;
       position
         ..setFrom(oneForward.position)
         ..add(oneBack!.position)
         ..scale(1 / 2);
-      //..x += snakeRadius
-      //..y += snakeRadius;
       width = oneForward.position.distanceTo(oneBack!.position);
       angle = atan2(oneForward.position.y - oneBack!.position.y,
           oneForward.position.x - oneBack!.position.x);
