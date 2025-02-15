@@ -14,8 +14,8 @@ final Paint _snakeLinePaint = Paint()..color = Palette.seed.color;
 final Paint _snakeLinePaintDebug = Paint()..color = Palette.warning.color;
 
 const double _offscreen = 10000;
-Vector2 _offscreenV = Vector2(_offscreen, _offscreen);
-Vector2 _startSize = Vector2(1, 1);
+final Vector2 _offscreenV = Vector2(_offscreen, _offscreen);
+final Vector2 _startSize = Vector2(1, 1);
 
 class SnakeLineBit extends RectangleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {

@@ -12,6 +12,9 @@ import 'snake_head.dart';
 import 'snake_line_part.dart';
 import 'snake_wrapper.dart';
 
+final Vector2 _volatileV2 = Vector2(0, 0);
+final Vector2 _hitboxPosition = Vector2.all(snakeRadius);
+
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
   SnakeBodyBit(
@@ -33,7 +36,7 @@ class SnakeBodyBit extends CircleComponent
     isSolid: true,
     collisionType: CollisionType.inactive,
     radius: radius * (1 - hitboxGenerosity),
-    position: Vector2.all(radius),
+    position: _hitboxPosition,
     anchor: Anchor.center,
   );
 
@@ -64,10 +67,11 @@ class SnakeBodyBit extends CircleComponent
     } else {
       //land
       _landed = true;
-      final Vector2 targetPosition = snakeNeck.position +
-          (snakeHead.position - snakeNeck.position).normalized() *
-              distanceBetweenSnakeBits;
-      position = targetPosition;
+      position = _volatileV2
+        ..setFrom(snakeHead.position)
+        ..sub(snakeNeck.position)
+        ..scaleTo(distanceBetweenSnakeBits)
+        ..add(snakeNeck.position);
       if (PacmanGame.stepDebug) {
         paint = snakePaint;
       }
@@ -88,10 +92,11 @@ class SnakeBodyBit extends CircleComponent
       if (_oneForward != null && snakeWrapper.snakeNeck != null) {
         final double neckDistance = snakeWrapper.snakeHead.position
             .distanceTo(snakeWrapper.snakeNeck!.position);
-        final Vector2 targetPosition = _oneForward!.position +
-            (position - _oneForward!.position).normalized() *
-                max(0, distanceBetweenSnakeBits - neckDistance);
-        position = targetPosition;
+        position = _volatileV2
+          ..setFrom(position)
+          ..sub(_oneForward!.position)
+          ..scaleTo(max(0.0001, distanceBetweenSnakeBits - neckDistance))
+          ..add(_oneForward!.position);
         if (PacmanGame.stepDebug) {
           paint = snakeTextPaint;
         }

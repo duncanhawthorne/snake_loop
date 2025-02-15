@@ -20,7 +20,7 @@ final Paint snakeTextPaint = Paint()..color = Palette.text.color;
 final double snakeRadius = maze.spriteWidth / 2 * pelletScaleFactor * 2;
 final int snakeBitsOverlaps = 3;
 final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
-Vector2 offscreen = Vector2(400, 400);
+final Vector2 offscreen = Vector2(400, 400);
 
 class SnakeWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
@@ -54,25 +54,25 @@ class SnakeWrapper extends WrapperNoEvents
       !(game.overlays.isActive(GameScreen.loseDialogKey)) &&
       !game.isWonOrLost;
 
-  final Vector2 _oneUsePosition = Vector2.all(0);
+  final Vector2 _volatileV2 = Vector2.all(0);
   Vector2 getSafePositionForFood() {
     bool safePos = false;
     safePos = false;
     while (!safePos) {
-      _oneUsePosition
+      _volatileV2
         ..x = (game.random.nextDouble() - 0.5) *
             (maze.mazeWidth - 2 * maze.blockWidth - snakeRadius * 2)
         ..y = (game.random.nextDouble() - 0.5) *
             (maze.mazeHeight - 2 * maze.blockWidth - snakeRadius * 2);
       safePos = true;
       for (SnakeBodyBit bit in bodyBits) {
-        if ((bit.position - _oneUsePosition).length <
+        if ((bit.position - _volatileV2).length <
             snakeHead.width * (1 + hitboxGenerosity)) {
           safePos = false;
         }
       }
     }
-    return _oneUsePosition;
+    return _volatileV2;
   }
 
   void extendSnake() {

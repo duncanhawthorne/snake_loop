@@ -42,7 +42,7 @@ class SnakeHead extends CircleComponent
   }
 
   void reset() {
-    position = Vector2(0, 0);
+    position.setAll(0);
   }
 
   bool get atStartingPosition => position.x == 0 && position.y == 0;
