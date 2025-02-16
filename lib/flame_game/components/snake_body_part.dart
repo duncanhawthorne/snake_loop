@@ -96,7 +96,7 @@ class SnakeBodyBit extends CircleComponent
         position = _volatileV2
           ..setFrom(position)
           ..sub(_oneForward!.position)
-          ..scaleTo(max(0.0001, distanceBetweenSnakeBits - neckDistance))
+          ..scaleTo(max(0, distanceBetweenSnakeBits - neckDistance))
           ..add(_oneForward!.position);
         if (PacmanGame.stepDebug) {
           paint = snakeTextPaint;
