@@ -12,8 +12,6 @@ import '../utils/constants.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/snake_wrapper.dart';
-import 'components/tutorial_layer.dart';
-import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
 import 'effects/remove_effects.dart';
@@ -49,11 +47,9 @@ class PacmanWorld extends Forge2DWorld
   final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
   final PelletWrapper pellets = PelletWrapper();
   final WallWrapper _walls = WallWrapper();
-  final TutorialWrapper _tutorial = TutorialWrapper();
 
   // ignore: unused_field
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
-  final MovingWallWrapper _movingWalls = MovingWallWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
@@ -109,15 +105,12 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  static const bool enableMovingWalls = true && kDebugMode;
+  static const bool enableMovingWalls = kDebugMode && false;
   @override
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
-    wrappers.addAll(<WrapperNoEvents>[snakeWrapper, _walls, _tutorial]);
-    if (enableMovingWalls) {
-      wrappers.add(_movingWalls);
-    }
+    wrappers.addAll(<WrapperNoEvents>[snakeWrapper, _walls]);
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
@@ -139,8 +132,9 @@ class PacmanWorld extends Forge2DWorld
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
       _fingersLastDragAngle[event.pointerId] = atan2(
-          event.canvasPosition.x - game.canvasSize.x / 2,
-          event.canvasPosition.y - game.canvasSize.y / 2);
+        event.canvasPosition.x - game.canvasSize.x / 2,
+        event.canvasPosition.y - game.canvasSize.y / 2,
+      );
     }
   }
 
@@ -149,15 +143,18 @@ class PacmanWorld extends Forge2DWorld
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     game.resumeGame();
-    _eventOffset.setValues(event.canvasStartPosition.x - game.canvasSize.x / 2,
-        event.canvasStartPosition.y - game.canvasSize.y / 2);
+    _eventOffset.setValues(
+      event.canvasStartPosition.x - game.canvasSize.x / 2,
+      event.canvasStartPosition.y - game.canvasSize.y / 2,
+    );
     final double eventVectorLengthProportion =
         _eventOffset.length / (min(game.canvasSize.x, game.canvasSize.y) / 2);
     final double fingerCurrentDragAngle = atan2(_eventOffset.x, _eventOffset.y);
     if (_fingersLastDragAngle.containsKey(event.pointerId)) {
       if (_fingersLastDragAngle[event.pointerId] != null) {
         final double angleDelta = smallAngle(
-            fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!);
+          fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!,
+        );
         const double maxSpinMultiplierRadius = 0.75;
         final double spinMultiplier = 4 *
             game.level.spinSpeedFactor *

@@ -25,7 +25,8 @@ class PelletWrapper extends WrapperNoEvents
       removeAll(children);
     }
     await addAll(
-        maze.pellets(game.level.superPelletsEnabled, pelletsRemainingNotifier));
+      maze.pellets(game.level.superPelletsEnabled, pelletsRemainingNotifier),
+    );
     clearSnapshot();
   }
 
@@ -36,6 +37,7 @@ class PelletWrapper extends WrapperNoEvents
       clearSnapshot();
     });
     await reset();
+    renderSnapshot = false;
   }
 
   @override

@@ -11,14 +11,15 @@ final Vector2 _volatileInstantConsumeVector2 =
 double get pelletScaleFactor => _pelletScaleFactor;
 
 class Pellet extends CircleComponent with IgnoreEvents {
-  Pellet(
-      {required super.position,
-      required this.pelletsRemainingNotifier,
-      double radiusFactor = 1,
-      double hitBoxRadiusFactor = 1})
-      : super(
-            radius: maze.spriteWidth / 2 * _pelletScaleFactor * radiusFactor,
-            anchor: Anchor.center) {
+  Pellet({
+    required super.position,
+    required this.pelletsRemainingNotifier,
+    double radiusFactor = 1,
+    double hitBoxRadiusFactor = 1,
+  }) : super(
+         radius: maze.spriteWidth / 2 * _pelletScaleFactor * radiusFactor,
+         anchor: Anchor.center,
+       ) {
     _hitbox = CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.active,
@@ -30,7 +31,7 @@ class Pellet extends CircleComponent with IgnoreEvents {
 
   late final CircleHitbox _hitbox;
   final ValueNotifier<int>
-      pelletsRemainingNotifier; //passed in on creation of object rather than use slow to initialise HasGameReference for every single pellet
+  pelletsRemainingNotifier; //passed in on creation of object rather than use slow to initialise HasGameReference for every single pellet
 
   @override
   Future<void> onLoad() async {

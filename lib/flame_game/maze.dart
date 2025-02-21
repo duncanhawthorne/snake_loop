@@ -14,24 +14,18 @@ final Map<int, String> mazeNames = <int, String>{
   -1: "T",
   0: "A",
   1: "B",
-  2: "C"
+  2: "C",
 };
 const int _bufferColumns = 2;
 
 class Maze {
-  Maze._({
-    required int mazeId,
-  }) {
+  Maze._({required int mazeId}) {
     setMazeId(mazeId);
   }
 
-  factory Maze({
-    required int mazeId,
-  }) {
+  factory Maze({required int mazeId}) {
     assert(_instance == null);
-    _instance ??= Maze._(
-      mazeId: mazeId,
-    );
+    _instance ??= Maze._(mazeId: mazeId);
     return _instance!;
   }
 
@@ -44,10 +38,10 @@ class Maze {
 
   void setMazeId(int id) {
     {
+      if (_mazeId == id) {
+        return;
+      }
       _mazeId = id;
-      ghostStart.setFrom(_volatileVectorOfMazeListCode(_kGhostStart));
-      pacmanStart.setFrom(_volatileVectorOfMazeListCode(_kPacmanStart));
-      _cage.setFrom(_volatileVectorOfMazeListCode(_kCage));
       //items below used every frame so calculate once here
       blockWidth = _blockWidth();
       spriteWidth = _spriteWidth();
@@ -57,6 +51,10 @@ class Maze {
       cloneThreshold = mazeWidth / 2 - spriteWidth / 2;
       mazeHalfWidth = mazeWidth / 2;
       mazeHalfHeight = mazeHeight / 2;
+      //other items
+      ghostStart.setFrom(_volatileVectorOfMazeListCode(_kGhostStart));
+      pacmanStart.setFrom(_volatileVectorOfMazeListCode(_kPacmanStart));
+      _cage.setFrom(_volatileVectorOfMazeListCode(_kCage));
       //item below used regularly
       _ghostStartForIdMap[0] = _ghostStartForId(0);
       _ghostStartForIdMap[1] = _ghostStartForId(1);
@@ -81,7 +79,7 @@ class Maze {
 
   bool get isDefault => mazeId == defaultMazeId;
 
-  int _mazeId = -1; //set properly in initializer
+  int _mazeId = -10; //set properly in initializer
   final Vector2 ghostStart = Vector2.zero(); //set properly in initializer
   final Vector2 pacmanStart = Vector2.zero(); //set properly in initializer
   final Vector2 _cage = Vector2.zero(); //set properly in initializer
@@ -101,7 +99,8 @@ class Maze {
   }
 
   Vector2 _ghostStartForId(int idNum) {
-    return ghostStart + Vector2(spriteWidth * (idNum % 3 - 1), 0);
+    assert(ghostStart.x != 0 || ghostStart.y != 0); //i.e. not set yet
+    return ghostStart.clone()..x += spriteWidth * (idNum % 3 - 1);
   }
 
   Vector2 ghostSpawnForId(int idNum) {
@@ -157,17 +156,23 @@ class Maze {
 
   final Vector2 _volatileInstantConsumeVector2 = Vector2.zero();
 
-  Vector2 _volatileVectorOfMazeListIndex(int icore, int jcore,
-      {double ioffset = 0, double joffset = 0}) {
+  Vector2 _volatileVectorOfMazeListIndex(
+    int icore,
+    int jcore, {
+    double ioffset = 0,
+    double joffset = 0,
+  }) {
     final double i = ioffset + icore;
     final double j = joffset + jcore;
 
     /// using [_volatileInstantConsumeVector2]
     /// so we don't have to make new Vector2 every time called
     /// but therefore must instantly consume the output as it may change
+    assert(blockWidth != 0); //i.e. not set yet
     _volatileInstantConsumeVector2.setValues(
-        (j + 1 / 2 - _mazeLayout[0].length / 2) * blockWidth,
-        (i + 1 / 2 - _mazeLayout.length / 2) * blockWidth);
+      (j + 1 / 2 - _mazeLayout[0].length / 2) * blockWidth,
+      (i + 1 / 2 - _mazeLayout.length / 2) * blockWidth,
+    );
     return _volatileInstantConsumeVector2;
   }
 
@@ -179,7 +184,7 @@ class Maze {
         }
       }
     }
-    throw 'Missing maze code';
+    throw 'Missing maze code $code';
   }
 
   bool _pelletCodeAtCell(int i, int j) {
@@ -200,22 +205,31 @@ class Maze {
   }
 
   List<Pellet> pellets(
-      bool superPelletsEnabled, ValueNotifier<int> pelletsRemainingNotifier) {
+    bool superPelletsEnabled,
+    ValueNotifier<int> pelletsRemainingNotifier,
+  ) {
     final List<Pellet> result = <Pellet>[];
     final Vector2 center = Vector2.zero();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         center.setFrom(
-            _volatileVectorOfMazeListIndex(i, j, ioffset: 0.5, joffset: 0.5));
+          _volatileVectorOfMazeListIndex(i, j, ioffset: 0.5, joffset: 0.5),
+        );
         if (_pelletAt(i, j)) {
           if (_mazeLayout[i][j] == _kSuperPellet && superPelletsEnabled) {
-            result.add(SuperPellet(
+            result.add(
+              SuperPellet(
                 position: center,
-                pelletsRemainingNotifier: pelletsRemainingNotifier));
+                pelletsRemainingNotifier: pelletsRemainingNotifier,
+              ),
+            );
           } else {
-            result.add(MiniPellet(
+            result.add(
+              MiniPellet(
                 position: center,
-                pelletsRemainingNotifier: pelletsRemainingNotifier));
+                pelletsRemainingNotifier: pelletsRemainingNotifier,
+              ),
+            );
           }
         }
       }
@@ -238,8 +252,12 @@ class Maze {
         localWallAt(i + 1, j + 1);
   }
 
-  int _bigBlockWidth(int i, int j,
-      {bool singleHeight = true, bool moving = false}) {
+  int _bigBlockWidth(
+    int i,
+    int j, {
+    bool singleHeight = true,
+    bool moving = false,
+  }) {
     final bool Function(int i, int j) localWallAt =
         moving ? _movingWallAt : _wallAt;
     assert(localWallAt(i, j));
@@ -252,8 +270,12 @@ class Maze {
     return k;
   }
 
-  int _bigBlockHeight(int i, int j,
-      {bool singleWidth = true, bool moving = false}) {
+  int _bigBlockHeight(
+    int i,
+    int j, {
+    bool singleWidth = true,
+    bool moving = false,
+  }) {
     final bool Function(int i, int j) localWallAt =
         moving ? _movingWallAt : _wallAt;
     assert(localWallAt(i, j));
@@ -266,18 +288,10 @@ class Maze {
     return l;
   }
 
-  FixtureDef _fixtureDefBlock(
-      {required Vector2 position,
-      required double width,
-      required double height,
-      double density = 1}) {
-    return FixtureDef(
-        PolygonShape()..setAsBox(width / 2, height / 2, position, 0),
-        density: density);
-  }
-
-  List<Component> mazeWalls(
-      {bool includeGround = true, bool includeVisualWalls = true}) {
+  List<Component> mazeWalls({
+    bool includeGround = true,
+    bool includeVisualWalls = true,
+  }) {
     final List<FixtureDef> fixtureDefs = <FixtureDef>[];
     final List<Component> result = <Component>[];
     final double scale = blockWidth;
@@ -290,10 +304,14 @@ class Maze {
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
             fixtureDefs.add(
-                FixtureDef(CircleShape(radius: scale / 2, position: center)));
-            result.add(WallCircleVisual(
+              FixtureDef(CircleShape(radius: scale / 2, position: center)),
+            );
+            result.add(
+              WallCircleVisual(
                 position: center,
-                radius: scale / 2 * _mazeInnerWallWidthFactor));
+                radius: scale / 2 * _mazeInnerWallWidthFactor,
+              ),
+            );
           }
           if (!_wallAt(i, j - 1)) {
             final int width = _bigBlockWidth(i, j);
@@ -301,14 +319,16 @@ class Maze {
               bigBlockCenter
                 ..setFrom(center)
                 ..x += scale * width / 2;
-              bigBlockSize.setValues(scale * (width + _pixelationBuffer),
-                  scale * _mazeInnerWallWidthFactor);
-              fixtureDefs.add(_fixtureDefBlock(
+              bigBlockSize.setValues(
+                scale * (width + _pixelationBuffer),
+                scale * _mazeInnerWallWidthFactor,
+              );
+              result.add(
+                WallRectangleVisual(
                   position: bigBlockCenter,
-                  width: scale * (width + _pixelationBuffer),
-                  height: scale));
-              result.add(WallRectangleVisual(
-                  position: bigBlockCenter, size: bigBlockSize));
+                  size: bigBlockSize,
+                ),
+              );
             }
           }
           if (!_wallAt(i - 1, j)) {
@@ -317,14 +337,16 @@ class Maze {
               bigBlockCenter
                 ..setFrom(center)
                 ..y += scale * height / 2;
-              bigBlockSize.setValues(scale * _mazeInnerWallWidthFactor,
-                  scale * (height + _pixelationBuffer));
-              fixtureDefs.add(_fixtureDefBlock(
+              bigBlockSize.setValues(
+                scale * _mazeInnerWallWidthFactor,
+                scale * (height + _pixelationBuffer),
+              );
+              result.add(
+                WallRectangleVisual(
                   position: bigBlockCenter,
-                  width: scale,
-                  height: scale * (height + _pixelationBuffer)));
-              result.add(WallRectangleVisual(
-                  position: bigBlockCenter, size: bigBlockSize));
+                  size: bigBlockSize,
+                ),
+              );
             }
           }
           if (_topLeftOfBigBlock(i, j)) {
@@ -336,8 +358,12 @@ class Maze {
                 ..x += scale * width / 2
                 ..y += scale * height / 2;
               bigBlockSize.setValues(scale * width, scale * height);
-              result.add(WallRectangleVisual(
-                  position: bigBlockCenter, size: bigBlockSize));
+              result.add(
+                WallRectangleVisual(
+                  position: bigBlockCenter,
+                  size: bigBlockSize,
+                ),
+              );
             }
           }
         }
@@ -356,55 +382,17 @@ class Maze {
     final List<Component> result = <Component>[];
     final double scale = blockWidth;
     const int width = 7;
-    final Vector2 size =
-        Vector2(scale * width, scale * _mazeLayoutVerticalLength());
-    final Vector2 position =
-        Vector2(scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0);
+    final Vector2 size = Vector2(
+      scale * width,
+      scale * _mazeLayoutVerticalLength(),
+    );
+    final Vector2 position = Vector2(
+      scale * (_mazeLayoutHorizontalLength() / 2 + width / 2),
+      0,
+    );
     result
-      ..add(
-        WallRectangleVisual(position: position, size: size),
-      )
-      ..add(
-        WallRectangleVisual(position: position..x *= -1, size: size),
-      );
-    return result;
-  }
-
-  List<Component> mazeMovingWalls(
-      {bool includeGround = true, bool includeVisualWalls = true}) {
-    const double lubricationScaleFactor = 0.98;
-    final List<Component> result = <Component>[];
-    final double scale = blockWidth;
-    final Vector2 center = Vector2.zero();
-    final Vector2 bigBlockCenter = Vector2.zero();
-    for (int i = 0; i < _mazeLayout.length; i++) {
-      for (int j = 0; j < _mazeLayout[i].length; j++) {
-        center.setFrom(_volatileVectorOfMazeListIndex(i, j));
-        if (_movingWallAt(i, j)) {
-          if (_topLeftOfBigBlock(i, j, moving: true)) {
-            final int width = _bigBlockWidth(i, j, moving: true);
-            final int height = _bigBlockHeight(i, j, moving: true);
-            if (width > 0 && height > 0) {
-              bigBlockCenter
-                ..setFrom(center)
-                ..x += scale * width / 2
-                ..y += scale * height / 2;
-              result.add((WallDynamic(
-                position: bigBlockCenter,
-                fixtureDefs: <FixtureDef>[
-                  _fixtureDefBlock(
-                      position: Vector2(0, 0),
-                      width: scale * (width + 1) * lubricationScaleFactor,
-                      height: scale * (height + 1) * lubricationScaleFactor,
-                      density: 10),
-                ],
-                //bigBlockCenter, //
-              )));
-            }
-          }
-        }
-      }
-    }
+      ..add(WallRectangleVisual(position: position, size: size))
+      ..add(WallRectangleVisual(position: position..x *= -1, size: size));
     return result;
   }
 
@@ -486,7 +474,7 @@ class Maze {
     '4100111111111001001111111110014',
     '4100000000000066600000000000014',
     '4100000000000066600000000000014',
-    '4111111111111111111111111111114'
+    '4111111111111111111111111111114',
   ];
 
   static const List<String> _mazeMP4Layout = <String>[
@@ -521,7 +509,7 @@ class Maze {
     '4100100111111001001111110010014',
     '4100000000000001000000000000014',
     '4100000000000001000000000000014',
-    '4111111111111111111111111111114'
+    '4111111111111111111111111111114',
   ];
 
   static const List<String> _mazeMP1Layout = <String>[
@@ -556,7 +544,7 @@ class Maze {
     '4100111001001111111001001110014',
     '4100000000000000000000000000014',
     '4100000000000000000000000000014',
-    '4111111111111111111111111111114'
+    '4111111111111111111111111111114',
   ];
 
   static const List<String> _mazeTutorialLayout = <String>[
@@ -591,7 +579,43 @@ class Maze {
     '4144111111111441441111111114414',
     '4100000000000000000000000000014',
     '4100000000000000000000000000014',
-    '4111111111111111111111111111114'
+    '4111111111111111111111111111114',
+  ];
+
+  // ignore: unused_field
+  static const List<String> _raceTrack = <String>[
+    '4111111111111111111111111111114',
+    '4144444444444411144444444444414',
+    '4144444444444448444444444444414',
+    '4144144444446647466444444414414',
+    '4144444444446644466444444444414',
+    '4144444444444444444444444444414',
+    '4144444111111111111111114444414',
+    '4144444111111111111111114444414',
+    '4144444114444444444444114444414',
+    '4144444114444444444444114444414',
+    '4144444114444444444444114444414',
+    '4146644114444444444444114466414',
+    '4146644114444444444444114466414',
+    '4144444114444444444444114444414',
+    '4144441114444449444444111444414',
+    '4144441114444444444444111444414',
+    '4144441114444444444444111444414',
+    '4144444114444444444444114444414',
+    '4144444114444444444444114444414',
+    '4144444114444444444444114444414',
+    '4144444114444444444444114444414',
+    '4144444114444444444444114444414',
+    '4144444114444444444444114444414',
+    '4144444114444444444444114444414',
+    '4114444111111111111111114444114',
+    '4114444111114444444111114444114',
+    '4144444444444444444444444444414',
+    '4144444444444661664444444444414',
+    '4144444444444664664444444444414',
+    '4144444444444444444444444444414',
+    '4144444111444444444441114444414',
+    '4111111111111111111111111111114',
   ];
 }
 

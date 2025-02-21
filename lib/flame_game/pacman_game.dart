@@ -58,7 +58,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }) : super(
           world: PacmanWorld(),
           camera: CameraComponent.withFixedResolution(
-              width: kVirtualGameSize, height: kVirtualGameSize),
+            width: kVirtualGameSize,
+            height: kVirtualGameSize,
+          ),
           zoom: flameGameZoom * _visualZoomMultiplier,
         ) {
     this.mazeId = mazeId;
@@ -73,11 +75,12 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }) {
     if (_instance == null) {
       _instance = PacmanGame._(
-          level: level,
-          mazeId: mazeId,
-          playerProgress: playerProgress,
-          audioController: audioController,
-          appLifecycleStateNotifier: appLifecycleStateNotifier);
+        level: level,
+        mazeId: mazeId,
+        playerProgress: playerProgress,
+        audioController: audioController,
+        appLifecycleStateNotifier: appLifecycleStateNotifier,
+      );
     } else {
       _instance!
         ..level = level
@@ -139,8 +142,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void recordAngle(double angle) {
     if (_recordMode && !playbackMode) {
-      _recordedMovesLive
-          .add(<double>[(stopwatchMilliSeconds).toDouble(), angle]);
+      _recordedMovesLive.add(<double>[
+        (stopwatchMilliSeconds).toDouble(),
+        angle,
+      ]);
       if (_recordedMovesLive.length % 100 == 0) {
         logGlobal(_recordedMovesLive);
       }
@@ -288,8 +293,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   @override
   Future<void> onGameResize(Vector2 size) async {
-    camera.viewport =
-        FixedResolutionViewport(resolution: _sanitizeScreenSize(size));
+    camera.viewport = FixedResolutionViewport(
+      resolution: _sanitizeScreenSize(size),
+    );
     super.onGameResize(size);
   }
 
@@ -369,8 +375,12 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     super.onLoad();
     _bugFixes();
     initializeCollisionDetection(
-      mapDimensions: Rect.fromLTWH(-maze.mazeWidth / 2, -maze.mazeHeight / 2,
-          maze.mazeWidth, maze.mazeHeight),
+      mapDimensions: Rect.fromLTWH(
+        -maze.mazeWidth / 2,
+        -maze.mazeHeight / 2,
+        maze.mazeWidth,
+        maze.mazeHeight,
+      ),
     ); //assume maze size won't change
     reset(firstRun: true, showStartDialog: true);
     _winOrLoseGameListener(); //isn't disposed so run once, not on start()
@@ -404,6 +414,9 @@ Vector2 _sanitizeScreenSize(Vector2 size) {
 const String _chars =
     'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 
-String _getRandomString(Random random, int length) =>
-    String.fromCharCodes(Iterable<int>.generate(
-        length, (_) => _chars.codeUnitAt(random.nextInt(_chars.length))));
+String _getRandomString(Random random, int length) => String.fromCharCodes(
+      Iterable<int>.generate(
+        length,
+        (_) => _chars.codeUnitAt(random.nextInt(_chars.length)),
+      ),
+    );
