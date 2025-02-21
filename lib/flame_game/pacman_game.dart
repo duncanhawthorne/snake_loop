@@ -56,13 +56,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     required this.audioController,
     required this.appLifecycleStateNotifier,
   }) : super(
-          world: PacmanWorld(),
-          camera: CameraComponent.withFixedResolution(
-            width: kVirtualGameSize,
-            height: kVirtualGameSize,
-          ),
-          zoom: flameGameZoom * _visualZoomMultiplier,
-        ) {
+         world: PacmanWorld(),
+         camera: CameraComponent.withFixedResolution(
+           width: kVirtualGameSize,
+           height: kVirtualGameSize,
+         ),
+         zoom: flameGameZoom * _visualZoomMultiplier,
+       ) {
     this.mazeId = mazeId;
   }
 
@@ -415,8 +415,8 @@ const String _chars =
     'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 
 String _getRandomString(Random random, int length) => String.fromCharCodes(
-      Iterable<int>.generate(
-        length,
-        (_) => _chars.codeUnitAt(random.nextInt(_chars.length)),
-      ),
-    );
+  Iterable<int>.generate(
+    length,
+    (_) => _chars.codeUnitAt(random.nextInt(_chars.length)),
+  ),
+);

@@ -17,11 +17,12 @@ class SnakeHead extends CircleComponent
         CollisionCallbacks,
         IgnoreEvents {
   SnakeHead({required super.position, required this.snakeWrapper})
-      : super(
-            paint: snakePaint,
-            radius: snakeRadius,
-            anchor: Anchor.center,
-            priority: PacmanGame.stepDebug ? -1 : 100);
+    : super(
+        paint: snakePaint,
+        radius: snakeRadius,
+        anchor: Anchor.center,
+        priority: PacmanGame.stepDebug ? -1 : 100,
+      );
 
   SnakeWrapper snakeWrapper;
 

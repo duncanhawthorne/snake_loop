@@ -156,7 +156,8 @@ class PacmanWorld extends Forge2DWorld
           fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!,
         );
         const double maxSpinMultiplierRadius = 0.75;
-        final double spinMultiplier = 4 *
+        final double spinMultiplier =
+            4 *
             game.level.spinSpeedFactor *
             min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
 

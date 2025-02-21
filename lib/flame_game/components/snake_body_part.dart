@@ -17,18 +17,20 @@ final Vector2 _hitboxPosition = Vector2.all(snakeRadius);
 
 class SnakeBodyBit extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
-  SnakeBodyBit(
-      {required super.position,
-      required this.snakeWrapper,
-      SnakeBodyBit? oneBack})
-      : _oneBack = oneBack,
-        super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
+  SnakeBodyBit({
+    required super.position,
+    required this.snakeWrapper,
+    SnakeBodyBit? oneBack,
+  }) : _oneBack = oneBack,
+       super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
 
   SnakeWrapper snakeWrapper;
   SnakeBodyBit? _oneBack;
   SnakeBodyBit? _oneForward;
-  late final SnakeLineBit _backwardLineBit =
-      SnakeLineBit(oneForward: this, oneBack: null);
+  late final SnakeLineBit _backwardLineBit = SnakeLineBit(
+    oneForward: this,
+    oneBack: null,
+  );
   int numberId = 0;
   bool active = false;
 
@@ -61,11 +63,12 @@ class SnakeBodyBit extends CircleComponent
     } else {
       //land
       _landed = true;
-      position = _volatileV2
-        ..setFrom(snakeHead.position)
-        ..sub(snakeNeck.position)
-        ..scaleTo(distanceBetweenSnakeBits)
-        ..add(snakeNeck.position);
+      position =
+          _volatileV2
+            ..setFrom(snakeHead.position)
+            ..sub(snakeNeck.position)
+            ..scaleTo(distanceBetweenSnakeBits)
+            ..add(snakeNeck.position);
       if (PacmanGame.stepDebug) {
         paint = snakePaint;
       }
@@ -91,13 +94,15 @@ class SnakeBodyBit extends CircleComponent
       removeToSpares();
     } else {
       if (_oneForward != null && snakeWrapper.snakeNeck != null) {
-        final double neckDistance = snakeWrapper.snakeHead.position
-            .distanceTo(snakeWrapper.snakeNeck!.position);
-        position = _volatileV2
-          ..setFrom(position)
-          ..sub(_oneForward!.position)
-          ..scaleTo(max(0, distanceBetweenSnakeBits - neckDistance))
-          ..add(_oneForward!.position);
+        final double neckDistance = snakeWrapper.snakeHead.position.distanceTo(
+          snakeWrapper.snakeNeck!.position,
+        );
+        position =
+            _volatileV2
+              ..setFrom(position)
+              ..sub(_oneForward!.position)
+              ..scaleTo(max(0, distanceBetweenSnakeBits - neckDistance))
+              ..add(_oneForward!.position);
         if (PacmanGame.stepDebug) {
           paint = snakeTextPaint;
         }
@@ -190,10 +195,7 @@ class SnakeBodyBit extends CircleComponent
   }
 
   @override
-  void onCollision(
-    Set<Vector2> intersectionPoints,
-    PositionComponent other,
-  ) {
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     _onCollideWith(other);
   }

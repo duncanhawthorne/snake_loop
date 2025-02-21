@@ -10,8 +10,8 @@ class MoveToPositionEffect extends MoveToEffect {
     Function()? onComplete,
     double duration = kResetPositionTimeMillis / 1000,
   }) : super(
-          destination,
-          EffectController(duration: duration, curve: Curves.easeOut),
-          onComplete: onComplete,
-        );
+         destination,
+         EffectController(duration: duration, curve: Curves.easeOut),
+         onComplete: onComplete,
+       );
 }

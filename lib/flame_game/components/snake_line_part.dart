@@ -20,14 +20,14 @@ final Vector2 _startSize = Vector2(1, 1);
 class SnakeLineBit extends RectangleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {
   SnakeLineBit({required SnakeBodyBit oneForward, required this.oneBack})
-      : _oneForward = oneForward,
-        super(
-            position: _offscreenV,
-            size: _startSize,
-            anchor: Anchor.center,
-            paint:
-                PacmanGame.stepDebug ? _snakeLinePaintDebug : _snakeLinePaint,
-            priority: PacmanGame.stepDebug ? 1000 : -10);
+    : _oneForward = oneForward,
+      super(
+        position: _offscreenV,
+        size: _startSize,
+        anchor: Anchor.center,
+        paint: PacmanGame.stepDebug ? _snakeLinePaintDebug : _snakeLinePaint,
+        priority: PacmanGame.stepDebug ? 1000 : -10,
+      );
 
   SnakeBodyBit? oneBack;
   final SnakeBodyBit _oneForward;
@@ -60,8 +60,10 @@ class SnakeLineBit extends RectangleComponent
         ..add(backwardPosition)
         ..scale(0.5);
       width = _forwardPosition.distanceTo(backwardPosition);
-      angle = atan2(_forwardPosition.y - backwardPosition.y,
-          _forwardPosition.x - backwardPosition.x);
+      angle = atan2(
+        _forwardPosition.y - backwardPosition.y,
+        _forwardPosition.x - backwardPosition.x,
+      );
     }
   }
 }

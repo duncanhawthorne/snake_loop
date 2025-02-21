@@ -64,11 +64,11 @@ class Maze {
 
   final Map<int, List<List<String>>> _decodedMazeList =
       <int, List<List<String>>>{
-    -1: _decodeMazeLayout(_mazeTutorialLayout),
-    0: _decodeMazeLayout(_borders),
-    1: _decodeMazeLayout(_mazeMP4Layout),
-    2: _decodeMazeLayout(_mazeMP1Layout)
-  };
+        -1: _decodeMazeLayout(_mazeTutorialLayout),
+        0: _decodeMazeLayout(_borders),
+        1: _decodeMazeLayout(_mazeMP4Layout),
+        2: _decodeMazeLayout(_mazeMP1Layout),
+      };
 
   List<List<String>> get _mazeLayout => _decodedMazeList[mazeId]!;
 
@@ -438,7 +438,7 @@ class Maze {
     '4144444444444444444444444444414',
     '4144444444444444444444444444414',
     '4144444444444444444444444444414',
-    '4111111111111111111111111111114'
+    '4111111111111111111111111111114',
   ];
 
   // ignore: unused_field

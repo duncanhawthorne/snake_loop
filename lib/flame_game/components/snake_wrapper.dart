@@ -27,8 +27,10 @@ class SnakeWrapper extends WrapperNoEvents
   @override
   final int priority = 1;
 
-  late final SnakeHead snakeHead =
-      SnakeHead(position: Vector2(0, 0), snakeWrapper: this);
+  late final SnakeHead snakeHead = SnakeHead(
+    position: Vector2(0, 0),
+    snakeWrapper: this,
+  );
   final List<SnakeBodyBit> bodyBits = <SnakeBodyBit>[];
   final List<SnakeBodyBit> spareBodyBits = <SnakeBodyBit>[];
 
@@ -45,8 +47,9 @@ class SnakeWrapper extends WrapperNoEvents
   int _snakeBitsLimit = 0;
 
   late final Food food = Food(
-      position: Vector2(0, 0),
-      pelletsRemainingNotifier: world.pellets.pelletsRemainingNotifier);
+    position: Vector2(0, 0),
+    pelletsRemainingNotifier: world.pellets.pelletsRemainingNotifier,
+  );
 
   bool get _activeGameplay =>
       game.isLive &&
@@ -59,9 +62,11 @@ class SnakeWrapper extends WrapperNoEvents
     bool safePos = false;
     while (!safePos) {
       _volatileV2
-        ..x = (game.random.nextDouble() - 0.5) *
+        ..x =
+            (game.random.nextDouble() - 0.5) *
             (maze.mazeWidth - 2 * maze.blockWidth - snakeRadius * 2)
-        ..y = (game.random.nextDouble() - 0.5) *
+        ..y =
+            (game.random.nextDouble() - 0.5) *
             (maze.mazeHeight - 2 * maze.blockWidth - snakeRadius * 2);
       safePos = true;
       for (SnakeBodyBit bit in bodyBits) {
@@ -91,8 +96,10 @@ class SnakeWrapper extends WrapperNoEvents
 
   void _topUpSpares() {
     for (int i = 0; i < 10 - spareBodyBits.length; i++) {
-      final SnakeBodyBit spareBit =
-          SnakeBodyBit(position: offscreen, snakeWrapper: this);
+      final SnakeBodyBit spareBit = SnakeBodyBit(
+        position: offscreen,
+        snakeWrapper: this,
+      );
       spareBodyBits.add(spareBit);
       add(spareBit);
     }
