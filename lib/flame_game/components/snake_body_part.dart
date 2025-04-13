@@ -14,6 +14,7 @@ import 'snake_line_part.dart';
 import 'snake_wrapper.dart';
 
 final Vector2 _volatileV2 = Vector2(0, 0);
+const double _spriteFactor = 1;
 
 class SnakeBodyBit extends SpriteComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
@@ -23,12 +24,12 @@ class SnakeBodyBit extends SpriteComponent
     SnakeBodyBit? oneBack,
   }) : _oneBack = oneBack,
        super(
-         size: Vector2.all(snakeRadius * 2),
+         size: Vector2.all(snakeRadius * 2 * _spriteFactor),
          anchor: Anchor.center,
          paint: snakePaint,
        );
 
-  double get radius => size.x / 2;
+  double get radius => size.x / 2 / _spriteFactor;
 
   SnakeWrapper snakeWrapper;
   SnakeBodyBit? _oneBack;

@@ -17,7 +17,7 @@ const double _offscreen = 10000;
 final Vector2 _offscreenV = Vector2(_offscreen, _offscreen);
 final Vector2 _startSize = Vector2(1, 1);
 
-class SnakeLineBit extends RectangleComponent
+class SnakeLineBit extends SpriteComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {
   SnakeLineBit({required SnakeBodyBit oneForward, required this.oneBack})
     : _oneForward = oneForward,
@@ -35,8 +35,9 @@ class SnakeLineBit extends RectangleComponent
   bool _active = true;
 
   @override
-  void onLoad() {
+  Future<void> onLoad() async {
     super.onLoad();
+    sprite = await Sprite.load('body.png');
     height = snakeRadius * (PacmanGame.stepDebug ? 0.5 : 2);
   }
 

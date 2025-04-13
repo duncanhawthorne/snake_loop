@@ -12,7 +12,7 @@ final Vector2 _volatileInstantConsumeVector2 =
     Vector2.zero(); //shared across all pellets
 
 double get pelletScaleFactor => _pelletScaleFactor;
-const double spriteFactor = 1.2;
+const double _spriteFactor = 1.2;
 
 class Pellet extends SpriteComponent
     with IgnoreEvents, HasWorldReference<PacmanWorld> {
@@ -23,7 +23,7 @@ class Pellet extends SpriteComponent
     double hitBoxRadiusFactor = 1,
   }) : super(
          size: Vector2.all(
-           spriteFactor *
+           _spriteFactor *
                2 *
                maze.spriteWidth /
                2 *
@@ -41,7 +41,7 @@ class Pellet extends SpriteComponent
     )..debugMode = false;
   }
 
-  double get radius => size.x / 2 / spriteFactor;
+  double get radius => size.x / 2 / _spriteFactor;
   late final CircleHitbox _hitbox;
   final ValueNotifier<int>
   pelletsRemainingNotifier; //passed in on creation of object rather than use slow to initialise HasGameReference for every single pellet

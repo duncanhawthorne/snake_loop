@@ -13,7 +13,7 @@ import 'snake_body_part.dart';
 import 'snake_wrapper.dart';
 import 'wall.dart';
 
-const double spriteFactor = 1.4;
+const double _spriteFactor = 1.4;
 
 class SnakeHead extends SpriteComponent
     with
@@ -24,13 +24,13 @@ class SnakeHead extends SpriteComponent
   SnakeHead({required super.position, required this.snakeWrapper})
     : super(
         paint: snakePaint,
-        size: Vector2.all(snakeRadius * 2 * spriteFactor),
+        size: Vector2.all(snakeRadius * 2 * _spriteFactor),
         anchor: Anchor.center,
         priority: PacmanGame.stepDebug ? -1 : 100,
       );
 
   SnakeWrapper snakeWrapper;
-  double get radius => size.x / 2 / spriteFactor;
+  double get radius => size.x / 2 / _spriteFactor;
 
   late final CircleHitbox _hitbox = CircleHitbox(
     isSolid: true,
