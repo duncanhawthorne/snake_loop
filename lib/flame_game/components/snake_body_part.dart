@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 
 import '../pacman_game.dart';
@@ -13,16 +14,21 @@ import 'snake_line_part.dart';
 import 'snake_wrapper.dart';
 
 final Vector2 _volatileV2 = Vector2(0, 0);
-final Vector2 _hitboxPosition = Vector2.all(snakeRadius);
 
-class SnakeBodyBit extends CircleComponent
+class SnakeBodyBit extends SpriteComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
   SnakeBodyBit({
     required super.position,
     required this.snakeWrapper,
     SnakeBodyBit? oneBack,
   }) : _oneBack = oneBack,
-       super(radius: snakeRadius, anchor: Anchor.center, paint: snakePaint);
+       super(
+         size: Vector2.all(snakeRadius * 2),
+         anchor: Anchor.center,
+         paint: snakePaint,
+       );
+
+  double get radius => size.x / 2;
 
   SnakeWrapper snakeWrapper;
   SnakeBodyBit? _oneBack;
@@ -38,9 +44,9 @@ class SnakeBodyBit extends CircleComponent
     isSolid: true,
     collisionType: CollisionType.inactive,
     radius: radius * (1 - hitboxGenerosity),
-    position: _hitboxPosition,
+    position: _volatileV2..setAll(size.x / 2),
     anchor: Anchor.center,
-  );
+  )..debugMode = false;
 
   bool _landed = false;
 
@@ -57,6 +63,7 @@ class SnakeBodyBit extends CircleComponent
         distanceBetweenSnakeBits) {
       //track
       position = snakeHead.position;
+      angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
       if (PacmanGame.stepDebug) {
         paint = snakeTextPaint;
       }
@@ -69,6 +76,7 @@ class SnakeBodyBit extends CircleComponent
             ..sub(snakeNeck.position)
             ..scaleTo(distanceBetweenSnakeBits)
             ..add(snakeNeck.position);
+      angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
       if (PacmanGame.stepDebug) {
         paint = snakePaint;
       }
@@ -156,6 +164,8 @@ class SnakeBodyBit extends CircleComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    sprite = await Sprite.load('body.png');
+    angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
     parent!.add(_backwardLineBit);
   }
 
