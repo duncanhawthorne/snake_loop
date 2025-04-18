@@ -25,5 +25,5 @@ class Palette {
   static const Color _transp = Color(0x00000000);
   static const Color _white = Color(0xffffffff);
   static const MaterialColor _grey = Colors.grey;
-  static const MaterialAccentColor _snakeGreen = Colors.greenAccent;
+  static const Color _snakeGreen = Color(0xFF2ECC71);
 }
