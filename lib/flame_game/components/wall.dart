@@ -6,18 +6,13 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../../style/palette.dart';
 
-final Paint _wallVisualPaint =
-    Paint()
-      //..filterQuality = FilterQuality.none
-      ////..color = Color.fromARGB(50, 100, 100, 100)
-      //..isAntiAlias = false
-      ..color = Palette.seed.color;
-final Paint _wallGroundPaint =
-    Paint()
-      //..filterQuality = FilterQuality.none
-      ////..color = Color.fromARGB(50, 100, 100, 100)
-      //..isAntiAlias = false
-      ..color = Palette.seed.color;
+final Paint _wallVisualPaint = Paint()..color = Palette.seed.color;
+final Paint _wallGroundPaint = Paint()..color = Palette.seed.color;
+final Paint _movingWallPaint = Paint()..color = Palette.text.color;
+
+//..filterQuality = FilterQuality.none
+////..color = Color.fromARGB(50, 100, 100, 100)
+//..isAntiAlias = false
 
 final BodyDef _staticBodyDef = BodyDef(type: BodyType.static);
 
