@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../../style/palette.dart';
+import '../pacman_game.dart';
 
 final Paint _wallVisualPaint = Paint()..color = Palette.seed.color;
 final Paint _wallGroundPaint = Paint()..color = Palette.seed.color;
@@ -40,8 +41,7 @@ class WallCircleVisual extends CircleComponent with IgnoreEvents {
     : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
-// ignore: always_specify_types
-class WallGround extends BodyComponent with IgnoreEvents {
+class WallGround extends BodyComponent<PacmanGame> with IgnoreEvents {
   WallGround({required super.fixtureDefs})
     : super(paint: _wallGroundPaint, bodyDef: _staticBodyDef);
 
