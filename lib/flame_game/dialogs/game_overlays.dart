@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../audio/audio_controller.dart';
 import '../../google/google.dart';
-import '../../google/google_widget.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
@@ -43,7 +42,7 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
               Visibility(
                 visible: g.loggingInProcess.value,
                 maintainState: false,
-                child: const GoogleSignInWidget(),
+                child: g.gWidget,
               ),
             ],
           );
