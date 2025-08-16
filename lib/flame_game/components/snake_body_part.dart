@@ -71,12 +71,11 @@ class SnakeBodyBit extends SpriteComponent
     } else {
       //land
       _landed = true;
-      position =
-          _volatileV2
-            ..setFrom(snakeHead.position)
-            ..sub(snakeNeck.position)
-            ..scaleTo(distanceBetweenSnakeBits)
-            ..add(snakeNeck.position);
+      position = _volatileV2
+        ..setFrom(snakeHead.position)
+        ..sub(snakeNeck.position)
+        ..scaleTo(distanceBetweenSnakeBits)
+        ..add(snakeNeck.position);
       angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
       if (PacmanGame.stepDebug) {
         paint = snakePaint;
@@ -106,12 +105,11 @@ class SnakeBodyBit extends SpriteComponent
         final double neckDistance = snakeWrapper.snakeHead.position.distanceTo(
           snakeWrapper.snakeNeck!.position,
         );
-        position =
-            _volatileV2
-              ..setFrom(position)
-              ..sub(_oneForward!.position)
-              ..scaleTo(max(0, distanceBetweenSnakeBits - neckDistance))
-              ..add(_oneForward!.position);
+        position = _volatileV2
+          ..setFrom(position)
+          ..sub(_oneForward!.position)
+          ..scaleTo(max(0, distanceBetweenSnakeBits - neckDistance))
+          ..add(_oneForward!.position);
         if (PacmanGame.stepDebug) {
           paint = snakeTextPaint;
         }
