@@ -9,7 +9,6 @@ import '../pacman_game.dart';
 
 final Paint _wallVisualPaint = Paint()..color = Palette.seed.color;
 final Paint _wallGroundPaint = Paint()..color = Palette.seed.color;
-final Paint _movingWallPaint = Paint()..color = Palette.text.color;
 
 //..filterQuality = FilterQuality.none
 ////..color = Color.fromARGB(50, 100, 100, 100)
