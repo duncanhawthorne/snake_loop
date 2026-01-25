@@ -62,69 +62,73 @@ class Ghost extends GameCharacter {
   }
 
   void setScared() {
-    if (!game.isWonOrLost) {
-      if (current != CharacterState.dead &&
-          current != CharacterState.spawning) {
-        // if dead, need to continue dead animation without physics applying,
-        // then get sequenced to scared via standard sequence code
-        current = CharacterState.scared;
-      }
+    if (game.isWonOrLost) {
+      return;
+    }
+    if (current != CharacterState.dead && current != CharacterState.spawning) {
+      // if dead, need to continue dead animation without physics applying,
+      // then get sequenced to scared via standard sequence code
+      current = CharacterState.scared;
     }
   }
 
   void setScaredToScaredIsh() {
-    if (!game.isWonOrLost) {
-      if (current == CharacterState.scared) {
-        current = CharacterState.scaredIsh;
-      }
+    if (game.isWonOrLost) {
+      return;
+    }
+    if (current == CharacterState.scared) {
+      current = CharacterState.scaredIsh;
     }
   }
 
   void setScaredIshToNormal() {
-    if (!game.isWonOrLost) {
-      if (current == CharacterState.scaredIsh) {
-        current = CharacterState.normal;
-      }
+    if (game.isWonOrLost) {
+      return;
+    }
+    if (current == CharacterState.scaredIsh) {
+      current = CharacterState.normal;
     }
   }
 
   void setDead() {
-    if (!game.isWonOrLost) {
-      current = CharacterState.dead; //stops further interactions
-      if (game.level.multipleSpawningGhosts) {
-        removeFromParent();
-      } else {
-        setPhysicsState(PhysicsState.none);
-        add(
-          MoveToPositionEffect(
-            maze.ghostStart,
-            onComplete: () => <void>{
-              setPositionStillActiveCurrentPosition(),
-              current = world.ghosts.current,
-            },
-          ),
-        );
-        resetSlideAngle(this);
-      }
+    if (game.isWonOrLost) {
+      return;
     }
-  }
-
-  void _setSpawning() {
-    if (!game.isWonOrLost) {
-      current = CharacterState.spawning; //stops further interactions
+    current = CharacterState.dead; //stops further interactions
+    if (game.level.multipleSpawningGhosts) {
+      removeFromParent();
+    } else {
       setPhysicsState(PhysicsState.none);
       add(
         MoveToPositionEffect(
-          game.level.homingGhosts
-              ? world.pacmans.ghostHomingTarget
-              : maze.ghostStart,
+          maze.ghostStart,
           onComplete: () => <void>{
             setPositionStillActiveCurrentPosition(),
             current = world.ghosts.current,
           },
         ),
       );
+      resetSlideAngle(this);
     }
+  }
+
+  void _setSpawning() {
+    if (game.isWonOrLost) {
+      return;
+    }
+    current = CharacterState.spawning; //stops further interactions
+    setPhysicsState(PhysicsState.none);
+    add(
+      MoveToPositionEffect(
+        game.level.homingGhosts
+            ? world.pacmans.ghostHomingTarget
+            : maze.ghostStart,
+        onComplete: () => <void>{
+          setPositionStillActiveCurrentPosition(),
+          current = world.ghosts.current,
+        },
+      ),
+    );
   }
 
   void resetSlideAfterPacmanDeath() {
@@ -135,8 +139,8 @@ class Ghost extends GameCharacter {
       MoveToPositionEffect(
         maze.ghostStartForId(ghostID),
         onComplete: () => <void>{
-          //bringBallToSprite()
-          //Calling bringBallToSprite here creates a crash
+          //initaliseFromOwnerAndSetDynamic()
+          //Calling initaliseFromOwnerAndSetDynamic here creates a crash
           //also would be a race condition
         },
       ),

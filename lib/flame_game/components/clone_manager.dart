@@ -11,27 +11,31 @@ mixin CloneManager on SpriteCharacter {
   bool _cloneEverMade = false; //could just test clone is null
   GameCharacter? _clone;
 
+  void _createClone() {
+    if (!_cloneEverMade) {
+      assert(_clone == null);
+      _cloneEverMade = true;
+      if (this is Pacman) {
+        _clone = PacmanClone(position: position, original: this as Pacman);
+      } else if (this is Ghost) {
+        _clone = GhostClone(
+          ghostID: (this as Ghost).ghostID,
+          original: this as Ghost,
+        );
+      }
+    }
+  }
+
   void _addRemoveClone() {
     if (isClone) {
+      //i.e. no cascade of clones
       return;
     }
-    assert(!isClone); //i.e. no cascade of clones
+    //run every frame
     if (position.x.abs() > maze.cloneThreshold) {
-      if (!_cloneEverMade) {
-        assert(_clone == null);
-        _cloneEverMade = true;
-        if (this is Pacman) {
-          _clone = PacmanClone(position: position, original: this as Pacman);
-        } else if (this is Ghost) {
-          _clone = GhostClone(
-            ghostID: (this as Ghost).ghostID,
-            original: this as Ghost,
-          );
-        }
-      }
+      _createClone();
       assert(_clone != null);
       assert(_clone!.isClone);
-      assert(!isClone);
       if (!_clone!.isMounted) {
         parent?.add(_clone!);
       }

@@ -4,10 +4,6 @@ import 'package:flutter/foundation.dart';
 
 import '../maze.dart';
 
-const double _pelletScaleFactor = 0.4;
-final Vector2 _volatileInstantConsumeVector2 =
-    Vector2.zero(); //shared across all pellets
-
 class Pellet extends CircleComponent with IgnoreEvents {
   Pellet({
     required super.position,
@@ -22,20 +18,21 @@ class Pellet extends CircleComponent with IgnoreEvents {
       isSolid: true,
       collisionType: CollisionType.passive,
       radius: radius * hitBoxRadiusFactor,
-      position: _volatileInstantConsumeVector2..setAll(radius),
+      position: _reusableVector..setAll(radius),
       anchor: Anchor.center,
     );
   }
 
+  static const double _pelletScaleFactor = 0.4;
+  static final Vector2 _reusableVector = Vector2.zero();
+
   late final CircleHitbox _hitbox;
-  final ValueNotifier<int>
-  pelletsRemainingNotifier; //passed in on creation of object rather than use slow to initialise HasGameReference for every single pellet
+  final ValueNotifier<int> pelletsRemainingNotifier;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     add(_hitbox);
-    //_hitbox.debugMode = true;
     pelletsRemainingNotifier.value += 1;
   }
 
