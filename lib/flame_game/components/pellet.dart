@@ -43,8 +43,7 @@ class Pellet extends SpriteComponent
 
   double get radius => size.x / 2 / _spriteFactor;
   late final CircleHitbox _hitbox;
-  final ValueNotifier<int>
-  pelletsRemainingNotifier; //passed in on creation of object rather than use slow to initialise HasGameReference for every single pellet
+  final ValueNotifier<int> pelletsRemainingNotifier;
 
   @override
   Future<void> onLoad() async {
