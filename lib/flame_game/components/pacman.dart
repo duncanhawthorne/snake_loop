@@ -239,6 +239,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    assert(isMounted && other.isMounted);
     onCollideWith(other);
     super.onCollision(intersectionPoints, other);
   }

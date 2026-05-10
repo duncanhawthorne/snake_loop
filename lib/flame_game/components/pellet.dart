@@ -38,6 +38,7 @@ class Pellet extends CircleComponent with IgnoreEvents {
 
   @override
   Future<void> onRemove() async {
+    _hitbox.removeFromParent();
     pelletsRemainingNotifier.value -= 1;
     super.onRemove();
   }

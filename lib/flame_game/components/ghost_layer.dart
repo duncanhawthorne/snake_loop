@@ -217,6 +217,7 @@ class Ghosts extends WrapperNoEvents
   }
 
   static const double _scaredToScaredIshThreshold = 2 / 3;
+
   void _stateSequence(double dt) {
     _ghostsScaredTimer.update(dt);
     if (current == CharacterState.scared) {
