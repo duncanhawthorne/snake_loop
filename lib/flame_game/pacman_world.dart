@@ -9,7 +9,6 @@ import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
 import '../utils/constants.dart';
-import 'components/blocking_bar_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/snake_wrapper.dart';
 import 'components/wall_layer.dart';
@@ -45,8 +44,6 @@ class PacmanWorld extends Forge2DWorld
   final PelletWrapper pellets = PelletWrapper();
   final WallWrapper _walls = WallWrapper();
 
-  // ignore: unused_field
-  final BlockingBarWrapper _blocking = BlockingBarWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};

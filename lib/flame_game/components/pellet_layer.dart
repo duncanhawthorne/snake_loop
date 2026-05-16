@@ -3,10 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
-import '../maze.dart';
 import '../pacman_game.dart';
-import 'mini_pellet.dart';
-import 'super_pellet.dart';
 import 'wrapper_no_events.dart';
 
 /// Use wrappers to minimise number of components directly in main world
@@ -25,25 +22,6 @@ class PelletWrapper extends WrapperNoEvents
   Future<void> reset() async {
     if (children.isNotEmpty) {
       removeAll(children);
-    }
-    final bool superPelletsEnabled = game.level.superPelletsEnabled;
-    for (Vector2 pos in maze.miniPelletPositions(superPelletsEnabled)) {
-      add(
-        MiniPellet(
-          position: pos,
-          pelletsRemainingNotifier: pelletsRemainingNotifier,
-        ),
-      );
-    }
-    if (superPelletsEnabled) {
-      for (Vector2 pos in maze.superPelletPositions()) {
-        add(
-          SuperPellet(
-            position: pos,
-            pelletsRemainingNotifier: pelletsRemainingNotifier,
-          ),
-        );
-      }
     }
     clearSnapshot();
   }
