@@ -8,12 +8,9 @@ import '../../utils/helper.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
-import 'pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_wrapper.dart';
 import 'wall.dart';
-
-const double _spriteFactor = 1.4;
 
 class SnakeHead extends SpriteComponent
     with
@@ -21,7 +18,7 @@ class SnakeHead extends SpriteComponent
         HasGameReference<PacmanGame>,
         CollisionCallbacks,
         IgnoreEvents {
-  SnakeHead({required super.position, required this.snakeWrapper})
+  SnakeHead({required this.snakeWrapper})
     : super(
         paint: snakePaint,
         size: Vector2.all(snakeRadius * 2 * _spriteFactor),
@@ -29,7 +26,9 @@ class SnakeHead extends SpriteComponent
         priority: PacmanGame.stepDebug ? -1 : 100,
       );
 
-  SnakeWrapper snakeWrapper;
+  static const double _spriteFactor = 1.4;
+
+  final SnakeWrapper snakeWrapper;
   double get radius => size.x / 2 / _spriteFactor;
 
   late final CircleHitbox _hitbox = CircleHitbox(
@@ -49,16 +48,20 @@ class SnakeHead extends SpriteComponent
     reset();
   }
 
+  void _updateAngle() {
+    angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+  }
+
   void reset() {
     position.setAll(0);
-    angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+    _updateAngle();
   }
 
   bool get atStartingPosition => position.x == 0 && position.y == 0;
 
   void move(double dt) {
     position.addScaled(world.downDirection, -dt);
-    angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+    _updateAngle();
   }
 
   @override
@@ -71,26 +74,25 @@ class SnakeHead extends SpriteComponent
   }
 
   void _onCollideWith(PositionComponent other) {
-    if (other is Pellet) {
-      _onCollideWithPellet(other);
-    } else if (other is SnakeBodyBit) {
-      if (other != snakeWrapper.snakeNeck) {
-        // don't count collisions with snakeBit just added
+    switch (other) {
+      case Food():
+        _onCollideWithFood(other);
+      case SnakeBodyBit():
+        if (other != snakeWrapper.snakeNeck) {
+          // don't count collisions with snakeBit just added
+          game.numberOfDeathsNotifier.value++;
+          logGlobal("trail intersect");
+        }
+      case WallRectangleVisual():
         game.numberOfDeathsNotifier.value++;
-        logGlobal("trail intersect");
-      }
-    } else if (other is WallRectangleVisual) {
-      game.numberOfDeathsNotifier.value++;
     }
   }
 
-  void _onCollideWithPellet(Pellet pellet) {
-    if (pellet is Food) {
-      snakeWrapper.extendSnake();
-      pellet
-        ..position = snakeWrapper.getSafePositionForFood()
-        ..angle = -atan2(world.downDirection.x, world.downDirection.y);
-      world.pellets.pelletsRemainingNotifier.value -= 1;
-    }
+  void _onCollideWithFood(Food food) {
+    snakeWrapper.extendSnake();
+    food
+      ..position = snakeWrapper.getSafePositionForFood()
+      ..angle = -atan2(world.downDirection.x, world.downDirection.y);
+    world.pellets.pelletsRemainingNotifier.value -= 1;
   }
 }

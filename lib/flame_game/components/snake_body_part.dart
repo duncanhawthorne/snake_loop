@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
-import 'pellet.dart';
 import 'snake_head.dart';
 import 'snake_line_part.dart';
 import 'snake_wrapper.dart';
@@ -51,6 +50,10 @@ class SnakeBodyBit extends SpriteComponent
 
   bool _landed = false;
 
+  void _updateAngle() {
+    angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+  }
+
   void updatePositionAsSlidingToNeck() {
     if (_landed) {
       return;
@@ -64,7 +67,7 @@ class SnakeBodyBit extends SpriteComponent
         distanceBetweenSnakeBits) {
       //track
       position = snakeHead.position;
-      angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+      _updateAngle();
       if (PacmanGame.stepDebug) {
         paint = snakeTextPaint;
       }
@@ -76,7 +79,7 @@ class SnakeBodyBit extends SpriteComponent
         ..sub(snakeNeck.position)
         ..scaleTo(distanceBetweenSnakeBits)
         ..add(snakeNeck.position);
-      angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+      _updateAngle();
       if (PacmanGame.stepDebug) {
         paint = snakePaint;
       }
@@ -97,7 +100,9 @@ class SnakeBodyBit extends SpriteComponent
       _extendMode = false;
       return;
     }
-    if (snakeWrapper.tooManyBits && snakeWrapper.bodyBits.indexOf(this) == 0) {
+    if (snakeWrapper.tooManyBits &&
+        snakeWrapper.bodyBits.isNotEmpty &&
+        snakeWrapper.bodyBits.first == this) {
       position = offscreen;
       removeToSpares();
     } else {
@@ -164,7 +169,7 @@ class SnakeBodyBit extends SpriteComponent
   Future<void> onLoad() async {
     await super.onLoad();
     sprite = await Sprite.load('body.png');
-    angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+    _updateAngle();
     parent!.add(_backwardLineBit);
   }
 
@@ -210,15 +215,15 @@ class SnakeBodyBit extends SpriteComponent
   }
 
   void _onCollideWith(PositionComponent other) {
-    if (other is Pellet) {
+    if (other is Food) {
       //debug(["snake body bit collide", other]);
-      _onCollideWithPellet(other);
+      _onCollideWithFood(other);
     }
   }
 
-  void _onCollideWithPellet(Pellet pellet) {
-    if (pellet is Food && snakeWrapper.snakeNeck != this) {
-      pellet.position = snakeWrapper.getSafePositionForFood();
+  void _onCollideWithFood(Food food) {
+    if (snakeWrapper.snakeNeck != this) {
+      food.position = snakeWrapper.getSafePositionForFood();
       //dont increment score as not captured by head
     }
   }

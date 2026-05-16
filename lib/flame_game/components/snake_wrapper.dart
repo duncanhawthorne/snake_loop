@@ -27,10 +27,7 @@ class SnakeWrapper extends WrapperNoEvents
   @override
   final int priority = 1;
 
-  late final SnakeHead snakeHead = SnakeHead(
-    position: Vector2(0, 0),
-    snakeWrapper: this,
-  );
+  late final SnakeHead snakeHead = SnakeHead(snakeWrapper: this);
   final List<SnakeBodyBit> bodyBits = <SnakeBodyBit>[];
   final List<SnakeBodyBit> spareBodyBits = <SnakeBodyBit>[];
 
@@ -38,7 +35,8 @@ class SnakeWrapper extends WrapperNoEvents
       bodyBits.isEmpty ? null : bodyBits[bodyBits.length - 1];
   SnakeBodyBit? get snakeNeck =>
       bodyBits.length < 2 ? null : bodyBits[bodyBits.length - 2];
-  SnakeBodyBit? get _snakeBitSlidingToRemove => bodyBits[0];
+  SnakeBodyBit? get _snakeBitSlidingToRemove =>
+      bodyBits.isEmpty ? null : bodyBits.first;
 
   bool get tooManyBits => bodyBits.length > _snakeBitsLimit;
   bool get tooFewBits => bodyBits.length < _snakeBitsLimit;
