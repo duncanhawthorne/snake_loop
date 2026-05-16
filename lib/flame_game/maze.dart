@@ -2,13 +2,9 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flutter/foundation.dart';
 
 import 'components/lap_angle.dart';
-import 'components/mini_pellet.dart';
-import 'components/pellet.dart';
 import 'components/physics_ball.dart';
-import 'components/super_pellet.dart';
 import 'components/wall.dart';
 import 'pacman_game.dart';
 
@@ -208,37 +204,35 @@ class Maze {
         _pelletCodeAtCell(i + 1, j + 1);
   }
 
-  List<Pellet> pellets(
-    bool superPelletsEnabled,
-    ValueNotifier<int> pelletsRemainingNotifier,
-  ) {
-    final List<Pellet> result = <Pellet>[];
+  Iterable<Vector2> miniPelletPositions(bool superPelletsEnabled) sync* {
     final Vector2 center = Vector2.zero();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        center.setFrom(
-          _volatileVectorOfMazeListIndex(i, j, ioffset: 0.5, joffset: 0.5),
-        );
         if (_pelletAt(i, j)) {
-          if (_mazeLayout[i][j] == _kSuperPellet && superPelletsEnabled) {
-            result.add(
-              SuperPellet(
-                position: center,
-                pelletsRemainingNotifier: pelletsRemainingNotifier,
-              ),
+          final bool isSuperPellet = _mazeLayout[i][j] == _kSuperPellet;
+          if (!isSuperPellet || !superPelletsEnabled) {
+            center.setFrom(
+              _volatileVectorOfMazeListIndex(i, j, ioffset: 0.5, joffset: 0.5),
             );
-          } else {
-            result.add(
-              MiniPellet(
-                position: center,
-                pelletsRemainingNotifier: pelletsRemainingNotifier,
-              ),
-            );
+            yield center;
           }
         }
       }
     }
-    return result;
+  }
+
+  Iterable<Vector2> superPelletPositions() sync* {
+    final Vector2 center = Vector2.zero();
+    for (int i = 0; i < _mazeLayout.length; i++) {
+      for (int j = 0; j < _mazeLayout[i].length; j++) {
+        if (_pelletAt(i, j) && _mazeLayout[i][j] == _kSuperPellet) {
+          center.setFrom(
+            _volatileVectorOfMazeListIndex(i, j, ioffset: 0.5, joffset: 0.5),
+          );
+          yield center;
+        }
+      }
+    }
   }
 
   static const double _mazeInnerWallWidthFactor = 0.7;
