@@ -6,6 +6,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
+import '../../utils/constants.dart';
 import '../effects/remove_effects.dart';
 import '../icons/stub_sprites.dart';
 import '../pacman_game.dart';
@@ -54,7 +55,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     radius: playerSize,
     position: Vector2.all(playerSize),
     anchor: Anchor.center,
-  )..debugMode = kDebugMode && true;
+  )..debugMode = kDebugMode && drawDebugBoxes;
 
   Future<Map<CharacterState, SpriteAnimation>> getSingleSprite([
     int size = 1,

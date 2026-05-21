@@ -5,6 +5,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
+import '../../utils/constants.dart';
 import '../../utils/helper.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
@@ -62,7 +63,7 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
   @override
   // ignore: overridden_fields
-  final bool renderBody = kDebugMode && true;
+  final bool renderBody = kDebugMode && drawDebugBoxes;
 
   @override
   // ignore: overridden_fields
