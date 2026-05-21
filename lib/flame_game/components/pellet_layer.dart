@@ -56,7 +56,7 @@ class PelletWrapper extends WrapperNoEvents
       clearSnapshot();
     });
     await reset();
-    renderSnapshot = false;
+    renderSnapshot = true;
   }
 
   @override
