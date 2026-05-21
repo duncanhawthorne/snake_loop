@@ -61,7 +61,7 @@ class Physics extends Component
         ..scale(spriteVsPhysicsScale);
   late final Vector2 _ballVelUnscaled = _ball.body.linearVelocity;
 
-  Future<void> _initaliseFromOwner() async {
+  void _initaliseFromOwner() {
     assert(_ball.isLoaded);
     _ball.position = owner.position;
     _ball.velocity = owner.velocity;

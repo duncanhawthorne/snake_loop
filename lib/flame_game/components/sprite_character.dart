@@ -38,11 +38,13 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   bool get stateTypical =>
       current != CharacterState.dead && current != CharacterState.spawning;
 
-  late final CollisionType defaultCollisionType = enableRotationRaceMode
-      ? CollisionType.inactive
-      : this is Pacman || this is PacmanClone
-      ? CollisionType.active
-      : CollisionType.passive;
+  late final CollisionType defaultCollisionType = _getDefaultCollisionType();
+
+  CollisionType _getDefaultCollisionType() {
+    if (enableRotationRaceMode) return CollisionType.inactive;
+    if (this is Pacman || this is PacmanClone) return CollisionType.active;
+    return CollisionType.passive;
+  }
 
   late final bool isClone = this is PacmanClone || this is GhostClone;
 
