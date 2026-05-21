@@ -108,6 +108,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   static const int _deathPenaltyMillis = 5000;
   final Timer stopwatch = Timer(double.infinity);
+
   int get stopwatchMilliSeconds =>
       (stopwatch.current * 1000).toInt() +
       (level.isTutorial
@@ -199,6 +200,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   bool regularItemsStarted = false;
+
   void startRegularItems() {
     if (!regularItemsStarted) {
       audioController.workaroundiOSSafariAudioOnUserInteraction();
@@ -253,6 +255,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   static const int _minRecordableWinTimeMillis = 10 * 1000;
+
   void _handleWinGame() {
     assert(!isRemoving);
     assert(isWonOrLost);
@@ -348,6 +351,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void pauseEngineIfNoActivity() {
     resumeEngine(); //for any catch up animation, if not already resumed
     _framesRendered = 0;
+    // If all characters at starting position and nothing happening,
+    // pause engine to save resources and avoid unnecessary animation
+    // check every 10ms, but only pause if nothing happening and still at starting position
+    // if something is happening, or not at starting position, then cancel timer and don't pause
     async.Timer.periodic(const Duration(milliseconds: 10), (async.Timer timer) {
       if (paused) {
         //already paused, no further action required, just cancel timer
