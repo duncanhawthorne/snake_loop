@@ -37,13 +37,20 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
+    final results = await Future.wait([
+      pacmanSprites.pacmanNormalSprites(size),
+      pacmanSprites.pacmanEatingSprites(size),
+      pacmanSprites.pacmanDyingSprites(size),
+      pacmanSprites.pacmanBirthingSprites(size),
+    ]);
+
     return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(
-        await pacmanSprites.pacmanNormalSprites(size),
+        results[0],
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
-        await pacmanSprites.pacmanEatingSprites(size),
+        results[1],
         stepTime:
             _kPacmanHalfEatingResetTimeMillis /
             1000 /
@@ -51,13 +58,13 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         loop: false,
       ),
       CharacterState.dead: SpriteAnimation.spriteList(
-        await pacmanSprites.pacmanDyingSprites(size),
+        results[2],
         stepTime:
             kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadIncrements,
         loop: false,
       ),
       CharacterState.spawning: SpriteAnimation.spriteList(
-        await pacmanSprites.pacmanBirthingSprites(size),
+        results[3],
         stepTime: kResetPositionTimeMillis / 1000 / pacmanDeadIncrements,
         loop: false,
       ),
@@ -65,57 +72,56 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _eat({required bool isPellet}) {
-    if (typical) {
-      if (current == CharacterState.normal) {
-        current = CharacterState.eating;
-        _eatTimer.start();
-        if (isPellet) {
-          //only play waka if not recently played waka
-          world.play(SfxType.waka);
-        }
+    assert(typical);
+    if (current == CharacterState.normal) {
+      current = CharacterState.eating;
+      _eatTimer.start();
+      if (isPellet) {
+        //only play waka if not recently played waka
+        world.play(SfxType.waka);
       }
-      if (!isPellet) {
-        //play eatGhost irrespective of current state
-        world.play(SfxType.eatGhost);
-      }
-      //if in eating state, just let that sequence complete normally
     }
+    if (!isPellet) {
+      //play eatGhost irrespective of current state
+      world.play(SfxType.eatGhost);
+    }
+    //if in eating state, just let that sequence complete normally
   }
 
   void onCollideWith(PositionComponent other) {
-    if (this is PacmanClone) {
+    if (isClone) {
       (original! as Pacman).onCollideWith(other);
       return;
     }
-    if (typical) {
-      if (other is Pellet) {
-        _onCollideWithPellet(other);
-      } else if (other is Ghost && other is! GhostClone) {
-        _onCollideWithGhost(other);
-      } else if (other is GhostClone) {
-        _onCollideWithGhost(other.original! as Ghost);
-      } else if (PacmanWorld.enableMovingWalls &&
-          movingWallsDamage &&
-          other is MovingWallWrapper) {
-        _dieFromGhost();
-      }
+
+    if (!typical) return;
+
+    if (other is Pellet) {
+      _onCollideWithPellet(other);
+    } else if (other is Ghost) {
+      final ghost = other is GhostClone ? (other.original! as Ghost) : other;
+      _onCollideWithGhost(ghost);
+    } else if (PacmanWorld.enableMovingWalls &&
+        movingWallsDamage &&
+        other is MovingWallWrapper) {
+      _dieFromGhost();
     }
   }
 
   void _onCollideWithPellet(Pellet pellet) {
-    if (typical) {
-      // can simultaneously eat pellet and die to ghost
-      // so don't want to do this if just died
-      pellet.removeFromParent(); //do this first, for checks based on game over
-      if (pellet is SuperPellet) {
-        world.ghosts.scareGhosts();
-      }
-      _eat(isPellet: true);
+    assert(typical);
+    // can simultaneously eat pellet and die to ghost
+    // so don't want to do this if just died
+    pellet.removeFromParent(); //do this first, for checks based on game over
+    if (pellet is SuperPellet) {
+      world.ghosts.scareGhosts();
     }
+    _eat(isPellet: true);
   }
 
   void _onCollideWithGhost(Ghost ghost) {
-    if (typical && ghost.typical) {
+    assert(typical);
+    if (ghost.typical) {
       if (ghost.current == CharacterState.scared ||
           ghost.current == CharacterState.scaredIsh) {
         _eatGhost(ghost);
@@ -126,12 +132,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _eatGhost(Ghost ghost) {
-    if (typical && ghost.typical) {
-      _eat(isPellet: false);
-      ghost.setDead();
-      if (multipleSpawningPacmans) {
-        world.pacmans.add(Pacman(position: position + Vector2.random() / 100));
-      }
+    assert(typical);
+    assert(ghost.typical);
+    _eat(isPellet: false);
+    ghost.setDead();
+    if (multipleSpawningPacmans) {
+      world.pacmans.add(Pacman(position: position + Vector2.random() / 100));
     }
   }
 
