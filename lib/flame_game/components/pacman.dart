@@ -1,5 +1,3 @@
-import 'dart:core';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
@@ -37,7 +35,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
-    final List<List<Sprite>> results =
+    final List<List<Sprite>> sprites =
         await Future.wait<List<Sprite>>(<Future<List<Sprite>>>[
           pacmanSprites.pacmanNormalSprites(size),
           pacmanSprites.pacmanEatingSprites(size),
@@ -47,11 +45,11 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
     return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(
-        results[0],
+        sprites[0],
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
-        results[1],
+        sprites[1],
         stepTime:
             _kPacmanHalfEatingResetTimeMillis /
             1000 /
@@ -59,13 +57,13 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         loop: false,
       ),
       CharacterState.dead: SpriteAnimation.spriteList(
-        results[2],
+        sprites[2],
         stepTime:
             kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadIncrements,
         loop: false,
       ),
       CharacterState.spawning: SpriteAnimation.spriteList(
-        results[3],
+        sprites[3],
         stepTime: kResetPositionTimeMillis / 1000 / pacmanDeadIncrements,
         loop: false,
       ),

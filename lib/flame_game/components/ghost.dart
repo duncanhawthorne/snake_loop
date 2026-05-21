@@ -1,5 +1,3 @@
-import 'dart:core';
-
 import 'package:flame/components.dart';
 
 import '../effects/move_to_effect.dart';
@@ -38,23 +36,30 @@ class Ghost extends GameCharacter {
         ? 0
         : ghostID % 3;
     if (!_ghostSpriteAnimationCache.containsKey(ghostIconNumber)) {
+      final List<Sprite> sprites = await Future.wait(<Future<Sprite>>[
+        game.loadSprite(_ghostSpritePaths[ghostIconNumber]!),
+        game.loadSprite('ghostscared1.png'),
+        game.loadSprite('ghostscared2.png'),
+        game.loadSprite('eyes.png'),
+      ]);
+
       _ghostSpriteAnimationCache[ghostIconNumber] =
           <CharacterState, SpriteAnimation>{
             CharacterState.normal: SpriteAnimation.spriteList(<Sprite>[
-              await game.loadSprite(_ghostSpritePaths[ghostIconNumber]!),
+              sprites[0],
             ], stepTime: double.infinity),
             CharacterState.scared: SpriteAnimation.spriteList(<Sprite>[
-              await game.loadSprite('ghostscared1.png'),
+              sprites[1],
             ], stepTime: double.infinity),
             CharacterState.scaredIsh: SpriteAnimation.spriteList(<Sprite>[
-              await game.loadSprite('ghostscared1.png'),
-              await game.loadSprite('ghostscared2.png'),
+              sprites[1],
+              sprites[2],
             ], stepTime: 0.1),
             CharacterState.dead: SpriteAnimation.spriteList(<Sprite>[
-              await game.loadSprite('eyes.png'),
+              sprites[3],
             ], stepTime: double.infinity),
             CharacterState.spawning: SpriteAnimation.spriteList(<Sprite>[
-              await game.loadSprite('eyes.png'),
+              sprites[3],
             ], stepTime: double.infinity),
           };
     }
@@ -102,9 +107,9 @@ class Ghost extends GameCharacter {
       add(
         MoveToPositionEffect(
           maze.ghostStart,
-          onComplete: () => <void>{
-            setPositionStillActiveCurrentPosition(),
-            current = world.ghosts.current,
+          onComplete: () {
+            setPositionStillActiveCurrentPosition();
+            current = world.ghosts.current;
           },
         ),
       );
@@ -123,9 +128,9 @@ class Ghost extends GameCharacter {
         game.level.homingGhosts
             ? world.pacmans.ghostHomingTarget
             : maze.ghostStart,
-        onComplete: () => <void>{
-          setPositionStillActiveCurrentPosition(),
-          current = world.ghosts.current,
+        onComplete: () {
+          setPositionStillActiveCurrentPosition();
+          current = world.ghosts.current;
         },
       ),
     );
