@@ -37,12 +37,13 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
-    final results = await Future.wait([
-      pacmanSprites.pacmanNormalSprites(size),
-      pacmanSprites.pacmanEatingSprites(size),
-      pacmanSprites.pacmanDyingSprites(size),
-      pacmanSprites.pacmanBirthingSprites(size),
-    ]);
+    final List<List<Sprite>> results =
+        await Future.wait<List<Sprite>>(<Future<List<Sprite>>>[
+          pacmanSprites.pacmanNormalSprites(size),
+          pacmanSprites.pacmanEatingSprites(size),
+          pacmanSprites.pacmanDyingSprites(size),
+          pacmanSprites.pacmanBirthingSprites(size),
+        ]);
 
     return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(
@@ -99,7 +100,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (other is Pellet) {
       _onCollideWithPellet(other);
     } else if (other is Ghost) {
-      final ghost = other is GhostClone ? (other.original! as Ghost) : other;
+      final Ghost ghost = other is GhostClone
+          ? (other.original! as Ghost)
+          : other;
       _onCollideWithGhost(ghost);
     } else if (PacmanWorld.enableMovingWalls &&
         movingWallsDamage &&
@@ -147,26 +150,25 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       // already doing a level reset flourish from somewhere else
       return;
     }
-    if (typical) {
-      if (!game.isWonOrLost) {
-        world.play(SfxType.pacmanDeath);
-        current = CharacterState.dead;
-        setPhysicsState(PhysicsState.none);
-        if (_freezeGhostsOnKillPacman) {
-          world.ghosts.disconnectGhostsFromBalls();
-        }
-        world.pacmans.pacmanDyingNotifier.value++;
-        if (world.pacmans.pacmanDeathIsFinalPacman) {
-          world.doingLevelResetFlourish = true;
-          game.stopRegularItems();
-        }
-        add(
-          NullEffect(
-            _kPacmanDeadResetTimeMillis,
-            onComplete: _dieFromGhostActionAfterDeathAnimation,
-          ),
-        );
+    if (!typical) return;
+    if (!game.isWonOrLost) {
+      world.play(SfxType.pacmanDeath);
+      current = CharacterState.dead;
+      setPhysicsState(PhysicsState.none);
+      if (_freezeGhostsOnKillPacman) {
+        world.ghosts.disconnectGhostsFromBalls();
       }
+      world.pacmans.pacmanDyingNotifier.value++;
+      if (world.pacmans.pacmanDeathIsFinalPacman) {
+        world.doingLevelResetFlourish = true;
+        game.stopRegularItems();
+      }
+      add(
+        NullEffect(
+          _kPacmanDeadResetTimeMillis,
+          onComplete: _dieFromGhostActionAfterDeathAnimation,
+        ),
+      );
     }
   }
 
