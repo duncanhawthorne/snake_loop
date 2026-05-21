@@ -96,7 +96,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   /// What the properties of the level that is played has.
   GameLevel level;
 
-  set mazeId(int id) => <void>{maze.mazeId = id};
+  set mazeId(int id) => maze.mazeId = id;
 
   int get mazeId => maze.mazeId;
 

@@ -27,7 +27,7 @@ class Maze {
     return _instance!;
   }
 
-  ///ensures singleton [Maze]
+  /// Ensures singleton [Maze]
   static Maze? _instance;
 
   int get mazeId => _mazeId;
@@ -129,7 +129,7 @@ class Maze {
   }
 
   int _mazeLayoutVerticalLength() {
-    return _mazeLayout.isEmpty ? 0 : _mazeLayout.length;
+    return _mazeLayout.length;
   }
 
   bool _wallAt(int i, int j) {
@@ -188,9 +188,10 @@ class Maze {
   }
 
   bool _pelletCodeAtCell(int i, int j) {
-    return _mazeLayout[i][j] == _kMiniPellet ||
-        _mazeLayout[i][j] == _kSuperPellet ||
-        _mazeLayout[i][j] == _kMovingWall;
+    final String char = _mazeLayout[i][j];
+    return char == _kMiniPellet ||
+        char == _kSuperPellet ||
+        char == _kMovingWall;
   }
 
   bool _pelletAt(int i, int j) {
