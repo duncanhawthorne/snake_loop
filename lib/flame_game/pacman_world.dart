@@ -15,6 +15,7 @@ import 'components/lap_angle.dart';
 import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
+import 'components/physics_ball.dart';
 import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
@@ -265,7 +266,7 @@ class PacmanWorld extends Forge2DWorld
       ..scale(game.level.levelSpeed);
 
     if (_updateGravityOnRotation) {
-      gravity = downDirection;
+      gravity = downDirection / spriteVsPhysicsScale;
       gravitySign.setValues(gravity.x.sign, gravity.y.sign); //used every frame
     }
   }

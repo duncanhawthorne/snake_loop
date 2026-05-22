@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import '../../style/palette.dart';
 import '../pacman_game.dart';
 import 'physics_ball.dart';
+import 'scaled_body_render.dart';
 
 final Paint _wallVisualPaint = Paint()..color = Palette.background.color;
 final Paint _wallGroundPaint = Paint()..color = Palette.seed.color;
@@ -30,7 +31,8 @@ class WallCircleVisual extends CircleComponent with IgnoreEvents {
     : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
-class WallGround extends BodyComponent<PacmanGame> with IgnoreEvents {
+class WallGround extends BodyComponent<PacmanGame>
+    with IgnoreEvents, ScaledBodyRender {
   WallGround({required super.fixtureDefs})
     : super(paint: _wallGroundPaint, bodyDef: _staticBodyDef);
 
@@ -42,7 +44,8 @@ final Vector2 _dynamicWallGravityScale = Vector2(-1, -1);
 
 const bool movingWallsDamage = kDebugMode && false;
 
-class WallDynamic extends BodyComponent<PacmanGame> with IgnoreEvents {
+class WallDynamic extends BodyComponent<PacmanGame>
+    with IgnoreEvents, ScaledBodyRender {
   WallDynamic({required super.fixtureDefs, required Vector2 position})
     : super(
         paint: _movingWallPaint,

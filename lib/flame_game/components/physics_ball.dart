@@ -12,10 +12,11 @@ import '../pacman_game.dart';
 import 'game_character.dart';
 import 'lap_angle.dart';
 import 'removal_actions.dart';
+import 'scaled_body_render.dart';
 
 const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;
 
-const double spriteVsPhysicsScale = 1;
+const double spriteVsPhysicsScale = spriteVsPhysicsScaleConstant ? 1 : 30;
 const bool spriteVsPhysicsScaleConstant = true;
 
 final Paint _activePaint = Paint()..color = Palette.pacman.color;
@@ -25,7 +26,7 @@ const double _lubricationScaleFactor = 0.99;
 const bool _kVerticalPortalsEnabled = false;
 
 class PhysicsBall extends BodyComponent<PacmanGame>
-    with RemovalActions, IgnoreEvents {
+    with RemovalActions, IgnoreEvents, ScaledBodyRender {
   PhysicsBall({
     required Vector2 position,
     required double radius,
@@ -84,8 +85,9 @@ class PhysicsBall extends BodyComponent<PacmanGame>
   );
 
   bool get _outsideMazeBounds =>
-      position.x.abs() > maze.mazeHalfWidth ||
-      (_kVerticalPortalsEnabled && position.y.abs() > maze.mazeHalfHeight);
+      position.x.abs() * spriteVsPhysicsScale > maze.mazeHalfWidth ||
+      (_kVerticalPortalsEnabled &&
+          position.y.abs() * spriteVsPhysicsScale > maze.mazeHalfHeight);
 
   set velocity(Vector2 vel) => body.linearVelocity.setFrom(
     spriteVsPhysicsScaleConstant ? vel : vel / spriteVsPhysicsScale,
@@ -136,10 +138,10 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
   Vector2 _teleportedPosition() {
     _reusableVector.setValues(
-      _smallMod(position.x, maze.mazeWidth),
+      _smallMod(position.x * spriteVsPhysicsScale, maze.mazeWidth),
       !_kVerticalPortalsEnabled
-          ? position.y
-          : _smallMod(position.y, maze.mazeHeight),
+          ? position.y * spriteVsPhysicsScale
+          : _smallMod(position.y * spriteVsPhysicsScale, maze.mazeHeight),
     );
     return _reusableVector;
   }
