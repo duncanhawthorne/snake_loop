@@ -290,6 +290,8 @@ class Maze {
     return l;
   }
 
+  final Vector2 _reusableFixtureDefVector2 = Vector2.zero();
+
   FixtureDef _fixtureDefBlock({
     required Vector2 position,
     required double width,
@@ -299,8 +301,29 @@ class Maze {
     return FixtureDef(
       friction: openSpaceMovement ? 1 : 0,
       restitution: openSpaceMovement ? 0.4 : 0,
-      PolygonShape()..setAsBox(width / 2, height / 2, position, 0),
+      PolygonShape()..setAsBox(
+        width / 2 / spriteVsPhysicsScale,
+        height / 2 / spriteVsPhysicsScale,
+        _reusableFixtureDefVector2
+          ..setFrom(position)
+          ..scale(1 / spriteVsPhysicsScale),
+        0,
+      ),
       density: density,
+    );
+  }
+
+  FixtureDef _fixtureCircle({
+    required Vector2 position,
+    required double radius,
+  }) {
+    return FixtureDef(
+      CircleShape(
+        radius: radius / spriteVsPhysicsScale,
+        position: _reusableFixtureDefVector2
+          ..setFrom(position)
+          ..scale(1 / spriteVsPhysicsScale),
+      ),
     );
   }
 
@@ -314,23 +337,13 @@ class Maze {
     final Vector2 center = Vector2.zero();
     final Vector2 bigBlockCenter = Vector2.zero();
     final Vector2 bigBlockSize = Vector2.zero();
-    final Vector2 centerPhysics = Vector2.zero();
-    final Vector2 bigBlockCenterPhysics = Vector2.zero();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         center.setFrom(_volatileVectorOfMazeListIndex(i, j));
-        centerPhysics
-          ..setFrom(center)
-          ..scale(1 / spriteVsPhysicsScale);
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
             fixtureDefs.add(
-              FixtureDef(
-                CircleShape(
-                  radius: scale / 2 / spriteVsPhysicsScale,
-                  position: centerPhysics,
-                ),
-              ),
+              _fixtureCircle(position: center, radius: scale / 2),
             );
             result.add(
               WallCircleVisual(
@@ -349,17 +362,11 @@ class Maze {
                 scale * (width + _pixelationBuffer),
                 scale * _mazeInnerWallWidthFactor,
               );
-              bigBlockCenterPhysics
-                ..setFrom(bigBlockCenter)
-                ..scale(1 / spriteVsPhysicsScale);
               fixtureDefs.add(
                 _fixtureDefBlock(
-                  position: bigBlockCenterPhysics,
-                  width:
-                      scale *
-                      (width + _pixelationBuffer) /
-                      spriteVsPhysicsScale,
-                  height: scale / spriteVsPhysicsScale,
+                  position: bigBlockCenter,
+                  width: scale * (width + _pixelationBuffer),
+                  height: scale,
                 ),
               );
               result.add(
@@ -380,17 +387,11 @@ class Maze {
                 scale * _mazeInnerWallWidthFactor,
                 scale * (height + _pixelationBuffer),
               );
-              bigBlockCenterPhysics
-                ..setFrom(bigBlockCenter)
-                ..scale(1 / spriteVsPhysicsScale);
               fixtureDefs.add(
                 _fixtureDefBlock(
-                  position: bigBlockCenterPhysics,
-                  width: scale / spriteVsPhysicsScale,
-                  height:
-                      scale *
-                      (height + _pixelationBuffer) /
-                      spriteVsPhysicsScale,
+                  position: bigBlockCenter,
+                  width: scale,
+                  height: scale * (height + _pixelationBuffer),
                 ),
               );
               result.add(
@@ -470,25 +471,14 @@ class Maze {
                 ..setFrom(center)
                 ..x += scale * width / 2
                 ..y += scale * height / 2;
-              bigBlockCenterPhysics
-                ..setFrom(bigBlockCenter)
-                ..scale(1 / spriteVsPhysicsScale);
               result.add(
                 (WallDynamic(
                   position: bigBlockCenterPhysics,
                   fixtureDefs: <FixtureDef>[
                     _fixtureDefBlock(
-                      position: Vector2(0, 0)..scale(1 / spriteVsPhysicsScale),
-                      width:
-                          scale *
-                          (width + 1) *
-                          lubricationScaleFactor /
-                          spriteVsPhysicsScale,
-                      height:
-                          scale *
-                          (height + 1) *
-                          lubricationScaleFactor /
-                          spriteVsPhysicsScale,
+                      position: Vector2(0, 0),
+                      width: scale * (width + 1) * lubricationScaleFactor,
+                      height: scale * (height + 1) * lubricationScaleFactor,
                       density: 10,
                     ),
                   ],
