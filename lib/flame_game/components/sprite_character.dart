@@ -55,7 +55,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     radius: playerSize,
     position: Vector2.all(playerSize),
     anchor: Anchor.center,
-  )..debugMode = kDebugMode && drawDebugBoxes;
+  )..debugMode = drawDebugBoxes;
 
   Future<Map<CharacterState, SpriteAnimation>> getSingleSprite([
     int size = 1,

@@ -63,7 +63,7 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
   @override
   // ignore: overridden_fields
-  final bool renderBody = kDebugMode && drawDebugBoxes;
+  final bool renderBody = drawDebugBoxes;
 
   @override
   // ignore: overridden_fields
