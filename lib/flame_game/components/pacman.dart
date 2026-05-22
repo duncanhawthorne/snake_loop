@@ -14,7 +14,7 @@ import 'ghost.dart';
 import 'pellet.dart';
 import 'sprite_character.dart';
 import 'super_pellet.dart';
-import 'wall.dart';
+import 'wall_dynamic.dart';
 import 'wall_dynamic_layer.dart';
 
 const int _kPacmanDeadResetTimeMillis = 1550;

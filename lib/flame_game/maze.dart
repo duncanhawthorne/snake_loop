@@ -6,6 +6,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'components/lap_angle.dart';
 import 'components/physics_ball.dart';
 import 'components/wall.dart';
+import 'components/wall_dynamic.dart';
 import 'pacman_game.dart';
 
 final Map<int, String> mazeNames = <int, String>{
