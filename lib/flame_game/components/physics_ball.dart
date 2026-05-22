@@ -17,7 +17,8 @@ import 'scaled_body_render.dart';
 const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;
 
 const double spriteVsPhysicsScale = spriteVsPhysicsScaleConstant ? 1 : 30;
-const bool spriteVsPhysicsScaleConstant = true;
+const bool spriteVsPhysicsScaleConstant =
+    false; //FIXME revert to true once flutter 3.45 sprite render bug resolved
 
 final Paint _activePaint = Paint()..color = Palette.pacman.color;
 final Paint _inactivePaint = Paint()..color = Palette.warning.color;
