@@ -36,7 +36,7 @@ class Maze {
 
   late MazeLayout layout;
   late MazeDimensions dimensions;
-  late MazePhysicsFactory factory;
+  late MazePhysicsFactory physicsFactory;
   late MazeItemFactory itemFactory;
 
   void setMazeId(int id) {
@@ -52,14 +52,17 @@ class Maze {
       );
 
       dimensions = MazeDimensions(layout: layout);
-      factory = MazePhysicsFactory(layout: layout, dimensions: dimensions);
+      physicsFactory = MazePhysicsFactory(
+        layout: layout,
+        dimensions: dimensions,
+      );
       itemFactory = MazeItemFactory(layout: layout, dimensions: dimensions);
     }
   }
 
   bool get isTutorial => isTutorialMaze(mazeId);
 
-  bool get isDefault => mazeId == Maze.defaultMazeId;
+  bool get isDefault => mazeId == defaultMazeId;
 }
 
 bool isTutorialMaze(int mazeId) {

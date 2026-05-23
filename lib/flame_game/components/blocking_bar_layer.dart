@@ -21,7 +21,7 @@ class BlockingBarWrapper extends WrapperNoEvents
     if (children.isNotEmpty) {
       removeAll(children);
     }
-    await addAll(maze.itemFactory.mazeBlockingWalls());
+    await addAll(maze.itemFactory.blockingWalls());
     clearSnapshot();
   }
 

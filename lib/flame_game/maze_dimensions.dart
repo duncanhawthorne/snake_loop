@@ -19,9 +19,9 @@ class MazeDimensions {
     mazeHalfWidthPhysics = mazeWidth / 2 / spriteVsPhysicsScale;
     mazeHalfHeightPhysics = mazeHeight / 2 / spriteVsPhysicsScale;
     //other items
-    ghostStart.setFrom(_volatileVectorOfMazeListCode(MazeData.kGhostStart));
-    pacmanStart.setFrom(_volatileVectorOfMazeListCode(MazeData.kPacmanStart));
-    _cage.setFrom(_volatileVectorOfMazeListCode(MazeData.kCage));
+    ghostStart.setFrom(_volatileVectorOfMazeItem(MazeData.kGhostStart));
+    pacmanStart.setFrom(_volatileVectorOfMazeItem(MazeData.kPacmanStart));
+    _cage.setFrom(_volatileVectorOfMazeItem(MazeData.kCage));
     //item below used regularly
     _ghostStartForIdMap[0] = _ghostStartForId(0);
     _ghostStartForIdMap[1] = _ghostStartForId(1);
@@ -55,7 +55,7 @@ class MazeDimensions {
     return blockWidth * 2;
   }
 
-  Vector2 volatileVectorOfMazeListIndex(
+  Vector2 volatileVectorFromIJ(
     int icore,
     int jcore, {
     double ioffset = 0,
@@ -75,9 +75,9 @@ class MazeDimensions {
     return _reusableVector;
   }
 
-  Vector2 _volatileVectorOfMazeListCode(String code) {
+  Vector2 _volatileVectorOfMazeItem(String code) {
     final (int i, int j) = layout.ijOfMazeListCode(code);
-    return volatileVectorOfMazeListIndex(i, j, ioffset: 0.5);
+    return volatileVectorFromIJ(i, j, ioffset: 0.5);
   }
 
   Vector2 ghostStartForId(int idNum) {

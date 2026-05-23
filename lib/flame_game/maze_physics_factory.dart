@@ -15,9 +15,9 @@ class MazePhysicsFactory {
 
   static const double _mazeInnerWallWidthFactor = 0.7;
   static const double _pixelationBuffer = 0.03;
-  static const double lubricationScaleFactor = 0.98;
+  static const double _lubricationScaleFactor = 0.98;
 
-  static final Vector2 _reusableFixtureDefVector2 = Vector2.zero();
+  static final Vector2 _reusableVector = Vector2.zero();
 
   FixtureDef _fixtureDefBlock({
     required Vector2 position,
@@ -31,7 +31,7 @@ class MazePhysicsFactory {
       PolygonShape()..setAsBox(
         width / 2 / spriteVsPhysicsScale,
         height / 2 / spriteVsPhysicsScale,
-        _reusableFixtureDefVector2
+        _reusableVector
           ..setFrom(position)
           ..scale(1 / spriteVsPhysicsScale),
         0,
@@ -98,14 +98,14 @@ class MazePhysicsFactory {
     return FixtureDef(
       CircleShape(
         radius: radius / spriteVsPhysicsScale,
-        position: _reusableFixtureDefVector2
+        position: _reusableVector
           ..setFrom(position)
           ..scale(1 / spriteVsPhysicsScale),
       ),
     );
   }
 
-  List<Component> mazeWalls({
+  List<Component> walls({
     bool includeGround = true,
     bool includeVisualWalls = true,
   }) {
@@ -117,7 +117,7 @@ class MazePhysicsFactory {
     final Vector2 bigBlockSize = Vector2.zero();
     for (int i = 0; i < layout.length; i++) {
       for (int j = 0; j < layout.lengthH; j++) {
-        center.setFrom(dimensions.volatileVectorOfMazeListIndex(i, j));
+        center.setFrom(dimensions.volatileVectorFromIJ(i, j));
         if (layout.wallAt(i, j)) {
           if (layout.circleAt(i, j)) {
             fixtureDefs.add(
@@ -209,7 +209,7 @@ class MazePhysicsFactory {
     return result;
   }
 
-  List<Component> mazeMovingWalls({
+  List<Component> movingWalls({
     bool includeGround = true,
     bool includeVisualWalls = true,
   }) {
@@ -220,7 +220,7 @@ class MazePhysicsFactory {
     final Vector2 bigBlockCenterPhysics = Vector2.zero();
     for (int i = 0; i < layout.length; i++) {
       for (int j = 0; j < layout.lengthH; j++) {
-        center.setFrom(dimensions.volatileVectorOfMazeListIndex(i, j));
+        center.setFrom(dimensions.volatileVectorFromIJ(i, j));
         if (layout.movingWallAt(i, j)) {
           if (_topLeftOfBigBlock(i, j, moving: true)) {
             final int width = _bigBlockWidth(i, j, moving: true);
@@ -236,8 +236,8 @@ class MazePhysicsFactory {
                   fixtureDefs: <FixtureDef>[
                     _fixtureDefBlock(
                       position: Vector2(0, 0),
-                      width: scale * (width + 1) * lubricationScaleFactor,
-                      height: scale * (height + 1) * lubricationScaleFactor,
+                      width: scale * (width + 1) * _lubricationScaleFactor,
+                      height: scale * (height + 1) * _lubricationScaleFactor,
                       density: 10,
                     ),
                   ],

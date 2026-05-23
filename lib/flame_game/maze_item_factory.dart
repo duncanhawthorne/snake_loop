@@ -10,7 +10,7 @@ class MazeItemFactory {
   final MazeLayout layout;
   final MazeDimensions dimensions;
 
-  List<Component> mazeBlockingWalls() {
+  List<Component> blockingWalls() {
     final List<Component> result = <Component>[];
     final double scale = dimensions.blockWidth;
     const int width = 7;
@@ -33,12 +33,7 @@ class MazeItemFactory {
           final bool isSuperPellet = layout.pelletIsSuperPellet(i, j);
           if (!isSuperPellet || !superPelletsEnabled) {
             center.setFrom(
-              dimensions.volatileVectorOfMazeListIndex(
-                i,
-                j,
-                ioffset: 0.5,
-                joffset: 0.5,
-              ),
+              dimensions.volatileVectorFromIJ(i, j, ioffset: 0.5, joffset: 0.5),
             );
             yield center;
           }
@@ -53,12 +48,7 @@ class MazeItemFactory {
       for (int j = 0; j < layout.lengthH; j++) {
         if (layout.pelletAt(i, j) && layout.pelletIsSuperPellet(i, j)) {
           center.setFrom(
-            dimensions.volatileVectorOfMazeListIndex(
-              i,
-              j,
-              ioffset: 0.5,
-              joffset: 0.5,
-            ),
+            dimensions.volatileVectorFromIJ(i, j, ioffset: 0.5, joffset: 0.5),
           );
           yield center;
         }
