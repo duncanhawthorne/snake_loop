@@ -178,8 +178,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Color backgroundColor() => Palette.background.color;
 
-  Map<String, dynamic> _getCurrentGameState() {
-    final Map<String, dynamic> gameStateTmp = <String, dynamic>{};
+  Map<String, Object> _getCurrentGameState() {
+    final Map<String, Object> gameStateTmp = <String, Object>{};
     gameStateTmp["userString"] = _userString;
     gameStateTmp["levelNum"] = level.number;
     gameStateTmp["levelCompleteTime"] = stopwatchMilliSeconds;

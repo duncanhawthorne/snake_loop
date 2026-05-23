@@ -37,7 +37,7 @@ mixin Clone on GameCharacter {
     assert(isClone); //i.e. no cascade of clones
     assert(original != null);
     assert(!original!.isRemoving);
-    assert(!original!.isMounted);
+    assert(original!.isMounted);
     updateCloneFrom(original!);
     super.update(dt); // must call to have sprite animations
   }
