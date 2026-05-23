@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import '../effects/move_to_effect.dart';
 import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
-import '../maze.dart';
+import '../maze/maze.dart';
 import 'game_character.dart';
 import 'sprite_character.dart';
 

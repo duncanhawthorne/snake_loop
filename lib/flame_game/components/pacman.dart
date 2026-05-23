@@ -6,7 +6,7 @@ import '../effects/move_to_effect.dart';
 import '../effects/null_effect.dart';
 import '../effects/remove_effects.dart';
 import '../icons/pacman_sprites.dart';
-import '../maze.dart';
+import '../maze/maze.dart';
 import '../pacman_world.dart';
 import 'clones.dart';
 import 'game_character.dart';

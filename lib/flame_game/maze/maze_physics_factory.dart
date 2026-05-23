@@ -1,9 +1,9 @@
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
-import 'components/physics_ball.dart';
-import 'components/wall.dart';
-import 'components/wall_dynamic.dart';
+import '../components/physics_ball.dart';
+import '../components/wall.dart';
+import '../components/wall_dynamic.dart';
 import 'maze_dimensions.dart';
 import 'maze_layout.dart';
 
@@ -28,14 +28,15 @@ class MazePhysicsFactory {
     return FixtureDef(
       friction: openSpaceMovement ? 1 : 0,
       restitution: openSpaceMovement ? 0.4 : 0,
-      PolygonShape()..setAsBox(
-        width / 2 / spriteVsPhysicsScale,
-        height / 2 / spriteVsPhysicsScale,
-        _reusableVector
-          ..setFrom(position)
-          ..scale(1 / spriteVsPhysicsScale),
-        0,
-      ),
+      PolygonShape()
+        ..setAsBox(
+          width / 2 / spriteVsPhysicsScale,
+          height / 2 / spriteVsPhysicsScale,
+          _reusableVector
+            ..setFrom(position)
+            ..scale(1 / spriteVsPhysicsScale),
+          0,
+        ),
       density: density,
     );
   }
@@ -53,12 +54,11 @@ class MazePhysicsFactory {
         localWallAt(i + 1, j + 1);
   }
 
-  int _bigBlockWidth(
-    int i,
-    int j, {
-    bool singleHeight = true,
-    bool moving = false,
-  }) {
+  int _bigBlockWidth(int i,
+      int j, {
+        bool singleHeight = true,
+        bool moving = false,
+      }) {
     final bool Function(int i, int j) localWallAt = moving
         ? layout.movingWallAt
         : layout.wallAt;
@@ -72,12 +72,11 @@ class MazePhysicsFactory {
     return k;
   }
 
-  int _bigBlockHeight(
-    int i,
-    int j, {
-    bool singleWidth = true,
-    bool moving = false,
-  }) {
+  int _bigBlockHeight(int i,
+      int j, {
+        bool singleWidth = true,
+        bool moving = false,
+      }) {
     final bool Function(int i, int j) localWallAt = moving
         ? layout.movingWallAt
         : layout.wallAt;

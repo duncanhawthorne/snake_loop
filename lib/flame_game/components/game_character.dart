@@ -3,7 +3,7 @@ import 'dart:core';
 import 'package:flame/components.dart';
 
 import '../effects/remove_effects.dart';
-import '../maze.dart';
+import '../maze/maze.dart';
 import 'clone_manager.dart';
 import 'follow_physics.dart';
 import 'follow_simple_physics.dart';

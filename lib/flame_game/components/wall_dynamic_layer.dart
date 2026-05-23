@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../maze.dart';
+import '../maze/maze.dart';
 import 'wrapper_no_events.dart';
 
 class MovingWallWrapper extends WrapperNoEvents {

@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../maze.dart';
+import '../maze/maze.dart';
 import '../pacman_game.dart';
 import 'pacman.dart';
 import 'sprite_character.dart';

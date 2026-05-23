@@ -2,7 +2,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
-import '../maze.dart';
+import '../maze/maze.dart';
 
 class Pellet extends CircleComponent with IgnoreEvents {
   Pellet({

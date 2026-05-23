@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
-import '../maze.dart';
+import '../maze/maze.dart';
 import '../pacman_game.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';

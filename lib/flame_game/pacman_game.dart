@@ -21,7 +21,7 @@ import '../utils/src/workarounds.dart';
 import '../utils/stored_moves.dart';
 import 'components/physics_ball.dart';
 import 'game_screen.dart';
-import 'maze.dart';
+import 'maze/maze.dart';
 import 'pacman_world.dart';
 
 /// This is the base of the game which is added to the [GameWidget].

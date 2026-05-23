@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:flame/components.dart';
 
-import '../maze.dart';
+import '../maze/maze.dart';
 import 'game_character.dart';
 import 'ghost.dart';
 import 'pacman.dart';

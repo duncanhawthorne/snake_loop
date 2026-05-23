@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import '../../style/palette.dart';
 import '../../utils/constants.dart';
 import '../../utils/helper.dart';
-import '../maze.dart';
+import '../maze/maze.dart';
 import '../pacman_game.dart';
 import 'game_character.dart';
 import 'lap_angle.dart';

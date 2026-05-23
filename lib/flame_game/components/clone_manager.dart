@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import '../maze.dart';
+import '../maze/maze.dart';
 import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';
