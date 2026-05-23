@@ -89,6 +89,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
 
 const int _cols = 5;
 const int _negativeRows = 1;
+
 Widget levelSelectorReal(BuildContext context, PacmanGame game) {
   final int maxLevelToShowCache = _maxLevelToShow(game);
   return bodyWidget(

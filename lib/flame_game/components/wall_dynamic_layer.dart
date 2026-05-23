@@ -9,7 +9,7 @@ class MovingWallWrapper extends WrapperNoEvents {
     if (children.isNotEmpty) {
       removeAll(children);
     }
-    await addAll(maze.mazeMovingWalls());
+    await addAll(maze.factory.mazeMovingWalls());
   }
 
   @override

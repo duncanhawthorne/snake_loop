@@ -88,9 +88,9 @@ class PhysicsBall extends BodyComponent<PacmanGame>
   );
 
   bool get _outsideMazeBounds =>
-      position.x.abs() > maze.mazeHalfWidthPhysics ||
+      position.x.abs() > maze.dimensions.mazeHalfWidthPhysics ||
       (_kVerticalPortalsEnabled &&
-          position.y.abs() > maze.mazeHalfHeightPhysics);
+          position.y.abs() > maze.dimensions.mazeHalfHeightPhysics);
 
   set velocity(Vector2 vel) => body.linearVelocity.setFrom(
     spriteVsPhysicsScaleConstant ? vel : vel / spriteVsPhysicsScale,
@@ -141,10 +141,13 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
   Vector2 _teleportedPosition() {
     _reusableVector.setValues(
-      _smallMod(position.x * spriteVsPhysicsScale, maze.mazeWidth),
+      _smallMod(position.x * spriteVsPhysicsScale, maze.dimensions.mazeWidth),
       !_kVerticalPortalsEnabled
           ? position.y * spriteVsPhysicsScale
-          : _smallMod(position.y * spriteVsPhysicsScale, maze.mazeHeight),
+          : _smallMod(
+              position.y * spriteVsPhysicsScale,
+              maze.dimensions.mazeHeight,
+            ),
     );
     return _reusableVector;
   }

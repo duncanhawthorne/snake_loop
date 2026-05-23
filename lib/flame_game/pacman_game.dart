@@ -405,10 +405,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     _bugFixes();
     initializeCollisionDetection(
       mapDimensions: Rect.fromLTWH(
-        -maze.mazeWidth / 2,
-        -maze.mazeHeight / 2,
-        maze.mazeWidth,
-        maze.mazeHeight,
+        -maze.dimensions.mazeWidth / 2,
+        -maze.dimensions.mazeHeight / 2,
+        maze.dimensions.mazeWidth,
+        maze.dimensions.mazeHeight,
       ),
     ); //assume maze size won't change
     reset(firstRun: true, showStartDialog: true);

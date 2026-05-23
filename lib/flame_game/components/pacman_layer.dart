@@ -21,8 +21,9 @@ class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
   bool get pacmanDeathIsFinalPacman =>
       !multipleSpawningPacmans || pacmanList.length == 1 || !anyAlivePacman;
 
-  Vector2 get ghostHomingTarget =>
-      pacmanList.isNotEmpty ? pacmanList[0].position : maze.pacmanStart;
+  Vector2 get ghostHomingTarget => pacmanList.isNotEmpty
+      ? pacmanList[0].position
+      : maze.dimensions.pacmanStart;
 
   bool get anyAlivePacman =>
       pacmanList.any((Pacman pacman) => pacman.current != CharacterState.dead);
@@ -38,7 +39,7 @@ class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
     for (final Pacman pacman in pacmanList.toList()) {
       pacman.removeFromParent();
     }
-    add(Pacman(position: maze.pacmanStart));
+    add(Pacman(position: maze.dimensions.pacmanStart));
     game.numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
   }

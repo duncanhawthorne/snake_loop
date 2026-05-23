@@ -9,7 +9,7 @@ import 'follow_physics.dart';
 import 'follow_simple_physics.dart';
 import 'sprite_character.dart';
 
-double get playerSize => maze.spriteWidth / 2;
+double get playerSize => maze.dimensions.spriteWidth / 2;
 
 class GameCharacter extends SpriteCharacter with CloneManager {
   GameCharacter({
@@ -26,12 +26,14 @@ class GameCharacter extends SpriteCharacter with CloneManager {
   bool possiblePhysicsConnection = true;
 
   Vector2 get velocity => _velocity;
+
   set velocity(Vector2 v) => _velocity.setFrom(v);
   final Vector2 _velocity = Vector2(0, 0);
 
   final bool canAccelerate = false;
 
   Vector2 get acceleration => _acceleration;
+
   set acceleration(Vector2 v) => _acceleration.setFrom(v);
   final Vector2 _acceleration = Vector2(0, 0);
 
@@ -43,6 +45,7 @@ class GameCharacter extends SpriteCharacter with CloneManager {
   double get speed => _physics.speed;
 
   double get radius => size.x.toDouble() / 2;
+
   set radius(double x) => _setRadius(x);
 
   void _setRadius(double x) {
@@ -56,6 +59,7 @@ class GameCharacter extends SpriteCharacter with CloneManager {
   late final SimplePhysics _simplePhysics = SimplePhysics(owner: this);
 
   PhysicsState state = PhysicsState.unset;
+
   @override
   void setPhysicsState(PhysicsState targetState, {bool starting = false}) {
     super.setPhysicsState(targetState);

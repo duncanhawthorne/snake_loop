@@ -27,7 +27,7 @@ mixin Clone on GameCharacter {
     assert(isClone);
     position
       ..setFrom(original.position)
-      ..x -= maze.mazeWidth * position.x.sign; //mirror on other side
+      ..x -= maze.dimensions.mazeWidth * position.x.sign; //mirror on other side
     angle = original.angle;
     current = original.current;
   }

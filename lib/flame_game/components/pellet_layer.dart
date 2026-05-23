@@ -27,7 +27,9 @@ class PelletWrapper extends WrapperNoEvents
       removeAll(children);
     }
     final bool superPelletsEnabled = game.level.superPelletsEnabled;
-    for (Vector2 pos in maze.miniPelletPositions(superPelletsEnabled)) {
+    for (Vector2 pos in maze.itemFactory.miniPelletPositions(
+      superPelletsEnabled,
+    )) {
       add(
         MiniPellet(
           position: pos,
@@ -36,7 +38,7 @@ class PelletWrapper extends WrapperNoEvents
       );
     }
     if (superPelletsEnabled) {
-      for (Vector2 pos in maze.superPelletPositions()) {
+      for (Vector2 pos in maze.itemFactory.superPelletPositions()) {
         add(
           SuperPellet(
             position: pos,

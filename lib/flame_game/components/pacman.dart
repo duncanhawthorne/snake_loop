@@ -189,14 +189,14 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void resetSlideAfterDeath() {
     removeEffects(this);
-    setPositionStillStatic(maze.pacmanStart);
+    setPositionStillStatic(maze.dimensions.pacmanStart);
     angle = 0;
     current = CharacterState.spawning;
   }
 
   void resetInstantAfterDeath() {
     removeEffects(this);
-    setPositionStillActive(maze.pacmanStart);
+    setPositionStillActive(maze.dimensions.pacmanStart);
     angle = 0;
     current = CharacterState.normal;
   }
@@ -229,7 +229,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<void> onGameResize(Vector2 size) async {
     if (size.x != _screenSizeLast.x || size.y != _screenSizeLast.y) {
-      final int newSize = 2 * maze.spriteWidthOnScreen(size);
+      final int newSize = 2 * maze.dimensions.spriteWidthOnScreen(size);
       if (newSize > 0) {
         _screenSizeLast.setFrom(size);
         animations = await getAnimations(newSize);

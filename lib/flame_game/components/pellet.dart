@@ -11,7 +11,11 @@ class Pellet extends CircleComponent with IgnoreEvents {
     double radiusFactor = 1,
     double hitBoxRadiusFactor = 1,
   }) : super(
-         radius: maze.spriteWidth / 2 * _pelletScaleFactor * radiusFactor,
+         radius:
+             maze.dimensions.spriteWidth /
+             2 *
+             _pelletScaleFactor *
+             radiusFactor,
          anchor: Anchor.center,
        ) {
     _hitbox = CircleHitbox(

@@ -32,7 +32,7 @@ mixin CloneManager on SpriteCharacter {
       return;
     }
     //run every frame
-    if (position.x.abs() > maze.cloneThreshold) {
+    if (position.x.abs() > maze.dimensions.cloneThreshold) {
       _createClone();
       assert(_clone != null);
       assert(_clone!.isClone);

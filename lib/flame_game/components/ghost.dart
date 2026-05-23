@@ -19,7 +19,7 @@ _ghostSpriteAnimationCache = <int, Map<CharacterState, SpriteAnimation>>{};
 class Ghost extends GameCharacter {
   Ghost({required this.ghostID, super.original})
     : super(
-        position: maze.ghostSpawnForId(ghostID),
+        position: maze.dimensions.ghostSpawnForId(ghostID),
         velocity: Vector2.zero(),
         radius: playerSize,
       );
@@ -106,7 +106,7 @@ class Ghost extends GameCharacter {
       setPhysicsState(PhysicsState.none);
       add(
         MoveToPositionEffect(
-          maze.ghostStart,
+          maze.dimensions.ghostStart,
           onComplete: () {
             setPositionStillActiveCurrentPosition();
             current = world.ghosts.current;
@@ -127,7 +127,7 @@ class Ghost extends GameCharacter {
       MoveToPositionEffect(
         game.level.homingGhosts
             ? world.pacmans.ghostHomingTarget
-            : maze.ghostStart,
+            : maze.dimensions.ghostStart,
         onComplete: () {
           setPositionStillActiveCurrentPosition();
           current = world.ghosts.current;
@@ -142,7 +142,7 @@ class Ghost extends GameCharacter {
     setPhysicsState(PhysicsState.none);
     add(
       MoveToPositionEffect(
-        maze.ghostStartForId(ghostID),
+        maze.dimensions.ghostStartForId(ghostID),
         onComplete: () => <void>{
           //initaliseFromOwnerAndSetDynamic()
           //Calling initaliseFromOwnerAndSetDynamic here creates a crash
@@ -156,7 +156,7 @@ class Ghost extends GameCharacter {
   void resetInstantAfterPacmanDeath() {
     removeEffects(this);
     current = CharacterState.normal;
-    setPositionStillActive(maze.ghostStartForId(ghostID));
+    setPositionStillActive(maze.dimensions.ghostStartForId(ghostID));
     angle = 0;
   }
 

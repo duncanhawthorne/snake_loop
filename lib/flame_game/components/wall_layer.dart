@@ -19,7 +19,7 @@ class WallWrapper extends WrapperNoEvents
     if (children.isNotEmpty) {
       removeAll(children);
     }
-    await addAll(maze.mazeWalls());
+    await addAll(maze.factory.mazeWalls());
     clearSnapshot();
   }
 
