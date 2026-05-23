@@ -25,6 +25,7 @@ class MazePhysicsFactory {
     required double height,
     double density = 1,
   }) {
+    /// [_reusableVector] safely instantly consumed inside FixtureDef
     return FixtureDef(
       friction: openSpaceMovement ? 1 : 0,
       restitution: openSpaceMovement ? 0.4 : 0,
@@ -95,6 +96,7 @@ class MazePhysicsFactory {
     required Vector2 position,
     required double radius,
   }) {
+    /// [_reusableVector] safely instantly consumed inside FixtureDef
     return FixtureDef(
       CircleShape(
         radius: radius / spriteVsPhysicsScale,

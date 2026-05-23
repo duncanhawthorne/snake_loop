@@ -19,6 +19,8 @@ class MazeItemFactory {
       scale * (layout.lengthHBuffered / 2 + width / 2),
       0,
     );
+
+    /// [position] safely instantly consumed by [WallRectangleVisual]
     result
       ..add(WallRectangleVisual(position: position, size: size))
       ..add(WallRectangleVisual(position: position..x *= -1, size: size));
@@ -26,6 +28,7 @@ class MazeItemFactory {
   }
 
   Iterable<Vector2> miniPelletPositions(bool superPelletsEnabled) sync* {
+    /// [center] safely instantly consumed by receiving function
     final Vector2 center = Vector2.zero();
     for (int i = 0; i < layout.length; i++) {
       for (int j = 0; j < layout.lengthH; j++) {
@@ -47,6 +50,7 @@ class MazeItemFactory {
   }
 
   Iterable<Vector2> superPelletPositions() sync* {
+    /// [center] safely instantly consumed by receiving function
     final Vector2 center = Vector2.zero();
     for (int i = 0; i < layout.length; i++) {
       for (int j = 0; j < layout.lengthH; j++) {
