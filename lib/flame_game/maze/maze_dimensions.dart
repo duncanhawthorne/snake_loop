@@ -8,41 +8,27 @@ import 'maze_data.dart';
 import 'maze_layout.dart';
 
 class MazeDimensions {
-  MazeDimensions({required this.layout}) {
-    //items below used every frame so calculate once here
-    blockWidth = _blockWidth();
-    spriteWidth = _spriteWidth();
-    mazeWidth = blockWidth * layout.lengthHBuffered;
-    mazeHeight = blockWidth * layout.length;
-    spriteSize.setAll(spriteWidth);
-    cloneThreshold = mazeWidth / 2 - spriteWidth / 2;
-    mazeHalfWidthPhysics = mazeWidth / 2 / spriteVsPhysicsScale;
-    mazeHalfHeightPhysics = mazeHeight / 2 / spriteVsPhysicsScale;
-    //other items
-    _locationOfMazeItem(MazeData.kGhostStart, output: ghostStart);
-    _locationOfMazeItem(MazeData.kPacmanStart, output: pacmanStart);
-    _locationOfMazeItem(MazeData.kCage, output: _cage);
-    //item below used regularly
-    _ghostStartForIdMap[0] = _ghostStartForId(0);
-    _ghostStartForIdMap[1] = _ghostStartForId(1);
-    _ghostStartForIdMap[2] = _ghostStartForId(2);
-  }
+  MazeDimensions({required this.layout});
 
   final MazeLayout layout;
 
-  final Vector2 ghostStart = Vector2.zero(); //set properly in initializer
-  final Vector2 pacmanStart = Vector2.zero(); //set properly in initializer
-  final Vector2 _cage = Vector2.zero(); //set properly in initializer
-  double mazeWidth = 0; //set properly in initializer
-  double mazeHeight = 0; //set properly in initializer
-  double blockWidth = 0; //set properly in initializer
-  double spriteWidth = 0; //set properly in initializer
-  double cloneThreshold = 0; //set properly in initializer
-  double mazeHalfWidthPhysics = 0; //set properly in initializer
-  double mazeHalfHeightPhysics = 0; //set properly in initializer
-  final Vector2 spriteSize = Vector2.zero(); //set properly in initializer
-  final Map<int, Vector2> _ghostStartForIdMap =
-      <int, Vector2>{}; //set properly in initializer
+  late final Vector2 ghostStart = _locationOfMazeItem(MazeData.kGhostStart);
+  late final Vector2 pacmanStart = _locationOfMazeItem(MazeData.kPacmanStart);
+  late final Vector2 _cage = _locationOfMazeItem(MazeData.kCage);
+  late final double mazeWidth = blockWidth * layout.lengthHBuffered;
+  late final double mazeHeight = blockWidth * layout.length;
+  late final double blockWidth = _blockWidth();
+  late final double spriteWidth = _spriteWidth();
+  late final double cloneThreshold = mazeWidth / 2 - spriteWidth / 2;
+  late final double mazeHalfWidthPhysics = mazeWidth / 2 / spriteVsPhysicsScale;
+  late final double mazeHalfHeightPhysics =
+      mazeHeight / 2 / spriteVsPhysicsScale;
+  late final Vector2 spriteSize = Vector2.zero()..setAll(spriteWidth);
+  late final Map<int, Vector2> _ghostStartForIdMap = <int, Vector2>{
+    0: _ghostStartForId(0),
+    1: _ghostStartForId(1),
+    2: _ghostStartForId(2),
+  };
 
   double _blockWidth() {
     return kVirtualGameSize /
@@ -74,9 +60,10 @@ class MazeDimensions {
     );
   }
 
-  Vector2 _locationOfMazeItem(String code, {required Vector2 output}) {
+  Vector2 _locationOfMazeItem(String code, {Vector2? output}) {
+    final Vector2 out = output ?? Vector2.zero();
     final (int i, int j) = layout.ijOfMazeListCode(code);
-    return locationOfIJ(i, j, ioffset: 0.5, output: output);
+    return locationOfIJ(i, j, ioffset: 0.5, output: out);
   }
 
   Vector2 ghostStartForId(int idNum) {
@@ -84,7 +71,6 @@ class MazeDimensions {
   }
 
   Vector2 _ghostStartForId(int idNum) {
-    assert(ghostStart.x != 0 || ghostStart.y != 0); //i.e. not set yet
     return ghostStart.clone()..x += spriteWidth * (idNum % 3 - 1);
   }
 
