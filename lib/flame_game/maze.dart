@@ -48,8 +48,8 @@ class Maze {
       mazeHeight = blockWidth * _mazeLayoutVerticalLength();
       spriteSize.setAll(spriteWidth);
       cloneThreshold = mazeWidth / 2 - spriteWidth / 2;
-      mazeHalfWidth = mazeWidth / 2;
-      mazeHalfHeight = mazeHeight / 2;
+      mazeHalfWidthPhysics = mazeWidth / 2 / spriteVsPhysicsScale;
+      mazeHalfHeightPhysics = mazeHeight / 2 / spriteVsPhysicsScale;
       //other items
       ghostStart.setFrom(_volatileVectorOfMazeListCode(_kGhostStart));
       pacmanStart.setFrom(_volatileVectorOfMazeListCode(_kPacmanStart));
@@ -89,8 +89,8 @@ class Maze {
   double blockWidth = 0; //set properly in initializer
   double spriteWidth = 0; //set properly in initializer
   double cloneThreshold = 0; //set properly in initializer
-  double mazeHalfWidth = 0; //set properly in initializer
-  double mazeHalfHeight = 0; //set properly in initializer
+  double mazeHalfWidthPhysics = 0; //set properly in initializer
+  double mazeHalfHeightPhysics = 0; //set properly in initializer
   final Vector2 spriteSize = Vector2.zero(); //set properly in initializer
   final Map<int, Vector2> _ghostStartForIdMap =
       <int, Vector2>{}; //set properly in initializer

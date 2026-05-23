@@ -38,6 +38,10 @@ mixin LapAngle on SpriteAnimationGroupComponent<CharacterState> {
 
   @override
   void update(double dt) {
+    if (!enableRotationRaceMode) {
+      super.update(dt);
+      return;
+    }
     _updateLapAngle();
     super.update(dt);
   }

@@ -180,6 +180,19 @@ class PacmanWorld extends Forge2DWorld
   }
 
   @override
+  void onRemove() {
+    _fingersLastDragAngle.clear();
+    wrappers.clear();
+    super.onRemove();
+  }
+
+  @override
+  Future<void> onGameResize(Vector2 size) async {
+    super.onGameResize(size);
+    _canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
+  }
+
+  @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
     if (isiOSWeb) {
@@ -193,6 +206,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   final Vector2 _eventOffset = Vector2.zero();
+  double _canvasRadius = 1.0;
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
@@ -203,7 +217,7 @@ class PacmanWorld extends Forge2DWorld
       event.canvasStartPosition.y - game.canvasSize.y / 2,
     );
     final double eventVectorLengthProportion =
-        _eventOffset.length / (min(game.canvasSize.x, game.canvasSize.y) / 2);
+        _eventOffset.length / _canvasRadius;
     final double fingerCurrentDragAngle = atan2(_eventOffset.x, _eventOffset.y);
     if (_fingersLastDragAngle.containsKey(event.pointerId)) {
       final double? lastAngle = _fingersLastDragAngle[event.pointerId];

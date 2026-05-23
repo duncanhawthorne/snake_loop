@@ -37,7 +37,7 @@ class Physics extends Component
 
   double get speed => !_ball.isMounted ? 0 : _ballVel.length;
 
-  late final double _initialRadius = owner.size.x / 2;
+  late final double _invInitialRadius = 1 / (owner.size.x / 2);
 
   bool _isActive = true;
 
@@ -91,7 +91,7 @@ class Physics extends Component
         owner.angle = _ball.angle;
       }
     } else {
-      owner.angle += speed * dt / _initialRadius * _spinParity;
+      owner.angle += speed * dt * _invInitialRadius * _spinParity;
     }
   }
 

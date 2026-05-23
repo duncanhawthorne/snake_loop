@@ -140,6 +140,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   static const bool _recordMode = kDebugMode && false;
   final List<List<double>> _recordedMovesLive = <List<double>>[];
 
+  VoidCallback? _lifecycleListenerRef;
+  VoidCallback? _deathListenerRef;
+  VoidCallback? _pelletListenerRef;
+
   void recordAngle(double angle) {
     if (_recordMode && !playbackMode) {
       _recordedMovesLive.add(<double>[
@@ -223,17 +227,18 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void _lifecycleChangeListener() {
-    appLifecycleStateNotifier.addListener(() {
+    _lifecycleListenerRef = () {
       if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
         assert(!isRemoving);
         pauseGame();
       }
-    });
+    };
+    appLifecycleStateNotifier.addListener(_lifecycleListenerRef!);
   }
 
   void _winOrLoseGameListener() {
     assert(!stopwatchStarted); //so no instant trigger of listeners
-    numberOfDeathsNotifier.addListener(() {
+    _deathListenerRef = () {
       if (numberOfDeathsNotifier.value >= level.maxAllowedDeaths &&
           stopwatchStarted &&
           !playbackMode) {
@@ -242,8 +247,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         stopRegularItems();
         _handleLoseGame();
       }
-    });
-    world.pellets.pelletsRemainingNotifier.addListener(() {
+    };
+    _pelletListenerRef = () {
       if (world.pellets.pelletsRemainingNotifier.value <= 0 &&
           stopwatchStarted &&
           !playbackMode) {
@@ -252,7 +257,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         stopRegularItems();
         _handleWinGame();
       }
-    });
+    };
+    numberOfDeathsNotifier.addListener(_deathListenerRef!);
+    world.pellets.pelletsRemainingNotifier.addListener(_pelletListenerRef!);
   }
 
   static const int _minRecordableWinTimeMillis = 10 * 1000;
@@ -349,34 +356,41 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   int _framesRendered = 0;
 
+  async.Timer? _activityCheckTimer;
+
   void pauseEngineIfNoActivity() {
     resumeEngine(); //for any catch up animation, if not already resumed
     _framesRendered = 0;
+    _activityCheckTimer?.cancel(); // Kill any preexisting active loops
     // If all characters at starting position and nothing happening,
     // pause engine to save resources and avoid unnecessary animation
     // check every 10ms, but only pause if nothing happening and still at starting position
     // if something is happening, or not at starting position, then cancel timer and don't pause
-    async.Timer.periodic(const Duration(milliseconds: 10), (async.Timer timer) {
-      if (paused) {
-        //already paused, no further action required, just cancel timer
-        timer.cancel();
-      } else if (playbackMode) {
-        //want to continue playback in playbackMode
-        timer.cancel();
-      } else if (stopwatch.isRunning()) {
-        //some game activity has happened, no need to pause, just cancel timer
-        timer.cancel();
-      } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {
-        //core components haven't loaded yet, so wait before start frame count
-        _framesRendered = 0;
-      } else if (_framesRendered <= 5) {
-        //core components loaded, but not yet had 5 good safety frame
-      } else {
-        //everything loaded and rendered, and still no game activity
-        pauseEngine();
-        timer.cancel();
-      }
-    });
+    _activityCheckTimer = async.Timer.periodic(
+      const Duration(milliseconds: 10),
+      (async.Timer timer) {
+        if (paused) {
+          //already paused, no further action required, just cancel timer
+          timer.cancel();
+        } else if (playbackMode) {
+          //want to continue playback in playbackMode
+          timer.cancel();
+        } else if (stopwatch.isRunning()) {
+          //some game activity has happened, no need to pause, just cancel timer
+          timer.cancel();
+        } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {
+          //core components haven't loaded yet, so wait before start frame count
+          _framesRendered = 0;
+        } else if (_framesRendered <= 5) {
+          //core components loaded, but not yet had 5 good safety frame
+        } else {
+          //everything loaded and rendered, and still no game activity
+          pauseEngine();
+          timer.cancel();
+          if (_activityCheckTimer == timer) _activityCheckTimer = null;
+        }
+      },
+    );
   }
 
   void _bugFixes() {
@@ -413,6 +427,20 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     cleanDialogs();
+    _activityCheckTimer?.cancel();
+    _activityCheckTimer = null;
+    if (_lifecycleListenerRef != null) {
+      appLifecycleStateNotifier.removeListener(_lifecycleListenerRef!);
+    }
+    if (_deathListenerRef != null) {
+      numberOfDeathsNotifier.removeListener(_deathListenerRef!);
+    }
+    if (_pelletListenerRef != null) {
+      world.pellets.pelletsRemainingNotifier.removeListener(
+        _pelletListenerRef!,
+      );
+    }
+    numberOfDeathsNotifier.dispose();
     super.onRemove();
     await audioController.stopAllSounds();
   }
@@ -429,9 +457,11 @@ Vector2 _sanitizeScreenSize(Vector2 size) {
 const String _chars =
     'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 
-String _getRandomString(Random random, int length) => String.fromCharCodes(
-  Iterable<int>.generate(
+String _getRandomString(Random random, int length) {
+  final List<int> charCodes = List<int>.generate(
     length,
     (_) => _chars.codeUnitAt(random.nextInt(_chars.length)),
-  ),
-);
+    growable: false,
+  );
+  return String.fromCharCodes(charCodes);
+}

@@ -86,9 +86,9 @@ class PhysicsBall extends BodyComponent<PacmanGame>
   );
 
   bool get _outsideMazeBounds =>
-      position.x.abs() * spriteVsPhysicsScale > maze.mazeHalfWidth ||
+      position.x.abs() > maze.mazeHalfWidthPhysics ||
       (_kVerticalPortalsEnabled &&
-          position.y.abs() * spriteVsPhysicsScale > maze.mazeHalfHeight);
+          position.y.abs() > maze.mazeHalfHeightPhysics);
 
   set velocity(Vector2 vel) => body.linearVelocity.setFrom(
     spriteVsPhysicsScaleConstant ? vel : vel / spriteVsPhysicsScale,

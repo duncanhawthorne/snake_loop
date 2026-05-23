@@ -21,11 +21,11 @@ class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
   bool get pacmanDeathIsFinalPacman =>
       !multipleSpawningPacmans || pacmanList.length == 1 || !anyAlivePacman;
 
-  Vector2 get ghostHomingTarget => pacmanList[0].position;
+  Vector2 get ghostHomingTarget =>
+      pacmanList.isNotEmpty ? pacmanList[0].position : maze.pacmanStart;
 
-  bool get anyAlivePacman => pacmanList
-      .where((Pacman pacman) => pacman.current != CharacterState.dead)
-      .isNotEmpty;
+  bool get anyAlivePacman =>
+      pacmanList.any((Pacman pacman) => pacman.current != CharacterState.dead);
 
   void resetInstantAfterPacmanDeath() {
     assert(pacmanList.length == 1);
