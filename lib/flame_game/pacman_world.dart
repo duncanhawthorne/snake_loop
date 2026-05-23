@@ -219,6 +219,7 @@ class PacmanWorld extends Forge2DWorld
     final double eventVectorLengthProportion =
         _eventOffset.length / _canvasRadius;
     final double fingerCurrentDragAngle = atan2(_eventOffset.x, _eventOffset.y);
+    // Need separate contains and null check due to isiOSWeb approach in onDragStart
     if (_fingersLastDragAngle.containsKey(event.pointerId)) {
       final double? lastAngle = _fingersLastDragAngle[event.pointerId];
       if (lastAngle != null) {
@@ -240,9 +241,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
-    if (_fingersLastDragAngle.containsKey(event.pointerId)) {
-      _fingersLastDragAngle.remove(event.pointerId);
-    }
+    _fingersLastDragAngle.remove(event.pointerId);
   }
 
   void _moveMazeAngleByDelta(double angleDelta) {
