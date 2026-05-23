@@ -28,15 +28,14 @@ class MazePhysicsFactory {
     return FixtureDef(
       friction: openSpaceMovement ? 1 : 0,
       restitution: openSpaceMovement ? 0.4 : 0,
-      PolygonShape()
-        ..setAsBox(
-          width / 2 / spriteVsPhysicsScale,
-          height / 2 / spriteVsPhysicsScale,
-          _reusableVector
-            ..setFrom(position)
-            ..scale(1 / spriteVsPhysicsScale),
-          0,
-        ),
+      PolygonShape()..setAsBox(
+        width / 2 / spriteVsPhysicsScale,
+        height / 2 / spriteVsPhysicsScale,
+        _reusableVector
+          ..setFrom(position)
+          ..scale(1 / spriteVsPhysicsScale),
+        0,
+      ),
       density: density,
     );
   }
@@ -54,11 +53,12 @@ class MazePhysicsFactory {
         localWallAt(i + 1, j + 1);
   }
 
-  int _bigBlockWidth(int i,
-      int j, {
-        bool singleHeight = true,
-        bool moving = false,
-      }) {
+  int _bigBlockWidth(
+    int i,
+    int j, {
+    bool singleHeight = true,
+    bool moving = false,
+  }) {
     final bool Function(int i, int j) localWallAt = moving
         ? layout.movingWallAt
         : layout.wallAt;
@@ -72,11 +72,12 @@ class MazePhysicsFactory {
     return k;
   }
 
-  int _bigBlockHeight(int i,
-      int j, {
-        bool singleWidth = true,
-        bool moving = false,
-      }) {
+  int _bigBlockHeight(
+    int i,
+    int j, {
+    bool singleWidth = true,
+    bool moving = false,
+  }) {
     final bool Function(int i, int j) localWallAt = moving
         ? layout.movingWallAt
         : layout.wallAt;
@@ -116,7 +117,7 @@ class MazePhysicsFactory {
     final Vector2 bigBlockSize = Vector2.zero();
     for (int i = 0; i < layout.length; i++) {
       for (int j = 0; j < layout.lengthH; j++) {
-        center.setFrom(dimensions.volatileVectorFromIJ(i, j));
+        dimensions.locationOfIJ(i, j, output: center);
         if (layout.wallAt(i, j)) {
           if (layout.circleAt(i, j)) {
             fixtureDefs.add(
@@ -219,7 +220,7 @@ class MazePhysicsFactory {
     final Vector2 bigBlockCenterPhysics = Vector2.zero();
     for (int i = 0; i < layout.length; i++) {
       for (int j = 0; j < layout.lengthH; j++) {
-        center.setFrom(dimensions.volatileVectorFromIJ(i, j));
+        dimensions.locationOfIJ(i, j, output: center);
         if (layout.movingWallAt(i, j)) {
           if (_topLeftOfBigBlock(i, j, moving: true)) {
             final int width = _bigBlockWidth(i, j, moving: true);

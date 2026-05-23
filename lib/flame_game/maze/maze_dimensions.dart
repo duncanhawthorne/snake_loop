@@ -19,9 +19,9 @@ class MazeDimensions {
     mazeHalfWidthPhysics = mazeWidth / 2 / spriteVsPhysicsScale;
     mazeHalfHeightPhysics = mazeHeight / 2 / spriteVsPhysicsScale;
     //other items
-    ghostStart.setFrom(_volatileVectorOfMazeItem(MazeData.kGhostStart));
-    pacmanStart.setFrom(_volatileVectorOfMazeItem(MazeData.kPacmanStart));
-    _cage.setFrom(_volatileVectorOfMazeItem(MazeData.kCage));
+    _locationOfMazeItem(MazeData.kGhostStart, output: ghostStart);
+    _locationOfMazeItem(MazeData.kPacmanStart, output: pacmanStart);
+    _locationOfMazeItem(MazeData.kCage, output: _cage);
     //item below used regularly
     _ghostStartForIdMap[0] = _ghostStartForId(0);
     _ghostStartForIdMap[1] = _ghostStartForId(1);
@@ -29,7 +29,6 @@ class MazeDimensions {
   }
 
   final MazeLayout layout;
-  static final Vector2 _reusableVector = Vector2.zero();
 
   final Vector2 ghostStart = Vector2.zero(); //set properly in initializer
   final Vector2 pacmanStart = Vector2.zero(); //set properly in initializer
@@ -55,11 +54,12 @@ class MazeDimensions {
     return blockWidth * 2;
   }
 
-  Vector2 volatileVectorFromIJ(
+  Vector2 locationOfIJ(
     int icore,
     int jcore, {
     double ioffset = 0,
     double joffset = 0,
+    required Vector2 output,
   }) {
     final double i = ioffset + icore;
     final double j = joffset + jcore;
@@ -68,16 +68,15 @@ class MazeDimensions {
     /// so we don't have to make new Vector2 every time called
     /// but therefore must instantly consume the output as it may change
     assert(blockWidth != 0); //i.e. not set yet
-    _reusableVector.setValues(
+    return output..setValues(
       (j + 1 / 2 - layout.lengthH / 2) * blockWidth,
       (i + 1 / 2 - layout.length / 2) * blockWidth,
     );
-    return _reusableVector;
   }
 
-  Vector2 _volatileVectorOfMazeItem(String code) {
+  Vector2 _locationOfMazeItem(String code, {required Vector2 output}) {
     final (int i, int j) = layout.ijOfMazeListCode(code);
-    return volatileVectorFromIJ(i, j, ioffset: 0.5);
+    return locationOfIJ(i, j, ioffset: 0.5, output: output);
   }
 
   Vector2 ghostStartForId(int idNum) {

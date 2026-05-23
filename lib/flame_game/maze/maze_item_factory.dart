@@ -32,8 +32,12 @@ class MazeItemFactory {
         if (layout.pelletAt(i, j)) {
           final bool isSuperPellet = layout.pelletIsSuperPellet(i, j);
           if (!isSuperPellet || !superPelletsEnabled) {
-            center.setFrom(
-              dimensions.volatileVectorFromIJ(i, j, ioffset: 0.5, joffset: 0.5),
+            dimensions.locationOfIJ(
+              i,
+              j,
+              ioffset: 0.5,
+              joffset: 0.5,
+              output: center,
             );
             yield center;
           }
@@ -47,8 +51,12 @@ class MazeItemFactory {
     for (int i = 0; i < layout.length; i++) {
       for (int j = 0; j < layout.lengthH; j++) {
         if (layout.pelletAt(i, j) && layout.pelletIsSuperPellet(i, j)) {
-          center.setFrom(
-            dimensions.volatileVectorFromIJ(i, j, ioffset: 0.5, joffset: 0.5),
+          dimensions.locationOfIJ(
+            i,
+            j,
+            ioffset: 0.5,
+            joffset: 0.5,
+            output: center,
           );
           yield center;
         }
