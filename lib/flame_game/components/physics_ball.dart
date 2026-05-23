@@ -81,7 +81,9 @@ class PhysicsBall extends BodyComponent<PacmanGame>
   static final Vector2 _reusableVector = Vector2.zero();
 
   set position(Vector2 pos) => body.setTransform(
-    spriteVsPhysicsScaleConstant ? pos : pos / spriteVsPhysicsScale,
+    spriteVsPhysicsScaleConstant ? pos : _reusableVector
+      ..setFrom(pos)
+      ..scale(1 / spriteVsPhysicsScale),
     owner.angle,
   );
 
