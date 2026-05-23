@@ -114,6 +114,7 @@ class PacmanSprites {
   }
 
   void _precacheAllPacmanAtFrac(int size) {
+    if (size <= 0) return;
     if (_pacmanSpriteAtFracCache.isEmpty || _pacmanSpriteCacheSize != size) {
       //call first time, later times no effect
       _pacmanSpriteCacheSize = size;

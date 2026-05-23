@@ -229,8 +229,11 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<void> onGameResize(Vector2 size) async {
     if (size.x != _screenSizeLast.x || size.y != _screenSizeLast.y) {
-      _screenSizeLast.setFrom(size);
-      animations = await getAnimations(2 * maze.spriteWidthOnScreen(size));
+      final int newSize = 2 * maze.spriteWidthOnScreen(size);
+      if (newSize > 0) {
+        _screenSizeLast.setFrom(size);
+        animations = await getAnimations(newSize);
+      }
     }
     super.onGameResize(size);
   }
