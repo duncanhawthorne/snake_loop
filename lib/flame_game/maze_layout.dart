@@ -3,12 +3,12 @@ import 'maze_data.dart';
 
 class MazeLayout {
   MazeLayout(int mazeId, {required bool enableRotationRaceMode}) {
-    mazeLayout = _decodeMazeLayout(
+    _layout = _decodeMazeLayout(
       _selectRawLayout(mazeId, enableRotationRaceMode),
     );
   }
 
-  late final List<List<String>> mazeLayout;
+  late final List<List<String>> _layout;
 
   static const int _bufferColumns = 2;
 
@@ -23,20 +23,30 @@ class MazeLayout {
     };
   }
 
-  int mazeLayoutHorizontalLength() {
-    return mazeLayout.isEmpty ? 0 : (mazeLayout[0].length - _bufferColumns);
-  }
+  int get lengthH => _layout.isEmpty ? 0 : (_layout[0].length);
 
-  int mazeLayoutVerticalLength() {
-    return mazeLayout.length;
+  int get lengthHBuffered =>
+      _layout.isEmpty ? 0 : (_layout[0].length - _bufferColumns);
+
+  int get length => _layout.length;
+
+  (int, int) ijOfMazeListCode(String code) {
+    for (int i = 0; i < _layout.length; i++) {
+      for (int j = 0; j < _layout[i].length; j++) {
+        if (_layout[i][j] == code) {
+          return (i, j);
+        }
+      }
+    }
+    throw 'Missing maze code $code';
   }
 
   bool wallAt(int i, int j) {
     return i >= 0 &&
-        i < mazeLayout.length &&
+        i < _layout.length &&
         j >= 0 &&
-        j < mazeLayout[i].length &&
-        mazeLayout[i][j] == MazeData.kWall;
+        j < _layout[i].length &&
+        _layout[i][j] == MazeData.kWall;
   }
 
   bool circleAt(int i, int j) {
@@ -47,14 +57,14 @@ class MazeLayout {
 
   bool movingWallAt(int i, int j) {
     return i >= 0 &&
-        i < mazeLayout.length &&
+        i < _layout.length &&
         j >= 0 &&
-        j < mazeLayout[i].length &&
-        mazeLayout[i][j] == MazeData.kMovingWall;
+        j < _layout[i].length &&
+        _layout[i][j] == MazeData.kMovingWall;
   }
 
   bool _pelletCodeAtCell(int i, int j) {
-    final String char = mazeLayout[i][j];
+    final String char = _layout[i][j];
     return char == MazeData.kMiniPellet ||
         char == MazeData.kSuperPellet ||
         char == MazeData.kMovingWall;
@@ -63,12 +73,17 @@ class MazeLayout {
   bool pelletAt(int i, int j) {
     return i >= 0 &&
         j >= 0 &&
-        i + 1 < mazeLayout.length &&
-        j + 1 < mazeLayout[0].length &&
+        i + 1 < _layout.length &&
+        j + 1 < _layout[0].length &&
         _pelletCodeAtCell(i, j) &&
         _pelletCodeAtCell(i, j + 1) &&
         _pelletCodeAtCell(i + 1, j) &&
         _pelletCodeAtCell(i + 1, j + 1);
+  }
+
+  bool pelletIsSuperPellet(int i, int j) {
+    assert(pelletAt(i, j));
+    return _layout[i][j] == MazeData.kSuperPellet;
   }
 }
 

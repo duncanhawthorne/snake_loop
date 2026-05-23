@@ -64,7 +64,7 @@ class MazePhysicsFactory {
         : layout.wallAt;
     assert(localWallAt(i, j));
     int k = 0;
-    while (j + k < layout.mazeLayout[i].length &&
+    while (j + k < layout.lengthH &&
         (singleHeight || localWallAt(i + 1, j + k + 1)) &&
         localWallAt(i, j + k + 1)) {
       k++;
@@ -83,7 +83,7 @@ class MazePhysicsFactory {
         : layout.wallAt;
     assert(localWallAt(i, j));
     int l = 0;
-    while (i + l < layout.mazeLayout.length &&
+    while (i + l < layout.length &&
         (singleWidth || localWallAt(i + l + 1, j + 1)) &&
         localWallAt(i + l + 1, j)) {
       l++;
@@ -115,8 +115,8 @@ class MazePhysicsFactory {
     final Vector2 center = Vector2.zero();
     final Vector2 bigBlockCenter = Vector2.zero();
     final Vector2 bigBlockSize = Vector2.zero();
-    for (int i = 0; i < layout.mazeLayout.length; i++) {
-      for (int j = 0; j < layout.mazeLayout[i].length; j++) {
+    for (int i = 0; i < layout.length; i++) {
+      for (int j = 0; j < layout.lengthH; j++) {
         center.setFrom(dimensions.volatileVectorOfMazeListIndex(i, j));
         if (layout.wallAt(i, j)) {
           if (layout.circleAt(i, j)) {
@@ -218,8 +218,8 @@ class MazePhysicsFactory {
     final Vector2 center = Vector2.zero();
     final Vector2 bigBlockCenter = Vector2.zero();
     final Vector2 bigBlockCenterPhysics = Vector2.zero();
-    for (int i = 0; i < layout.mazeLayout.length; i++) {
-      for (int j = 0; j < layout.mazeLayout[i].length; j++) {
+    for (int i = 0; i < layout.length; i++) {
+      for (int j = 0; j < layout.lengthH; j++) {
         center.setFrom(dimensions.volatileVectorOfMazeListIndex(i, j));
         if (layout.movingWallAt(i, j)) {
           if (_topLeftOfBigBlock(i, j, moving: true)) {

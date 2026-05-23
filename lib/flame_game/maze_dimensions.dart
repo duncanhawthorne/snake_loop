@@ -12,8 +12,8 @@ class MazeDimensions {
     //items below used every frame so calculate once here
     blockWidth = _blockWidth();
     spriteWidth = _spriteWidth();
-    mazeWidth = blockWidth * layout.mazeLayoutHorizontalLength();
-    mazeHeight = blockWidth * layout.mazeLayoutVerticalLength();
+    mazeWidth = blockWidth * layout.lengthHBuffered;
+    mazeHeight = blockWidth * layout.length;
     spriteSize.setAll(spriteWidth);
     cloneThreshold = mazeWidth / 2 - spriteWidth / 2;
     mazeHalfWidthPhysics = mazeWidth / 2 / spriteVsPhysicsScale;
@@ -48,10 +48,7 @@ class MazeDimensions {
   double _blockWidth() {
     return kVirtualGameSize /
         flameGameZoom /
-        max(
-          layout.mazeLayoutHorizontalLength(),
-          layout.mazeLayoutVerticalLength(),
-        );
+        max(layout.lengthHBuffered, layout.length);
   }
 
   double _spriteWidth() {
@@ -72,21 +69,15 @@ class MazeDimensions {
     /// but therefore must instantly consume the output as it may change
     assert(blockWidth != 0); //i.e. not set yet
     _reusableVector.setValues(
-      (j + 1 / 2 - layout.mazeLayout[0].length / 2) * blockWidth,
-      (i + 1 / 2 - layout.mazeLayout.length / 2) * blockWidth,
+      (j + 1 / 2 - layout.lengthH / 2) * blockWidth,
+      (i + 1 / 2 - layout.length / 2) * blockWidth,
     );
     return _reusableVector;
   }
 
   Vector2 _volatileVectorOfMazeListCode(String code) {
-    for (int i = 0; i < layout.mazeLayout.length; i++) {
-      for (int j = 0; j < layout.mazeLayout[i].length; j++) {
-        if (layout.mazeLayout[i][j] == code) {
-          return volatileVectorOfMazeListIndex(i, j, ioffset: 0.5);
-        }
-      }
-    }
-    throw 'Missing maze code $code';
+    final (int i, int j) = layout.ijOfMazeListCode(code);
+    return volatileVectorOfMazeListIndex(i, j, ioffset: 0.5);
   }
 
   Vector2 ghostStartForId(int idNum) {
