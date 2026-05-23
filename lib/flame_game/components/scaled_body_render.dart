@@ -14,11 +14,14 @@ mixin ScaledBodyRender on BodyComponent<PacmanGame> {
       return;
     }
 
-    final double s = spriteVsPhysicsScale;
+    const double s = spriteVsPhysicsScale;
     canvas
       ..save()
+      ..rotate(-body.angle)
+      ..translate(-position.x, -position.y)
       ..scale(s)
-      ..translate(position.x * (1 - 1 / s), position.y * (1 - 1 / s));
+      ..translate(position.x, position.y)
+      ..rotate(body.angle);
     super.render(canvas);
     canvas.restore();
 
