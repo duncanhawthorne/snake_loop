@@ -263,10 +263,10 @@ class PacmanWorld extends Forge2DWorld
     cameraAngle = angle;
     downDirection
       ..setValues(-sin(angle), cos(angle))
-      ..scale(game.level.levelSpeed);
+      ..scale(game.level.levelSpeed / spriteVsPhysicsScale);
 
     if (_updateGravityOnRotation) {
-      gravity = downDirection / spriteVsPhysicsScale;
+      gravity = downDirection;
       gravitySign.setValues(gravity.x.sign, gravity.y.sign); //used every frame
     }
   }
