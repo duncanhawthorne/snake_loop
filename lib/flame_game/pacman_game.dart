@@ -178,7 +178,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       stopwatch.resume();
       world.ghosts
         ..addSpawner()
-        ..startSirenVolumeUpdaterTimer();
+        ..ghostSiren.startSirenVolumeUpdaterTimer();
     }
   }
 
@@ -187,7 +187,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     stopwatch.pause();
     world.ghosts
       ..removeSpawner()
-      ..cancelSirenVolumeUpdaterTimer();
+      ..ghostSiren.cancelSirenVolumeUpdaterTimer();
   }
 
   void _lifecycleChangeListener() {
