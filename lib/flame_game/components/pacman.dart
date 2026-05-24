@@ -143,7 +143,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _dieFromGhost() {
-    if (world.doingLevelResetFlourish) {
+    if (world.deathManager.doingLevelResetFlourish) {
       // avoid race condition
       // already doing a level reset flourish from somewhere else
       return;
@@ -158,7 +158,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       }
       world.pacmans.pacmanDyingNotifier.value++;
       if (world.pacmans.pacmanDeathIsFinalPacman) {
-        world.doingLevelResetFlourish = true;
+        world.deathManager.doingLevelResetFlourish = true;
         game.stopRegularItems();
       }
       add(
@@ -173,11 +173,11 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void _dieFromGhostActionAfterDeathAnimation() {
     if (current == CharacterState.dead && !game.isWonOrLost) {
       if (world.pacmans.pacmanDeathIsFinalPacman) {
-        if (world.doingLevelResetFlourish) {
+        if (world.deathManager.doingLevelResetFlourish) {
           // must test doingLevelResetFlourish
           // as could have been removed by reset during delay
           game.numberOfDeathsNotifier.value++; //score counting deaths
-          world.resetAfterPacmanDeath(this);
+          world.deathManager.resetAfterPacmanDeath(this);
         }
       } else {
         assert(multipleSpawningPacmans);

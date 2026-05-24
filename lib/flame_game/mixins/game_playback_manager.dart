@@ -39,14 +39,14 @@ mixin GamePlaybackManager on Forge2DGame<PacmanWorld> {
         _playbackModeCounter++;
         (this as PacmanGame).startRegularItems();
       }
-      while (!world.doingLevelResetFlourish &&
+      while (!world.deathManager.doingLevelResetFlourish &&
           _playbackModeCounter < storedMoves.length &&
           (this as PacmanGame).stopwatchMilliSeconds >
               storedMoves[_playbackModeCounter][0]) {
         world.dragManager.setMazeAngle(storedMoves[_playbackModeCounter][1]);
         _playbackModeCounter++;
       }
-      if (!world.doingLevelResetFlourish &&
+      if (!world.deathManager.doingLevelResetFlourish &&
           (this as PacmanGame).stopwatchMilliSeconds > 20000) {
         (this as PacmanGame).reset(); //if stuck, reset
       }

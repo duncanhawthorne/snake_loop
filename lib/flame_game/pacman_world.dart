@@ -11,12 +11,12 @@ import '../../audio/sounds.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/ghost_layer.dart';
 import 'components/lap_angle.dart';
-import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
+import 'mixins/world_death_manager.dart';
 import 'mixins/world_drag_rotation_manager.dart';
 import 'pacman_game.dart';
 
@@ -52,8 +52,6 @@ class PacmanWorld extends Forge2DWorld
   final MovingWallWrapper _movingWalls = MovingWallWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
-  bool doingLevelResetFlourish = false;
-
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
 
@@ -64,65 +62,17 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  final WorldDeathManager deathManager = WorldDeathManager();
+
   void resetAfterGameWin() {
     game.audioController.stopSound(SfxType.ghostsScared);
     play(SfxType.endMusic);
     ghosts.resetAfterGameWin();
   }
 
-  static const bool _slideCharactersAfterPacmanDeath = true;
-
-  void resetAfterPacmanDeath(Pacman dyingPacman) {
-    _resetSlideAfterPacmanDeath(dyingPacman);
-  }
-
-  void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
-    //reset ghost scared status. Shouldn't be relevant as just died
-    game.audioController.stopSound(SfxType.ghostsScared);
-    if (!game.isWonOrLost) {
-      if (_slideCharactersAfterPacmanDeath) {
-        dragManager.flourishReset(_resetInstantAfterPacmanDeath);
-        dyingPacman.resetSlideAfterDeath();
-        ghosts.resetSlideAfterPacmanDeath();
-      } else {
-        _resetInstantAfterPacmanDeath();
-      }
-    } else {
-      doingLevelResetFlourish = false;
-    }
-  }
-
-  void _resetInstantAfterPacmanDeath() {
-    // ignore: dead_code
-    if (true || doingLevelResetFlourish) {
-      // originally thought must test doingLevelResetFlourish
-      // as could have been removed by reset during delay x 2
-      // but this code is only run from resetSlide,
-      // so if we have got here (accidentally) then resetSlide has run
-      // and rotation will be wrong
-      // so should clean up anyway
-      if (game.level.infLives) {
-        game.numberOfDeathsNotifier.value = 0;
-        pacmans.pacmanDyingNotifier.value = 0;
-      }
-      pacmans.resetInstantAfterPacmanDeath();
-      ghosts.resetInstantAfterPacmanDeath();
-      _cameraAndTimersReset();
-      if (game.playbackMode) {
-        game.reset();
-      } else {
-        game.pauseEngineIfNoActivity();
-      }
-    }
-  }
-
-  void _cameraAndTimersReset() {
-    dragManager.reset();
-    doingLevelResetFlourish = false;
-  }
-
   void reset({bool firstRun = false}) {
-    _cameraAndTimersReset();
+    dragManager.reset();
+    deathManager.doingLevelResetFlourish = false;
     game.audioController.stopSound(SfxType.ghostsScared);
 
     if (!firstRun) {
@@ -153,6 +103,7 @@ class PacmanWorld extends Forge2DWorld
       _walls,
       _blocking,
       if (enableMovingWalls) _movingWalls,
+      deathManager,
     ]);
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
@@ -177,6 +128,7 @@ class PacmanWorld extends Forge2DWorld
     game: game,
     world: this,
   );
+
   final Vector2 gravitySign = Vector2.zero();
 
   @override

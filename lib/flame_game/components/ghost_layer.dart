@@ -96,7 +96,9 @@ class Ghosts extends WrapperNoEvents
         assert(
           !world.pacmans.isMounted || world.pacmans.anyAlivePacman,
         ); //timer cancelled already here
-        assert(!world.doingLevelResetFlourish); //timer cancelled already here
+        assert(
+          !world.deathManager.doingLevelResetFlourish,
+        ); //timer cancelled already here
         assert(game.openingScreenCleared);
         if (game.isLive) {
           game.audioController.setSirenVolume(

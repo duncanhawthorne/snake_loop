@@ -88,7 +88,7 @@ class WorldDragRotationManager {
         game.openingScreenCleared &&
         !game.playbackMode) {
       setMazeAngle(cameraAngle + angleDelta);
-      if (!world.doingLevelResetFlourish && !game.isWonOrLost) {
+      if (!world.deathManager.doingLevelResetFlourish && !game.isWonOrLost) {
         game.startRegularItems();
       }
     }
