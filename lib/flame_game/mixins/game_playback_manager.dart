@@ -43,7 +43,7 @@ mixin GamePlaybackManager on Forge2DGame<PacmanWorld> {
           _playbackModeCounter < storedMoves.length &&
           (this as PacmanGame).stopwatchMilliSeconds >
               storedMoves[_playbackModeCounter][0]) {
-        world.setMazeAngle(storedMoves[_playbackModeCounter][1]);
+        world.dragManager.setMazeAngle(storedMoves[_playbackModeCounter][1]);
         _playbackModeCounter++;
       }
       if (!world.doingLevelResetFlourish &&

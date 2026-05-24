@@ -8,19 +8,16 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
-import '../utils/constants.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/ghost_layer.dart';
 import 'components/lap_angle.dart';
 import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
-import 'components/physics_ball.dart';
 import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
-import 'effects/remove_effects.dart';
-import 'effects/rotate_effect.dart';
+import 'mixins/world_drag_rotation_manager.dart';
 import 'pacman_game.dart';
 
 /// The world is where you place all the components that should live inside of
@@ -55,10 +52,7 @@ class PacmanWorld extends Forge2DWorld
   final MovingWallWrapper _movingWalls = MovingWallWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
-  final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
-
   bool doingLevelResetFlourish = false;
-  bool _cameraRotatableOnPacmanDeathFlourish = true;
 
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
@@ -87,13 +81,9 @@ class PacmanWorld extends Forge2DWorld
     game.audioController.stopSound(SfxType.ghostsScared);
     if (!game.isWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
-        _cameraRotatableOnPacmanDeathFlourish = false;
+        dragManager.flourishReset(_resetInstantAfterPacmanDeath);
         dyingPacman.resetSlideAfterDeath();
         ghosts.resetSlideAfterPacmanDeath();
-        resetSlideAngle(
-          game.camera.viewfinder,
-          onComplete: _resetInstantAfterPacmanDeath,
-        );
       } else {
         _resetInstantAfterPacmanDeath();
       }
@@ -127,11 +117,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void _cameraAndTimersReset() {
-    //stop any rotation effect added to camera
-    //note, still leaves flourish variable hot, so fix below
-    removeEffects(game.camera.viewfinder);
-    setMazeAngle(0);
-    _cameraRotatableOnPacmanDeathFlourish = true;
+    dragManager.reset();
     doingLevelResetFlourish = false;
   }
 
@@ -181,7 +167,7 @@ class PacmanWorld extends Forge2DWorld
 
   @override
   void onRemove() {
-    _fingersLastDragAngle.clear();
+    dragManager.clear();
     wrappers.clear();
     super.onRemove();
   }
@@ -189,98 +175,30 @@ class PacmanWorld extends Forge2DWorld
   @override
   Future<void> onGameResize(Vector2 size) async {
     super.onGameResize(size);
-    _canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
+    dragManager.canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
   }
+
+  late final WorldDragRotationManager dragManager = WorldDragRotationManager(
+    game: game,
+    world: this,
+  );
+  final Vector2 gravitySign = Vector2(0, 0);
 
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    if (isiOSWeb) {
-      _fingersLastDragAngle[event.pointerId] = null;
-    } else {
-      _fingersLastDragAngle[event.pointerId] = atan2(
-        event.canvasPosition.x - game.canvasSize.x / 2,
-        event.canvasPosition.y - game.canvasSize.y / 2,
-      );
-    }
+    dragManager.onDragStart(event);
   }
-
-  final Vector2 _eventOffset = Vector2.zero();
-  double _canvasRadius = 1.0;
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    game.resumeGame();
-    _eventOffset.setValues(
-      event.canvasStartPosition.x - game.canvasSize.x / 2,
-      event.canvasStartPosition.y - game.canvasSize.y / 2,
-    );
-    final double eventVectorLengthProportion =
-        _eventOffset.length / _canvasRadius;
-    final double fingerCurrentDragAngle = atan2(_eventOffset.x, _eventOffset.y);
-    // Need separate contains and null check due to isiOSWeb approach in onDragStart
-    if (_fingersLastDragAngle.containsKey(event.pointerId)) {
-      final double? lastAngle = _fingersLastDragAngle[event.pointerId];
-      if (lastAngle != null) {
-        final double angleDelta = smallAngle(
-          fingerCurrentDragAngle - lastAngle,
-        );
-        const double maxSpinMultiplierRadius = 0.75;
-        final double spinMultiplier =
-            4 *
-            game.level.spinSpeedFactor *
-            min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
-
-        _moveMazeAngleByDelta(angleDelta * spinMultiplier);
-      }
-      _fingersLastDragAngle[event.pointerId] = fingerCurrentDragAngle;
-    }
+    dragManager.onDragUpdate(event);
   }
 
   @override
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
-    _fingersLastDragAngle.remove(event.pointerId);
-  }
-
-  void _moveMazeAngleByDelta(double angleDelta) {
-    if (_cameraRotatableOnPacmanDeathFlourish &&
-        game.isLive &&
-        game.openingScreenCleared &&
-        !game.playbackMode) {
-      setMazeAngle(cameraAngle + angleDelta);
-      if (!doingLevelResetFlourish && !game.isWonOrLost) {
-        game.startRegularItems();
-      }
-    }
-  }
-
-  final Vector2 downDirection = Vector2.zero();
-
-  static const bool _updateGravityOnRotation = true;
-  final Vector2 gravitySign = Vector2(0, 0);
-
-  static const bool _kRotatingCamera = !kDebugMode || true;
-
-  double get cameraAngle =>
-      _kRotatingCamera ? game.camera.viewfinder.angle : _debugFakeAngle;
-
-  set cameraAngle(double z) =>
-      _kRotatingCamera ? game.camera.viewfinder.angle = z : _debugFakeAngle = z;
-
-  double _debugFakeAngle = 0;
-
-  void setMazeAngle(double angle) {
-    game.recordAngle(angle);
-    cameraAngle = angle;
-    downDirection
-      ..setValues(-sin(angle), cos(angle))
-      ..scale(game.level.levelSpeed / spriteVsPhysicsScale);
-
-    if (_updateGravityOnRotation) {
-      gravity = downDirection;
-      gravitySign.setValues(gravity.x.sign, gravity.y.sign); //used every frame
-    }
+    dragManager.onDragEnd(event);
   }
 }
