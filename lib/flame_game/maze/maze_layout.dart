@@ -1,27 +1,14 @@
-import 'maze.dart';
 import 'maze_data.dart';
+import 'maze_tiles.dart';
 
 class MazeLayout {
-  MazeLayout(int mazeId, {required bool enableRotationRaceMode}) {
-    _layout = _decodeMazeLayout(
-      _selectRawLayout(mazeId, enableRotationRaceMode),
-    );
+  MazeLayout(int mazeId, {required bool raceMode}) {
+    _layout = MazeData.getLayout(mazeId, raceMode: raceMode);
   }
 
-  late final List<List<String>> _layout;
+  late final List<List<Tile>> _layout;
 
   static const int _bufferColumns = 2;
-
-  List<String> _selectRawLayout(int id, bool raceMode) {
-    return switch (id) {
-      Maze.tutorialMazeId => MazeData.mazeTutorialLayout,
-      Maze.defaultMazeId =>
-        raceMode ? MazeData.raceTrack : MazeData.mazeP1Layout,
-      1 => MazeData.mazeMP4Layout,
-      2 => MazeData.mazeMP1Layout,
-      _ => throw ArgumentError('Unknown maze ID: $id'),
-    };
-  }
 
   int get lengthH => _layout.isEmpty ? 0 : (_layout[0].length);
 
@@ -30,15 +17,15 @@ class MazeLayout {
 
   int get length => _layout.length;
 
-  (int, int) ijOfMazeListCode(String code) {
+  (int, int) ijOfMazeTile(Tile tile) {
     for (int i = 0; i < _layout.length; i++) {
       for (int j = 0; j < _layout[i].length; j++) {
-        if (_layout[i][j] == code) {
+        if (_layout[i][j] == tile) {
           return (i, j);
         }
       }
     }
-    throw 'Missing maze code $code';
+    throw 'Missing maze code $tile';
   }
 
   bool wallAt(int i, int j) {
@@ -46,7 +33,7 @@ class MazeLayout {
         i < _layout.length &&
         j >= 0 &&
         j < _layout[i].length &&
-        _layout[i][j] == MazeData.kWall;
+        _layout[i][j] == Tile.wall;
   }
 
   bool circleAt(int i, int j) {
@@ -60,14 +47,14 @@ class MazeLayout {
         i < _layout.length &&
         j >= 0 &&
         j < _layout[i].length &&
-        _layout[i][j] == MazeData.kMovingWall;
+        _layout[i][j] == Tile.movingWall;
   }
 
   bool _pelletCodeAtCell(int i, int j) {
-    final String char = _layout[i][j];
-    return char == MazeData.kMiniPellet ||
-        char == MazeData.kSuperPellet ||
-        char == MazeData.kMovingWall;
+    final Tile char = _layout[i][j];
+    return char == Tile.miniPellet ||
+        char == Tile.superPellet ||
+        char == Tile.movingWall;
   }
 
   bool pelletAt(int i, int j) {
@@ -83,14 +70,6 @@ class MazeLayout {
 
   bool pelletIsSuperPellet(int i, int j) {
     assert(pelletAt(i, j));
-    return _layout[i][j] == MazeData.kSuperPellet;
+    return _layout[i][j] == Tile.superPellet;
   }
-}
-
-List<List<String>> _decodeMazeLayout(List<String> encodedMazeLayout) {
-  final List<List<String>> result = <List<String>>[];
-  for (final String row in encodedMazeLayout) {
-    result.add(row.split(""));
-  }
-  return result;
 }

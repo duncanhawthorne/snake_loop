@@ -46,10 +46,7 @@ class Maze {
       }
       _mazeId = id;
 
-      layout = MazeLayout(
-        _mazeId,
-        enableRotationRaceMode: enableRotationRaceMode,
-      );
+      layout = MazeLayout(_mazeId, raceMode: enableRotationRaceMode);
 
       dimensions = MazeDimensions(layout: layout);
       physicsFactory = MazePhysicsFactory(

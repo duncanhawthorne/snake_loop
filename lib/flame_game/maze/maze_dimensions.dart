@@ -4,17 +4,17 @@ import 'package:flame/components.dart';
 
 import '../components/physics_ball.dart';
 import '../pacman_game.dart';
-import 'maze_data.dart';
 import 'maze_layout.dart';
+import 'maze_tiles.dart';
 
 class MazeDimensions {
   MazeDimensions({required this.layout});
 
   final MazeLayout layout;
 
-  late final Vector2 ghostStart = _locationOfMazeItem(MazeData.kGhostStart);
-  late final Vector2 pacmanStart = _locationOfMazeItem(MazeData.kPacmanStart);
-  late final Vector2 _cage = _locationOfMazeItem(MazeData.kCage);
+  late final Vector2 ghostStart = _vectorOfMazeTile(Tile.ghostStart);
+  late final Vector2 pacmanStart = _vectorOfMazeTile(Tile.pacmanStart);
+  late final Vector2 _cage = _vectorOfMazeTile(Tile.cage);
   late final double mazeWidth = blockWidth * layout.lengthHBuffered;
   late final double mazeHeight = blockWidth * layout.length;
   late final double blockWidth = _blockWidth();
@@ -60,9 +60,9 @@ class MazeDimensions {
     );
   }
 
-  Vector2 _locationOfMazeItem(String code, {Vector2? output}) {
+  Vector2 _vectorOfMazeTile(Tile code, {Vector2? output}) {
     final Vector2 out = output ?? Vector2.zero();
-    final (int i, int j) = layout.ijOfMazeListCode(code);
+    final (int i, int j) = layout.ijOfMazeTile(code);
     return locationOfIJ(i, j, ioffset: 0.5, output: out);
   }
 

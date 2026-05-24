@@ -1,19 +1,36 @@
+import 'maze.dart';
+import 'maze_tiles.dart';
+
 class MazeData {
-  static const String kMiniPellet = "0"; //quad of dots
-  static const String kWall = "1";
-  static const String kMovingWall = "6";
+  static List<List<Tile>> getLayout(int id, {required bool raceMode}) {
+    return switch (id) {
+      Maze.tutorialMazeId => _tutorial,
+      Maze.defaultMazeId => raceMode ? _raceTrack : _p1,
+      1 => _m4,
+      2 => _m1,
+      _ => _p1, // Static safe configuration fallback
+    };
+  }
 
-  // ignore: unused_field
-  static const String kLair = "2";
-  static const String kSuperPellet = "3"; //quad top
-  // ignore: unused_field
-  static const String kEmpty = "4";
-  static const String kGhostStart = "7";
-  static const String kPacmanStart = "8";
-  static const String kCage = "9";
+  static List<List<Tile>> _decode(List<String> rawLayout) {
+    return rawLayout
+        .map((String row) {
+          return List<Tile>.generate(
+            row.length,
+            (int i) => Tile.fromCode(row[i]),
+            growable: false,
+          );
+        })
+        .toList(growable: false);
+  }
 
-  // ignore: unused_field
-  static const List<String> mazeP1Layout = <String>[
+  static final List<List<Tile>> _tutorial = _decode(_tutorialEncoded);
+  static final List<List<Tile>> _p1 = _decode(_p1Encoded);
+  static final List<List<Tile>> _raceTrack = _decode(_raceTrackEncoded);
+  static final List<List<Tile>> _m4 = _decode(_m4Encoded);
+  static final List<List<Tile>> _m1 = _decode(_m1Encoded);
+
+  static const List<String> _p1Encoded = <String>[
     '4111111111111111111111111111114',
     '4100000660000001000000660000014',
     '4100000660000001000000660000014',
@@ -48,7 +65,7 @@ class MazeData {
     '4111111111111111111111111111114',
   ];
 
-  static const List<String> mazeMP4Layout = <String>[
+  static const List<String> _m4Encoded = <String>[
     '4111111111111111111111111111114',
     '4100000000000000000000000000014',
     '4100000000000000000000000000014',
@@ -83,7 +100,7 @@ class MazeData {
     '4111111111111111111111111111114',
   ];
 
-  static const List<String> mazeMP1Layout = <String>[
+  static const List<String> _m1Encoded = <String>[
     '4111111111111111111111111111114',
     '4100000001000000000001000000014',
     '4133000001000000000001000003314',
@@ -118,7 +135,7 @@ class MazeData {
     '4111111111111111111111111111114',
   ];
 
-  static const List<String> mazeTutorialLayout = <String>[
+  static const List<String> _tutorialEncoded = <String>[
     '4111111111111111111111111111114',
     '4100000444444441444444440000014',
     '4100000444444441444444440000014',
@@ -153,8 +170,7 @@ class MazeData {
     '4111111111111111111111111111114',
   ];
 
-  // ignore: unused_field
-  static const List<String> raceTrack = <String>[
+  static const List<String> _raceTrackEncoded = <String>[
     '4111111111111111111111111111114',
     '4144444444444411144444444444414',
     '4144444444444448444444444444414',
