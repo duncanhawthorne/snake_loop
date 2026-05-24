@@ -28,14 +28,14 @@ class GameCharacter extends SpriteCharacter with CloneManager {
   Vector2 get velocity => _velocity;
 
   set velocity(Vector2 v) => _velocity.setFrom(v);
-  final Vector2 _velocity = Vector2(0, 0);
+  final Vector2 _velocity = Vector2.zero();
 
   final bool canAccelerate = false;
 
   Vector2 get acceleration => _acceleration;
 
   set acceleration(Vector2 v) => _acceleration.setFrom(v);
-  final Vector2 _acceleration = Vector2(0, 0);
+  final Vector2 _acceleration = Vector2.zero();
 
   double angularVelocity = 0;
 

@@ -241,7 +241,7 @@ class MazePhysicsFactory {
                   position: bigBlockCenterPhysics,
                   fixtureDefs: <FixtureDef>[
                     _fixtureDefBlock(
-                      position: Vector2(0, 0),
+                      position: Vector2.zero(),
                       width: scale * (width + 1) * _lubricationScaleFactor,
                       height: scale * (height + 1) * _lubricationScaleFactor,
                       density: 10,

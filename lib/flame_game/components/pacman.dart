@@ -28,7 +28,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Pacman({required super.position, super.original})
     : super(velocity: Vector2.zero(), radius: playerSize);
 
-  final Vector2 _screenSizeLast = Vector2(0, 0);
+  final Vector2 _screenSizeLast = Vector2.zero();
   final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
 
   @override

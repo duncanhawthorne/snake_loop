@@ -149,16 +149,11 @@ class PacmanWorld extends Forge2DWorld
     wrappers.addAll(<WrapperNoEvents>[
       pacmans,
       ghosts,
-      pellets,
+      if (!enableRotationRaceMode) pellets,
       _walls,
       _blocking,
+      if (enableMovingWalls) _movingWalls,
     ]);
-    if (enableRotationRaceMode) {
-      wrappers.remove(pellets);
-    }
-    if (enableMovingWalls) {
-      wrappers.add(_movingWalls);
-    }
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
@@ -173,7 +168,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   @override
-  Future<void> onGameResize(Vector2 size) async {
+  void onGameResize(Vector2 size) {
     super.onGameResize(size);
     dragManager.canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
   }
@@ -182,7 +177,7 @@ class PacmanWorld extends Forge2DWorld
     game: game,
     world: this,
   );
-  final Vector2 gravitySign = Vector2(0, 0);
+  final Vector2 gravitySign = Vector2.zero();
 
   @override
   void onDragStart(DragStartEvent event) {
