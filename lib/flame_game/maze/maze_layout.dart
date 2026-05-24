@@ -25,7 +25,7 @@ class MazeLayout {
         }
       }
     }
-    throw 'Missing maze code $tile';
+    throw 'Missing maze tile $tile';
   }
 
   bool wallAt(int i, int j) {
@@ -50,7 +50,7 @@ class MazeLayout {
         _layout[i][j] == Tile.movingWall;
   }
 
-  bool _pelletCodeAtCell(int i, int j) {
+  bool _pelletTileAtCell(int i, int j) {
     final Tile char = _layout[i][j];
     return char == Tile.miniPellet ||
         char == Tile.superPellet ||
@@ -62,10 +62,10 @@ class MazeLayout {
         j >= 0 &&
         i + 1 < _layout.length &&
         j + 1 < _layout[0].length &&
-        _pelletCodeAtCell(i, j) &&
-        _pelletCodeAtCell(i, j + 1) &&
-        _pelletCodeAtCell(i + 1, j) &&
-        _pelletCodeAtCell(i + 1, j + 1);
+        _pelletTileAtCell(i, j) &&
+        _pelletTileAtCell(i, j + 1) &&
+        _pelletTileAtCell(i + 1, j) &&
+        _pelletTileAtCell(i + 1, j + 1);
   }
 
   bool pelletIsSuperPellet(int i, int j) {

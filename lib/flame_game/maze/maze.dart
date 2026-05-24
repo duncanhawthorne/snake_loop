@@ -34,7 +34,7 @@ class Maze {
 
   set mazeId(int i) => setMazeId(i);
 
-  late MazeLayout layout;
+  late MazeLayout _layout;
   late MazeDimensions dimensions;
   late MazePhysicsFactory physicsFactory;
   late MazeItemFactory itemFactory;
@@ -46,14 +46,14 @@ class Maze {
       }
       _mazeId = id;
 
-      layout = MazeLayout(_mazeId, raceMode: enableRotationRaceMode);
+      _layout = MazeLayout(_mazeId, raceMode: enableRotationRaceMode);
 
-      dimensions = MazeDimensions(layout: layout);
+      dimensions = MazeDimensions(layout: _layout);
       physicsFactory = MazePhysicsFactory(
-        layout: layout,
+        layout: _layout,
         dimensions: dimensions,
       );
-      itemFactory = MazeItemFactory(layout: layout, dimensions: dimensions);
+      itemFactory = MazeItemFactory(layout: _layout, dimensions: dimensions);
     }
   }
 

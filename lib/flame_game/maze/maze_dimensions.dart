@@ -8,15 +8,15 @@ import 'maze_layout.dart';
 import 'maze_tiles.dart';
 
 class MazeDimensions {
-  MazeDimensions({required this.layout});
+  MazeDimensions({required MazeLayout layout}) : _layout = layout;
 
-  final MazeLayout layout;
+  final MazeLayout _layout;
 
   late final Vector2 ghostStart = _vectorOfMazeTile(Tile.ghostStart);
   late final Vector2 pacmanStart = _vectorOfMazeTile(Tile.pacmanStart);
   late final Vector2 _cage = _vectorOfMazeTile(Tile.cage);
-  late final double mazeWidth = blockWidth * layout.lengthHBuffered;
-  late final double mazeHeight = blockWidth * layout.length;
+  late final double mazeWidth = blockWidth * _layout.lengthHBuffered;
+  late final double mazeHeight = blockWidth * _layout.length;
   late final double blockWidth = _blockWidth();
   late final double spriteWidth = _spriteWidth();
   late final double cloneThreshold = mazeWidth / 2 - spriteWidth / 2;
@@ -33,7 +33,7 @@ class MazeDimensions {
   double _blockWidth() {
     return kVirtualGameSize /
         flameGameZoom /
-        max(layout.lengthHBuffered, layout.length);
+        max(_layout.lengthHBuffered, _layout.length);
   }
 
   double _spriteWidth() {
@@ -55,14 +55,14 @@ class MazeDimensions {
     /// but therefore must instantly consume the output as it may change
     assert(blockWidth != 0); //i.e. not set yet
     return output..setValues(
-      (j + 1 / 2 - layout.lengthH / 2) * blockWidth,
-      (i + 1 / 2 - layout.length / 2) * blockWidth,
+      (j + 1 / 2 - _layout.lengthH / 2) * blockWidth,
+      (i + 1 / 2 - _layout.length / 2) * blockWidth,
     );
   }
 
-  Vector2 _vectorOfMazeTile(Tile code, {Vector2? output}) {
+  Vector2 _vectorOfMazeTile(Tile tile, {Vector2? output}) {
     final Vector2 out = output ?? Vector2.zero();
-    final (int i, int j) = layout.ijOfMazeTile(code);
+    final (int i, int j) = _layout.ijOfMazeTile(tile);
     return locationOfIJ(i, j, ioffset: 0.5, output: out);
   }
 

@@ -8,10 +8,14 @@ import 'maze_dimensions.dart';
 import 'maze_layout.dart';
 
 class MazePhysicsFactory {
-  MazePhysicsFactory({required this.layout, required this.dimensions});
+  MazePhysicsFactory({
+    required MazeLayout layout,
+    required MazeDimensions dimensions,
+  }) : _layout = layout,
+       _dimensions = dimensions;
 
-  final MazeLayout layout;
-  final MazeDimensions dimensions;
+  final MazeLayout _layout;
+  final MazeDimensions _dimensions;
 
   static const double _mazeInnerWallWidthFactor = 0.7;
   static const double _pixelationBuffer = 0.03;
@@ -43,8 +47,8 @@ class MazePhysicsFactory {
 
   bool _topLeftOfBigBlock(int i, int j, {bool moving = false}) {
     final bool Function(int i, int j) localWallAt = moving
-        ? layout.movingWallAt
-        : layout.wallAt;
+        ? _layout.movingWallAt
+        : _layout.wallAt;
     assert(localWallAt(i, j));
     return (!localWallAt(i - 1, j) || !localWallAt(i - 1, j + 1)) &&
         (!localWallAt(i, j - 1) || !localWallAt(i + 1, j - 1)) &&
@@ -61,11 +65,11 @@ class MazePhysicsFactory {
     bool moving = false,
   }) {
     final bool Function(int i, int j) localWallAt = moving
-        ? layout.movingWallAt
-        : layout.wallAt;
+        ? _layout.movingWallAt
+        : _layout.wallAt;
     assert(localWallAt(i, j));
     int k = 0;
-    while (j + k < layout.lengthH &&
+    while (j + k < _layout.lengthH &&
         (singleHeight || localWallAt(i + 1, j + k + 1)) &&
         localWallAt(i, j + k + 1)) {
       k++;
@@ -80,11 +84,11 @@ class MazePhysicsFactory {
     bool moving = false,
   }) {
     final bool Function(int i, int j) localWallAt = moving
-        ? layout.movingWallAt
-        : layout.wallAt;
+        ? _layout.movingWallAt
+        : _layout.wallAt;
     assert(localWallAt(i, j));
     int l = 0;
-    while (i + l < layout.length &&
+    while (i + l < _layout.length &&
         (singleWidth || localWallAt(i + l + 1, j + 1)) &&
         localWallAt(i + l + 1, j)) {
       l++;
@@ -113,15 +117,15 @@ class MazePhysicsFactory {
   }) {
     final List<FixtureDef> fixtureDefs = <FixtureDef>[];
     final List<Component> result = <Component>[];
-    final double scale = dimensions.blockWidth;
+    final double scale = _dimensions.blockWidth;
     final Vector2 center = Vector2.zero();
     final Vector2 bigBlockCenter = Vector2.zero();
     final Vector2 bigBlockSize = Vector2.zero();
-    for (int i = 0; i < layout.length; i++) {
-      for (int j = 0; j < layout.lengthH; j++) {
-        dimensions.locationOfIJ(i, j, output: center);
-        if (layout.wallAt(i, j)) {
-          if (layout.circleAt(i, j)) {
+    for (int i = 0; i < _layout.length; i++) {
+      for (int j = 0; j < _layout.lengthH; j++) {
+        _dimensions.locationOfIJ(i, j, output: center);
+        if (_layout.wallAt(i, j)) {
+          if (_layout.circleAt(i, j)) {
             fixtureDefs.add(
               _fixtureCircle(position: center, radius: scale / 2),
             );
@@ -132,7 +136,7 @@ class MazePhysicsFactory {
               ),
             );
           }
-          if (!layout.wallAt(i, j - 1)) {
+          if (!_layout.wallAt(i, j - 1)) {
             final int width = _bigBlockWidth(i, j);
             if (width > 0) {
               bigBlockCenter
@@ -157,7 +161,7 @@ class MazePhysicsFactory {
               );
             }
           }
-          if (!layout.wallAt(i - 1, j)) {
+          if (!_layout.wallAt(i - 1, j)) {
             final int height = _bigBlockHeight(i, j);
             if (height > 0) {
               bigBlockCenter
@@ -216,14 +220,14 @@ class MazePhysicsFactory {
     bool includeVisualWalls = true,
   }) {
     final List<Component> result = <Component>[];
-    final double scale = dimensions.blockWidth;
+    final double scale = _dimensions.blockWidth;
     final Vector2 center = Vector2.zero();
     final Vector2 bigBlockCenter = Vector2.zero();
     final Vector2 bigBlockCenterPhysics = Vector2.zero();
-    for (int i = 0; i < layout.length; i++) {
-      for (int j = 0; j < layout.lengthH; j++) {
-        dimensions.locationOfIJ(i, j, output: center);
-        if (layout.movingWallAt(i, j)) {
+    for (int i = 0; i < _layout.length; i++) {
+      for (int j = 0; j < _layout.lengthH; j++) {
+        _dimensions.locationOfIJ(i, j, output: center);
+        if (_layout.movingWallAt(i, j)) {
           if (_topLeftOfBigBlock(i, j, moving: true)) {
             final int width = _bigBlockWidth(i, j, moving: true);
             final int height = _bigBlockHeight(i, j, moving: true);
