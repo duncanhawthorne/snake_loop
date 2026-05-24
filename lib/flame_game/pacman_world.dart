@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -43,6 +42,14 @@ class PacmanWorld extends Forge2DWorld
   ///ensures singleton [PacmanWorld]
   static PacmanWorld? _instance;
 
+  static const bool enableMovingWalls = kDebugMode && false;
+  final Vector2 gravitySign = Vector2.zero();
+
+  late final WorldDragRotationManager dragManager = WorldDragRotationManager(
+    game: game,
+    world: this,
+  );
+
   final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
   final Pacmans pacmans = Pacmans();
   final Ghosts ghosts = Ghosts();
@@ -50,10 +57,8 @@ class PacmanWorld extends Forge2DWorld
   final WallWrapper _walls = WallWrapper();
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
   final MovingWallWrapper _movingWalls = MovingWallWrapper();
+  final WorldDeathManager deathManager = WorldDeathManager();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
-
-  /// The gravity is defined in virtual pixels per second squared.
-  /// These pixels are in relation to how big the [FixedResolutionViewport] is.
 
   void play(SfxType type) {
     const bool soundOn = true; //!(windows && !kIsWeb);
@@ -61,8 +66,6 @@ class PacmanWorld extends Forge2DWorld
       game.audioController.playSfx(type);
     }
   }
-
-  final WorldDeathManager deathManager = WorldDeathManager();
 
   void resetAfterGameWin() {
     game.audioController.stopSound(SfxType.ghostsScared);
@@ -89,8 +92,6 @@ class PacmanWorld extends Forge2DWorld
       wrapper.start();
     }
   }
-
-  static const bool enableMovingWalls = kDebugMode && false;
 
   @override
   Future<void> onLoad() async {
@@ -123,13 +124,6 @@ class PacmanWorld extends Forge2DWorld
     super.onGameResize(size);
     dragManager.canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
   }
-
-  late final WorldDragRotationManager dragManager = WorldDragRotationManager(
-    game: game,
-    world: this,
-  );
-
-  final Vector2 gravitySign = Vector2.zero();
 
   @override
   void onDragStart(DragStartEvent event) {

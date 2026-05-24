@@ -116,6 +116,9 @@ class WorldDragRotationManager {
       ..scale(game.level.levelSpeed / spriteVsPhysicsScale);
 
     if (_updateGravityOnRotation) {
+      /// The gravity is defined in virtual pixels per second squared.
+      /// These pixels are in relation to how big the [FixedResolutionViewport] is.
+
       world.gravity = downDirection;
       world.gravitySign.setValues(
         world.gravity.x.sign,
