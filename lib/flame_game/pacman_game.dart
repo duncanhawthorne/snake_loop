@@ -16,12 +16,12 @@ import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
-import '../utils/helper.dart';
 import '../utils/src/workarounds.dart';
-import '../utils/stored_moves.dart';
 import 'components/physics_ball.dart';
 import 'game_screen.dart';
 import 'maze/maze.dart';
+import 'mixins/game_overlay_manager.dart';
+import 'mixins/game_playback_manager.dart';
 import 'pacman_world.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -49,6 +49,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         // ignore: always_specify_types
         HasQuadTreeCollisionDetection,
         SingleGameInstance,
+        GamePlaybackManager,
+        GameOverlayManager,
         HasTimeScale {
   PacmanGame._({
     required this.level,
@@ -133,47 +135,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final Random random = Random();
 
-  late int _playbackModeCounter;
-  bool playbackMode = false;
-
-  // ignore: dead_code
-  static const bool _recordMode = kDebugMode && false;
-  final List<List<double>> _recordedMovesLive = <List<double>>[];
-
   VoidCallback? _lifecycleListenerRef;
   VoidCallback? _deathListenerRef;
   VoidCallback? _pelletListenerRef;
-
-  void recordAngle(double angle) {
-    if (_recordMode && !playbackMode) {
-      _recordedMovesLive.add(<double>[
-        (stopwatchMilliSeconds).toDouble(),
-        angle,
-      ]);
-      if (_recordedMovesLive.length % 100 == 0) {
-        logGlobal(_recordedMovesLive);
-      }
-    }
-  }
-
-  void playbackAngles() {
-    if (playbackMode && isLive && _framesRendered > 30) {
-      // && isLive && overlays.isActive(GameScreen.startDialogKey)
-      if (_playbackModeCounter == -1) {
-        _playbackModeCounter++;
-        startRegularItems();
-      }
-      while (!world.doingLevelResetFlourish &&
-          _playbackModeCounter < storedMoves.length &&
-          stopwatchMilliSeconds > storedMoves[_playbackModeCounter][0]) {
-        world.setMazeAngle(storedMoves[_playbackModeCounter][1]);
-        _playbackModeCounter++;
-      }
-      if (!world.doingLevelResetFlourish && stopwatchMilliSeconds > 20000) {
-        reset(); //if stuck, reset
-      }
-    }
-  }
 
   @override
   Color backgroundColor() => Palette.background.color;
@@ -290,25 +254,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     overlays.add(GameScreen.loseDialogKey);
   }
 
-  void cleanDialogs() {
-    overlays
-      ..remove(GameScreen.startDialogKey)
-      ..remove(GameScreen.loseDialogKey)
-      ..remove(GameScreen.wonDialogKey)
-      ..remove(GameScreen.tutorialDialogKey)
-      ..remove(GameScreen.resetDialogKey)
-      ..remove(GameScreen.debugDialogKey);
-  }
-
-  void toggleOverlay(String overlayKey) {
-    if (overlays.activeOverlays.contains(overlayKey)) {
-      overlays.remove(overlayKey);
-    } else {
-      cleanDialogs();
-      overlays.add(overlayKey);
-    }
-  }
-
   @override
   Future<void> onGameResize(Vector2 size) async {
     camera.viewport = FixedResolutionViewport(
@@ -319,9 +264,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
     //audioController.soLoudReset();
-    _playbackModeCounter = -1;
-    playbackMode = !_recordMode && level.number == Levels.playbackModeLevel;
-    _recordedMovesLive.clear();
+    resetPlayback(level);
     pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
     cleanDialogs();
@@ -354,13 +297,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     world.start();
   }
 
-  int _framesRendered = 0;
+  int framesRendered = 0;
 
   async.Timer? _activityCheckTimer;
 
   void pauseEngineIfNoActivity() {
     resumeEngine(); //for any catch up animation, if not already resumed
-    _framesRendered = 0;
+    framesRendered = 0;
     _activityCheckTimer?.cancel(); // Kill any preexisting active loops
     // If all characters at starting position and nothing happening,
     // pause engine to save resources and avoid unnecessary animation
@@ -380,8 +323,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
           timer.cancel();
         } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {
           //core components haven't loaded yet, so wait before start frame count
-          _framesRendered = 0;
-        } else if (_framesRendered <= 5) {
+          framesRendered = 0;
+        } else if (framesRendered <= 5) {
           //core components loaded, but not yet had 5 good safety frame
         } else {
           //everything loaded and rendered, and still no game activity
@@ -419,7 +362,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   void update(double dt) {
     stopwatch.update(dt * timeScale); //stops stopwatch when timeScale = 0
-    _framesRendered++;
+    framesRendered++;
     playbackAngles();
     super.update(dt);
   }
