@@ -49,7 +49,12 @@ class SnakeHead extends SpriteComponent
   }
 
   void _updateAngle() {
-    angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+    angle =
+        -atan2(
+          world.dragManager.downDirection.x,
+          world.dragManager.downDirection.y,
+        ) +
+        tau / 2;
   }
 
   void reset() {
@@ -60,7 +65,7 @@ class SnakeHead extends SpriteComponent
   bool get atStartingPosition => position.x == 0 && position.y == 0;
 
   void move(double dt) {
-    position.addScaled(world.downDirection, -dt);
+    position.addScaled(world.dragManager.downDirection, -dt);
     _updateAngle();
   }
 
@@ -92,7 +97,10 @@ class SnakeHead extends SpriteComponent
     snakeWrapper.extendSnake();
     food
       ..position = snakeWrapper.getSafePositionForFood()
-      ..angle = -atan2(world.downDirection.x, world.downDirection.y);
+      ..angle = -atan2(
+        world.dragManager.downDirection.x,
+        world.dragManager.downDirection.y,
+      );
     world.pellets.pelletsRemainingNotifier.value -= 1;
   }
 }

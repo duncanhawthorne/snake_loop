@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../style/palette.dart';
 import '../game_screen.dart';
-import '../maze.dart';
+import '../maze/maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'food_pellet.dart';
@@ -17,7 +17,8 @@ import 'wrapper_no_events.dart';
 final Paint snakePaint = Paint()..color = Palette.seed.color;
 final Paint snakeWarningPaint = Paint()..color = Palette.warning.color;
 final Paint snakeTextPaint = Paint()..color = Palette.text.color;
-final double snakeRadius = maze.spriteWidth / 2 * pelletScaleFactor * 2;
+final double snakeRadius =
+    maze.dimensions.spriteWidth / 2 * pelletScaleFactor * 2;
 final int snakeBitsOverlaps = 3;
 final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
 final Vector2 offscreen = Vector2(400, 400);
@@ -62,10 +63,14 @@ class SnakeWrapper extends WrapperNoEvents
       _volatileV2
         ..x =
             (game.random.nextDouble() - 0.5) *
-            (maze.mazeWidth - 2 * maze.blockWidth - snakeRadius * 2)
+            (maze.dimensions.mazeWidth -
+                2 * maze.dimensions.blockWidth -
+                snakeRadius * 2)
         ..y =
             (game.random.nextDouble() - 0.5) *
-            (maze.mazeHeight - 2 * maze.blockWidth - snakeRadius * 2);
+            (maze.dimensions.mazeHeight -
+                2 * maze.dimensions.blockWidth -
+                snakeRadius * 2);
       safePos = true;
       for (SnakeBodyBit bit in bodyBits) {
         if ((bit.position.distanceTo(_volatileV2)) <

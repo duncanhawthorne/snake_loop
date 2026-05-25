@@ -4,12 +4,11 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
-import '../maze.dart';
+import '../maze/maze.dart';
 import '../pacman_world.dart';
 
 const double _pelletScaleFactor = 0.4;
-final Vector2 _volatileInstantConsumeVector2 =
-    Vector2.zero(); //shared across all pellets
+final Vector2 _reusableVector = Vector2.zero(); //shared across all pellets
 
 double get pelletScaleFactor => _pelletScaleFactor;
 const double _spriteFactor = 1.2;
@@ -25,7 +24,7 @@ class Pellet extends SpriteComponent
          size: Vector2.all(
            _spriteFactor *
                2 *
-               maze.spriteWidth /
+               maze.dimensions.spriteWidth /
                2 *
                _pelletScaleFactor *
                radiusFactor,
@@ -36,7 +35,7 @@ class Pellet extends SpriteComponent
       isSolid: true,
       collisionType: CollisionType.active,
       radius: radius * hitBoxRadiusFactor,
-      position: _volatileInstantConsumeVector2..setAll(size.x / 2),
+      position: _reusableVector..setAll(size.x / 2),
       anchor: Anchor.center,
     )..debugMode = false;
   }
@@ -49,7 +48,10 @@ class Pellet extends SpriteComponent
   Future<void> onLoad() async {
     await super.onLoad();
     sprite = await Sprite.load('apple.png');
-    angle = -atan2(world.downDirection.x, world.downDirection.y);
+    angle = -atan2(
+      world.dragManager.downDirection.x,
+      world.dragManager.downDirection.y,
+    );
     add(_hitbox);
   }
 }

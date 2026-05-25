@@ -51,7 +51,12 @@ class SnakeBodyBit extends SpriteComponent
   bool _landed = false;
 
   void _updateAngle() {
-    angle = -atan2(world.downDirection.x, world.downDirection.y) + tau / 2;
+    angle =
+        -atan2(
+          world.dragManager.downDirection.x,
+          world.dragManager.downDirection.y,
+        ) +
+        tau / 2;
   }
 
   void updatePositionAsSlidingToNeck() {
