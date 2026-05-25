@@ -52,11 +52,11 @@ class GhostSiren extends WrapperNoEvents
 
   double _averageGhostSpeed() {
     assert(game.isLive); //test before call, else test here
-    assert(game.openingScreenCleared);
+    assert(game.lifecycle.openingScreenCleared);
     assert(
       !world.pacmans.isMounted || world.pacmans.anyAlivePacman,
     ); //test before call, else test here
-    assert(!game.isWonOrLost); //test before call, else test here
+    assert(!game.session.isWonOrLost); //test before call, else test here
     _tidyStrayGhosts();
     if (ghostList.isEmpty) {
       return 0;
@@ -77,20 +77,20 @@ class GhostSiren extends WrapperNoEvents
       if (!ghosts.isMounted) {
         return;
       }
-      assert(!game.isWonOrLost); //test before call, else test here
+      assert(!game.session.isWonOrLost); //test before call, else test here
       assert(game.isLive); //test before call, else test here
-      assert(game.openingScreenCleared);
+      assert(game.lifecycle.openingScreenCleared);
       _sirenTimer ??= async.Timer.periodic(const Duration(milliseconds: 250), (
         async.Timer timer,
       ) {
-        assert(!game.isWonOrLost); //timer cancelled already here
+        assert(!game.session.isWonOrLost); //timer cancelled already here
         assert(
           !world.pacmans.isMounted || world.pacmans.anyAlivePacman,
         ); //timer cancelled already here
         assert(
           !world.deathManager.doingLevelResetFlourish,
         ); //timer cancelled already here
-        assert(game.openingScreenCleared);
+        assert(game.lifecycle.openingScreenCleared);
         if (game.isLive) {
           game.audioController.setSirenVolume(
             _averageGhostSpeed() * flameGameZoom / 30,
@@ -108,7 +108,7 @@ class GhostSiren extends WrapperNoEvents
       game.audioController.setSirenVolume(0);
       _sirenTimer!.cancel();
       _sirenTimer = null;
-      game.regularItemsStarted = false; //so that will restart later
+      game.lifecycle.regularItemsStarted = false; //so that will restart later
     }
   }
 }

@@ -20,7 +20,7 @@ class WorldDeathManager extends WrapperNoEvents
   void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
     game.audioController.stopSound(SfxType.ghostsScared);
-    if (!game.isWonOrLost) {
+    if (!game.session.isWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
         world.dragManager.flourishReset(_resetInstantAfterPacmanDeath);
         dyingPacman.resetSlideAfterDeath();
@@ -43,7 +43,7 @@ class WorldDeathManager extends WrapperNoEvents
       // and rotation will be wrong
       // so should clean up anyway
       if (game.level.infLives) {
-        game.numberOfDeathsNotifier.value = 0;
+        game.session.numberOfDeathsNotifier.value = 0;
         world.pacmans.pacmanDyingNotifier.value = 0;
       }
       world.pacmans.resetInstantAfterPacmanDeath();

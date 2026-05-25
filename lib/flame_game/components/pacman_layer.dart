@@ -40,7 +40,7 @@ class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
       pacman.removeFromParent();
     }
     add(Pacman(position: maze.dimensions.pacmanStart));
-    game.numberOfDeathsNotifier.value = 0;
+    game.session.numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
   }
 

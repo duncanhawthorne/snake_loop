@@ -45,7 +45,7 @@ class Ghosts extends WrapperNoEvents
       return;
     }
     current = CharacterState.scared;
-    if (!game.isWonOrLost) {
+    if (!game.session.isWonOrLost) {
       game.play(SfxType.ghostsScared);
       for (final Ghost ghost in ghostList) {
         ghost.setScared();
@@ -58,7 +58,7 @@ class Ghosts extends WrapperNoEvents
     if (!isMounted) {
       return; //else cant use game references
     }
-    assert(!game.isWonOrLost); //test before call, else test here
+    assert(!game.session.isWonOrLost); //test before call, else test here
     if (game.level.multipleSpawningGhosts) {
       _ghostSpawner ??= SpawnComponent(
         factory: (int i) =>
@@ -79,7 +79,7 @@ class Ghosts extends WrapperNoEvents
     _ghostSpawner?.removeFromParent();
     _ghostSpawner = null; //FIXME shouldn't be necessary
     _ghostSpawner?.timer.reset(); //so next spawn based on time of reset
-    game.regularItemsStarted = false; //so that will restart later
+    game.lifecycle.regularItemsStarted = false; //so that will restart later
   }
 
   void _removeAllGhosts() {

@@ -21,7 +21,7 @@ mixin GamePlaybackManager on Forge2DGame<PacmanWorld> {
   void recordAngle(double angle) {
     if (_recordMode && !playbackMode) {
       _recordedMovesLive.add(<double>[
-        ((this as PacmanGame).stopwatchMilliSeconds).toDouble(),
+        ((this as PacmanGame).session.stopwatchMilliSeconds).toDouble(),
         angle,
       ]);
       if (_recordedMovesLive.length % 100 == 0) {
@@ -37,17 +37,17 @@ mixin GamePlaybackManager on Forge2DGame<PacmanWorld> {
       // && isLive && overlays.isActive(GameScreen.startDialogKey)
       if (_playbackModeCounter == -1) {
         _playbackModeCounter++;
-        (this as PacmanGame).startRegularItems();
+        (this as PacmanGame).lifecycle.startRegularItems();
       }
       while (!world.deathManager.doingLevelResetFlourish &&
           _playbackModeCounter < storedMoves.length &&
-          (this as PacmanGame).stopwatchMilliSeconds >
+          (this as PacmanGame).session.stopwatchMilliSeconds >
               storedMoves[_playbackModeCounter][0]) {
         world.dragManager.setMazeAngle(storedMoves[_playbackModeCounter][1]);
         _playbackModeCounter++;
       }
       if (!world.deathManager.doingLevelResetFlourish &&
-          (this as PacmanGame).stopwatchMilliSeconds > 20000) {
+          (this as PacmanGame).session.stopwatchMilliSeconds > 20000) {
         (this as PacmanGame).reset(); //if stuck, reset
       }
     }

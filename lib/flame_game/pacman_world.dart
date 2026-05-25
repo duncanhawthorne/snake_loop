@@ -48,7 +48,9 @@ class PacmanWorld extends Forge2DWorld
     world: this,
   );
 
+  final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
   final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
+
   final Pacmans pacmans = Pacmans();
   final Ghosts ghosts = Ghosts();
   final PelletWrapper pellets = PelletWrapper();
@@ -57,7 +59,6 @@ class PacmanWorld extends Forge2DWorld
   final MovingWallWrapper _movingWalls = MovingWallWrapper();
   final WorldDeathManager deathManager = WorldDeathManager();
   final GameActivityMonitor activityMonitor = GameActivityMonitor();
-  final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
   void reset({bool firstRun = false}) {
     dragManager.reset();
@@ -88,6 +89,8 @@ class PacmanWorld extends Forge2DWorld
       if (enableMovingWalls) _movingWalls,
       deathManager,
       activityMonitor,
+      game.session,
+      game.lifecycle,
     ]);
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);

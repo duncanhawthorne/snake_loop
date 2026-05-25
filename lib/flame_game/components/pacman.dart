@@ -149,7 +149,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       return;
     }
     if (!typical) return;
-    if (!game.isWonOrLost) {
+    if (!game.session.isWonOrLost) {
       game.play(SfxType.pacmanDeath);
       current = CharacterState.dead;
       setPhysicsState(PhysicsState.none);
@@ -159,7 +159,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       world.pacmans.pacmanDyingNotifier.value++;
       if (world.pacmans.pacmanDeathIsFinalPacman) {
         world.deathManager.doingLevelResetFlourish = true;
-        game.stopRegularItems();
+        game.lifecycle.stopRegularItems();
       }
       add(
         NullEffect(
@@ -171,12 +171,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _dieFromGhostActionAfterDeathAnimation() {
-    if (current == CharacterState.dead && !game.isWonOrLost) {
+    if (current == CharacterState.dead && !game.session.isWonOrLost) {
       if (world.pacmans.pacmanDeathIsFinalPacman) {
         if (world.deathManager.doingLevelResetFlourish) {
           // must test doingLevelResetFlourish
           // as could have been removed by reset during delay
-          game.numberOfDeathsNotifier.value++; //score counting deaths
+          game.session.numberOfDeathsNotifier.value++; //score counting deaths
           world.deathManager.resetAfterPacmanDeath(this);
         }
       } else {

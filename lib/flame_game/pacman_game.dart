@@ -7,12 +7,10 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flutter/foundation.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
 import '../audio/audio_controller.dart';
 import '../audio/sounds.dart';
-import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
@@ -20,8 +18,10 @@ import '../utils/src/workarounds.dart';
 import 'components/physics_ball.dart';
 import 'game_screen.dart';
 import 'maze/maze.dart';
+import 'mixins/game_lifecycle.dart';
 import 'mixins/game_overlay_manager.dart';
 import 'mixins/game_playback_manager.dart';
+import 'mixins/game_session.dart';
 import 'pacman_world.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -107,157 +107,21 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   final AppLifecycleStateNotifier appLifecycleStateNotifier;
   final PlayerProgress playerProgress;
 
-  String _userString = "";
-
-  static const int _deathPenaltyMillis = 5000;
-  final Timer stopwatch = Timer(double.infinity);
-
-  int get stopwatchMilliSeconds =>
-      (stopwatch.current * 1000).toInt() +
-      (level.isTutorial
-          ? 0
-          : min(level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
-                _deathPenaltyMillis);
-
-  bool stopwatchStarted = false;
-  bool regularItemsStarted = false;
+  final GameSession session = GameSession();
+  final GameLifecycle lifecycle = GameLifecycle();
 
   bool get isLive => !paused && isLoaded && isMounted;
 
-  bool get openingScreenCleared =>
-      !(!stopwatchStarted && overlays.isActive(GameScreen.startDialogKey));
-
-  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
-
-  bool get isWonOrLost =>
-      ((!kDebugMode || world.pellets.isMounted) &&
-          world.pellets.pelletsRemainingNotifier.value <= 0) ||
-      numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
-
   final Random random = Random();
-
-  VoidCallback? _lifecycleListenerRef;
-  VoidCallback? _deathListenerRef;
-  VoidCallback? _pelletListenerRef;
 
   @override
   Color backgroundColor() => Palette.background.color;
-
-  Map<String, Object> _getCurrentGameState() {
-    final Map<String, Object> gameStateTmp = <String, Object>{};
-    gameStateTmp["userString"] = _userString;
-    gameStateTmp["levelNum"] = level.number;
-    gameStateTmp["levelCompleteTime"] = stopwatchMilliSeconds;
-    gameStateTmp["dateTime"] = DateTime.now().millisecondsSinceEpoch;
-    gameStateTmp["mazeId"] = maze.mazeId;
-    return gameStateTmp;
-  }
 
   void play(SfxType type) {
     const bool soundOn = true;
     if (soundOn) {
       audioController.playSfx(type);
     }
-  }
-
-  void pauseGame() {
-    pause(); //timeScale = 0;
-    pauseEngine();
-    regularItemsStarted = false; //so restart things next time
-    //stopwatch.pause(); //shouldn't be necessary given timeScale = 0
-  }
-
-  void resumeGame() {
-    if (paused) {
-      regularItemsStarted = false; //so restart things next time
-      audioController.workaroundiOSSafariAudioOnUserInteraction();
-      resume(); //timeScale = 1.0;
-      resumeEngine();
-    }
-  }
-
-  void startRegularItems() {
-    if (!regularItemsStarted) {
-      audioController.workaroundiOSSafariAudioOnUserInteraction();
-      regularItemsStarted = true;
-      stopwatchStarted = true; //once per reset
-      stopwatch.resume();
-      world.ghosts
-        ..addSpawner()
-        ..ghostSiren.startSirenVolumeUpdaterTimer();
-    }
-  }
-
-  void stopRegularItems() {
-    regularItemsStarted = false;
-    stopwatch.pause();
-    world.ghosts
-      ..removeSpawner()
-      ..ghostSiren.cancelSirenVolumeUpdaterTimer();
-  }
-
-  void _lifecycleChangeListener() {
-    _lifecycleListenerRef = () {
-      if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
-        assert(!isRemoving);
-        pauseGame();
-      }
-    };
-    appLifecycleStateNotifier.addListener(_lifecycleListenerRef!);
-  }
-
-  void _winOrLoseGameListener() {
-    assert(!stopwatchStarted); //so no instant trigger of listeners
-    _deathListenerRef = () {
-      if (numberOfDeathsNotifier.value >= level.maxAllowedDeaths &&
-          stopwatchStarted &&
-          !playbackMode) {
-        assert(!isRemoving);
-        assert(isWonOrLost);
-        stopRegularItems();
-        _handleLoseGame();
-      }
-    };
-    _pelletListenerRef = () {
-      if (world.pellets.pelletsRemainingNotifier.value <= 0 &&
-          stopwatchStarted &&
-          !playbackMode) {
-        assert(!isRemoving);
-        assert(isWonOrLost);
-        stopRegularItems();
-        _handleWinGame();
-      }
-    };
-    numberOfDeathsNotifier.addListener(_deathListenerRef!);
-    world.pellets.pelletsRemainingNotifier.addListener(_pelletListenerRef!);
-  }
-
-  void _handleWinGame() {
-    assert(!isRemoving);
-    assert(isWonOrLost);
-    assert(!stopwatch.isRunning());
-    assert(stopwatchStarted);
-    if (world.pellets.pelletsRemainingNotifier.value <= 0) {
-      play(SfxType.endMusic);
-      world.ghosts.resetAfterGameWin();
-      const int minRecordableWinTimeMillis = 10 * 1000;
-      if (stopwatchMilliSeconds > minRecordableWinTimeMillis &&
-          !level.isTutorial) {
-        fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
-      }
-      playerProgress.saveLevelComplete(_getCurrentGameState());
-      cleanDialogs();
-      overlays.add(GameScreen.wonDialogKey);
-    }
-  }
-
-  void _handleLoseGame() {
-    assert(!isRemoving);
-    assert(isWonOrLost);
-    assert(stopwatchStarted);
-    audioController.stopAllSounds();
-    cleanDialogs();
-    overlays.add(GameScreen.loseDialogKey);
   }
 
   @override
@@ -271,18 +135,12 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void reset({bool firstRun = false, bool showStartDialog = false}) {
     //audioController.soLoudReset();
     resetPlayback(level);
-    _userString = _getRandomString(random, 15);
     cleanDialogs();
     if (showStartDialog) {
       playbackMode
           ? overlays.add(GameScreen.beginDialogKey)
           : overlays.add(GameScreen.startDialogKey);
     }
-    stopRegularItems(); //duplicates other items, belt and braces only
-    stopwatch
-      ..pause()
-      ..reset();
-    stopwatchStarted = false;
     if (!firstRun) {
       assert(world.isLoaded);
       world.reset();
@@ -321,13 +179,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       ),
     ); //assume maze size won't change
     reset(firstRun: true, showStartDialog: true);
-    _winOrLoseGameListener(); //isn't disposed so run once, not on start()
-    _lifecycleChangeListener(); //isn't disposed so run once, not on start()
   }
 
   @override
   void update(double dt) {
-    stopwatch.update(dt * timeScale); //stops stopwatch when timeScale = 0
     playbackAngles();
     super.update(dt);
   }
@@ -335,18 +190,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     cleanDialogs();
-    if (_lifecycleListenerRef != null) {
-      appLifecycleStateNotifier.removeListener(_lifecycleListenerRef!);
-    }
-    if (_deathListenerRef != null) {
-      numberOfDeathsNotifier.removeListener(_deathListenerRef!);
-    }
-    if (_pelletListenerRef != null) {
-      world.pellets.pelletsRemainingNotifier.removeListener(
-        _pelletListenerRef!,
-      );
-    }
-    numberOfDeathsNotifier.dispose();
+
     super.onRemove();
     await audioController.stopAllSounds();
   }
@@ -358,16 +202,4 @@ Vector2 _sanitizeScreenSize(Vector2 size) {
   } else {
     return Vector2(kVirtualGameSize, kVirtualGameSize * size.y / size.x);
   }
-}
-
-const String _chars =
-    'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-
-String _getRandomString(Random random, int length) {
-  final List<int> charCodes = List<int>.generate(
-    length,
-    (_) => _chars.codeUnitAt(random.nextInt(_chars.length)),
-    growable: false,
-  );
-  return String.fromCharCodes(charCodes);
 }

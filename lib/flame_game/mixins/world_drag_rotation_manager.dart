@@ -51,7 +51,7 @@ class WorldDragRotationManager {
   }
 
   void onDragUpdate(DragUpdateEvent event) {
-    game.resumeGame();
+    game.lifecycle.resumeGame();
     _eventOffset.setValues(
       event.canvasStartPosition.x - game.canvasSize.x / 2,
       event.canvasStartPosition.y - game.canvasSize.y / 2,
@@ -85,11 +85,12 @@ class WorldDragRotationManager {
   void _moveMazeAngleByDelta(double angleDelta) {
     if (_cameraRotatableOnPacmanDeathFlourish &&
         game.isLive &&
-        game.openingScreenCleared &&
+        game.lifecycle.openingScreenCleared &&
         !game.playbackMode) {
       setMazeAngle(cameraAngle + angleDelta);
-      if (!world.deathManager.doingLevelResetFlourish && !game.isWonOrLost) {
-        game.startRegularItems();
+      if (!world.deathManager.doingLevelResetFlourish &&
+          !game.session.isWonOrLost) {
+        game.lifecycle.startRegularItems();
       }
     }
   }

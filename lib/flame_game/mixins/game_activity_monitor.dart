@@ -29,7 +29,7 @@ class GameActivityMonitor extends WrapperNoEvents
         } else if (game.playbackMode) {
           //want to continue playback in playbackMode
           timer.cancel();
-        } else if (game.stopwatch.isRunning()) {
+        } else if (game.lifecycle.stopwatch.isRunning()) {
           //some game activity has happened, no need to pause, just cancel timer
           timer.cancel();
         } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {

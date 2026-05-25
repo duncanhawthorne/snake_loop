@@ -96,7 +96,7 @@ Widget _livesWidget(BuildContext context, PacmanGame game) {
       right: _pacmanOuterSpacing,
     ),
     child: ValueListenableBuilder<int>(
-      valueListenable: game.numberOfDeathsNotifier,
+      valueListenable: game.session.numberOfDeathsNotifier,
       builder: (BuildContext context, int value, Widget? child) {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -134,7 +134,7 @@ Widget _clockWidget(PacmanGame game) {
         ),
         builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
           return Text(
-            (game.stopwatchMilliSeconds / 1000)
+            (game.session.stopwatchMilliSeconds / 1000)
                 .toStringAsFixed(1)
                 .padLeft(4, " "),
             style: textStyleBody,

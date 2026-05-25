@@ -35,7 +35,7 @@ class StartDialog extends StatelessWidget {
                 mazeSelector(context, game),
               ],
         bottomRowWidget(
-          children: game.stopwatchStarted && !game.playbackMode
+          children: game.lifecycle.stopwatchStarted && !game.playbackMode
               ? <Widget>[
                   TextButton(
                     style: buttonStyle(borderColor: Palette.warning.color),

@@ -67,7 +67,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScared() {
-    if (game.isWonOrLost) {
+    if (game.session.isWonOrLost) {
       return;
     }
     if (current != CharacterState.dead && current != CharacterState.spawning) {
@@ -78,7 +78,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScaredToScaredIsh() {
-    if (game.isWonOrLost) {
+    if (game.session.isWonOrLost) {
       return;
     }
     if (current == CharacterState.scared) {
@@ -87,7 +87,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScaredIshToNormal() {
-    if (game.isWonOrLost) {
+    if (game.session.isWonOrLost) {
       return;
     }
     if (current == CharacterState.scaredIsh) {
@@ -96,7 +96,7 @@ class Ghost extends GameCharacter {
   }
 
   void setDead() {
-    if (game.isWonOrLost) {
+    if (game.session.isWonOrLost) {
       return;
     }
     current = CharacterState.dead; //stops further interactions
@@ -118,7 +118,7 @@ class Ghost extends GameCharacter {
   }
 
   void _setSpawning() {
-    if (game.isWonOrLost) {
+    if (game.session.isWonOrLost) {
       return;
     }
     current = CharacterState.spawning; //stops further interactions
