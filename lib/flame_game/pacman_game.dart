@@ -1,4 +1,3 @@
-import 'dart:async' as async;
 import 'dart:core';
 import 'dart:math';
 import 'dart:ui';
@@ -141,10 +140,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   VoidCallback? _deathListenerRef;
   VoidCallback? _pelletListenerRef;
 
-  int framesRendered = 0;
-
-  async.Timer? _activityCheckTimer;
-
   @override
   Color backgroundColor() => Palette.background.color;
 
@@ -265,41 +260,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     overlays.add(GameScreen.loseDialogKey);
   }
 
-  void pauseEngineIfNoActivity() {
-    resumeEngine(); //for any catch up animation, if not already resumed
-    framesRendered = 0;
-    _activityCheckTimer?.cancel(); // Kill any preexisting active loops
-    // If all characters at starting position and nothing happening,
-    // pause engine to save resources and avoid unnecessary animation
-    // check every 10ms, but only pause if nothing happening and still at starting position
-    // if something is happening, or not at starting position, then cancel timer and don't pause
-    _activityCheckTimer = async.Timer.periodic(
-      const Duration(milliseconds: 10),
-      (async.Timer timer) {
-        if (paused) {
-          //already paused, no further action required, just cancel timer
-          timer.cancel();
-        } else if (playbackMode) {
-          //want to continue playback in playbackMode
-          timer.cancel();
-        } else if (stopwatch.isRunning()) {
-          //some game activity has happened, no need to pause, just cancel timer
-          timer.cancel();
-        } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {
-          //core components haven't loaded yet, so wait before start frame count
-          framesRendered = 0;
-        } else if (framesRendered <= 5) {
-          //core components loaded, but not yet had 5 good safety frame
-        } else {
-          //everything loaded and rendered, and still no game activity
-          pauseEngine();
-          timer.cancel();
-          if (_activityCheckTimer == timer) _activityCheckTimer = null;
-        }
-      },
-    );
-  }
-
   @override
   Future<void> onGameResize(Vector2 size) async {
     camera.viewport = FixedResolutionViewport(
@@ -311,7 +271,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void reset({bool firstRun = false, bool showStartDialog = false}) {
     //audioController.soLoudReset();
     resetPlayback(level);
-    pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
     cleanDialogs();
     if (showStartDialog) {
@@ -340,7 +299,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     audioController.workaroundiOSSafariAudioOnUserInteraction();
     play(SfxType.startMusic);
     //resumeEngine();
-    pauseEngineIfNoActivity();
     world.start();
   }
 
@@ -370,7 +328,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   void update(double dt) {
     stopwatch.update(dt * timeScale); //stops stopwatch when timeScale = 0
-    framesRendered++;
     playbackAngles();
     super.update(dt);
   }
@@ -378,8 +335,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     cleanDialogs();
-    _activityCheckTimer?.cancel();
-    _activityCheckTimer = null;
     if (_lifecycleListenerRef != null) {
       appLifecycleStateNotifier.removeListener(_lifecycleListenerRef!);
     }

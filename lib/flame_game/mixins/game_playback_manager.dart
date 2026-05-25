@@ -33,7 +33,7 @@ mixin GamePlaybackManager on Forge2DGame<PacmanWorld> {
   void playbackAngles() {
     if (playbackMode &&
         (this as PacmanGame).isLive &&
-        (this as PacmanGame).framesRendered > 30) {
+        (this as PacmanGame).world.activityMonitor.framesRendered > 30) {
       // && isLive && overlays.isActive(GameScreen.startDialogKey)
       if (_playbackModeCounter == -1) {
         _playbackModeCounter++;

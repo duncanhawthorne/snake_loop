@@ -53,7 +53,7 @@ class WorldDeathManager extends WrapperNoEvents
       if (game.playbackMode) {
         game.reset();
       } else {
-        game.pauseEngineIfNoActivity();
+        world.activityMonitor.reset();
       }
     }
   }

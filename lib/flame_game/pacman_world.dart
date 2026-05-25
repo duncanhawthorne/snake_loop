@@ -13,6 +13,7 @@ import 'components/pellet_layer.dart';
 import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
+import 'mixins/game_activity_monitor.dart';
 import 'mixins/world_death_manager.dart';
 import 'mixins/world_drag_rotation_manager.dart';
 import 'pacman_game.dart';
@@ -55,6 +56,7 @@ class PacmanWorld extends Forge2DWorld
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
   final MovingWallWrapper _movingWalls = MovingWallWrapper();
   final WorldDeathManager deathManager = WorldDeathManager();
+  final GameActivityMonitor activityMonitor = GameActivityMonitor();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
   void reset({bool firstRun = false}) {
@@ -85,6 +87,7 @@ class PacmanWorld extends Forge2DWorld
       _blocking,
       if (enableMovingWalls) _movingWalls,
       deathManager,
+      activityMonitor,
     ]);
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
