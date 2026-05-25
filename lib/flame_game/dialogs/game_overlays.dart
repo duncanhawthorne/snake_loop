@@ -6,6 +6,7 @@ import '../../google/google.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
+import '../../utils/constants.dart';
 import '../components/lap_angle.dart';
 import '../game_screen.dart';
 import '../icons/pacman_icons.dart';

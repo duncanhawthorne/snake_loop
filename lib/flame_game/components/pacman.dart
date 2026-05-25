@@ -2,12 +2,12 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
+import '../../utils/constants.dart';
 import '../effects/move_to_effect.dart';
 import '../effects/null_effect.dart';
 import '../effects/remove_effects.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze/maze.dart';
-import '../pacman_world.dart';
 import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';
@@ -77,12 +77,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       _eatTimer.start();
       if (isPellet) {
         //only play waka if not recently played waka
-        world.play(SfxType.waka);
+        game.play(SfxType.waka);
       }
     }
     if (!isPellet) {
       //play eatGhost irrespective of current state
-      world.play(SfxType.eatGhost);
+      game.play(SfxType.eatGhost);
     }
     //if in eating state, just let that sequence complete normally
   }
@@ -102,7 +102,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           ? (other.original! as Ghost)
           : other;
       _onCollideWithGhost(ghost);
-    } else if (PacmanWorld.enableMovingWalls &&
+    } else if (enableMovingWalls &&
         movingWallsDamage &&
         other is MovingWallWrapper) {
       _dieFromGhost();
@@ -150,7 +150,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
     if (!typical) return;
     if (!game.isWonOrLost) {
-      world.play(SfxType.pacmanDeath);
+      game.play(SfxType.pacmanDeath);
       current = CharacterState.dead;
       setPhysicsState(PhysicsState.none);
       if (_freezeGhostsOnKillPacman) {

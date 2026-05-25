@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
@@ -44,7 +46,7 @@ class Ghosts extends WrapperNoEvents
     }
     current = CharacterState.scared;
     if (!game.isWonOrLost) {
-      world.play(SfxType.ghostsScared);
+      game.play(SfxType.ghostsScared);
       for (final Ghost ghost in ghostList) {
         ghost.setScared();
       }
@@ -96,6 +98,7 @@ class Ghosts extends WrapperNoEvents
   }
 
   void resetAfterGameWin() {
+    game.audioController.stopSound(SfxType.ghostsScared);
     current = CharacterState.normal;
     _ghostsScaredTimer.pause(); //makes update function for timer free
     _removeAllGhosts();
@@ -150,6 +153,7 @@ class Ghosts extends WrapperNoEvents
 
   @override
   Future<void> reset({bool mazeResize = false}) async {
+    unawaited(game.audioController.stopSound(SfxType.ghostsScared));
     ghostSiren.cancelSirenVolumeUpdaterTimer();
     current = CharacterState.normal;
     _ghostsScaredTimer.pause(); //makes update function for timer free

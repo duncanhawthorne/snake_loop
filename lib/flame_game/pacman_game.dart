@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
 import '../audio/audio_controller.dart';
+import '../audio/sounds.dart';
 import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
@@ -120,6 +121,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
                 _deathPenaltyMillis);
 
   bool stopwatchStarted = false;
+  bool regularItemsStarted = false;
 
   bool get isLive => !paused && isLoaded && isMounted;
 
@@ -139,6 +141,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   VoidCallback? _deathListenerRef;
   VoidCallback? _pelletListenerRef;
 
+  int framesRendered = 0;
+
+  async.Timer? _activityCheckTimer;
+
   @override
   Color backgroundColor() => Palette.background.color;
 
@@ -150,6 +156,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     gameStateTmp["dateTime"] = DateTime.now().millisecondsSinceEpoch;
     gameStateTmp["mazeId"] = maze.mazeId;
     return gameStateTmp;
+  }
+
+  void play(SfxType type) {
+    const bool soundOn = true;
+    if (soundOn) {
+      audioController.playSfx(type);
+    }
   }
 
   void pauseGame() {
@@ -167,8 +180,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       resumeEngine();
     }
   }
-
-  bool regularItemsStarted = false;
 
   void startRegularItems() {
     if (!regularItemsStarted) {
@@ -226,16 +237,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     world.pellets.pelletsRemainingNotifier.addListener(_pelletListenerRef!);
   }
 
-  static const int _minRecordableWinTimeMillis = 10 * 1000;
-
   void _handleWinGame() {
     assert(!isRemoving);
     assert(isWonOrLost);
     assert(!stopwatch.isRunning());
     assert(stopwatchStarted);
     if (world.pellets.pelletsRemainingNotifier.value <= 0) {
-      world.resetAfterGameWin();
-      if (stopwatchMilliSeconds > _minRecordableWinTimeMillis &&
+      play(SfxType.endMusic);
+      world.ghosts.resetAfterGameWin();
+      const int minRecordableWinTimeMillis = 10 * 1000;
+      if (stopwatchMilliSeconds > minRecordableWinTimeMillis &&
           !level.isTutorial) {
         fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
       }
@@ -252,6 +263,41 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     audioController.stopAllSounds();
     cleanDialogs();
     overlays.add(GameScreen.loseDialogKey);
+  }
+
+  void pauseEngineIfNoActivity() {
+    resumeEngine(); //for any catch up animation, if not already resumed
+    framesRendered = 0;
+    _activityCheckTimer?.cancel(); // Kill any preexisting active loops
+    // If all characters at starting position and nothing happening,
+    // pause engine to save resources and avoid unnecessary animation
+    // check every 10ms, but only pause if nothing happening and still at starting position
+    // if something is happening, or not at starting position, then cancel timer and don't pause
+    _activityCheckTimer = async.Timer.periodic(
+      const Duration(milliseconds: 10),
+      (async.Timer timer) {
+        if (paused) {
+          //already paused, no further action required, just cancel timer
+          timer.cancel();
+        } else if (playbackMode) {
+          //want to continue playback in playbackMode
+          timer.cancel();
+        } else if (stopwatch.isRunning()) {
+          //some game activity has happened, no need to pause, just cancel timer
+          timer.cancel();
+        } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {
+          //core components haven't loaded yet, so wait before start frame count
+          framesRendered = 0;
+        } else if (framesRendered <= 5) {
+          //core components loaded, but not yet had 5 good safety frame
+        } else {
+          //everything loaded and rendered, and still no game activity
+          pauseEngine();
+          timer.cancel();
+          if (_activityCheckTimer == timer) _activityCheckTimer = null;
+        }
+      },
+    );
   }
 
   @override
@@ -292,48 +338,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void start() {
     audioController.workaroundiOSSafariAudioOnUserInteraction();
+    play(SfxType.startMusic);
     //resumeEngine();
     pauseEngineIfNoActivity();
     world.start();
-  }
-
-  int framesRendered = 0;
-
-  async.Timer? _activityCheckTimer;
-
-  void pauseEngineIfNoActivity() {
-    resumeEngine(); //for any catch up animation, if not already resumed
-    framesRendered = 0;
-    _activityCheckTimer?.cancel(); // Kill any preexisting active loops
-    // If all characters at starting position and nothing happening,
-    // pause engine to save resources and avoid unnecessary animation
-    // check every 10ms, but only pause if nothing happening and still at starting position
-    // if something is happening, or not at starting position, then cancel timer and don't pause
-    _activityCheckTimer = async.Timer.periodic(
-      const Duration(milliseconds: 10),
-      (async.Timer timer) {
-        if (paused) {
-          //already paused, no further action required, just cancel timer
-          timer.cancel();
-        } else if (playbackMode) {
-          //want to continue playback in playbackMode
-          timer.cancel();
-        } else if (stopwatch.isRunning()) {
-          //some game activity has happened, no need to pause, just cancel timer
-          timer.cancel();
-        } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {
-          //core components haven't loaded yet, so wait before start frame count
-          framesRendered = 0;
-        } else if (framesRendered <= 5) {
-          //core components loaded, but not yet had 5 good safety frame
-        } else {
-          //everything loaded and rendered, and still no game activity
-          pauseEngine();
-          timer.cancel();
-          if (_activityCheckTimer == timer) _activityCheckTimer = null;
-        }
-      },
-    );
   }
 
   void _bugFixes() {

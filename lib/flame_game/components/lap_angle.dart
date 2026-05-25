@@ -3,14 +3,12 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
-import 'package:flutter/foundation.dart';
 
+import '../../utils/constants.dart';
 import '../effects/rotate_effect.dart';
 import '../pacman_world.dart';
 import 'ghost.dart';
 import 'sprite_character.dart';
-
-const bool enableRotationRaceMode = kDebugMode && false;
 
 mixin LapAngle on SpriteAnimationGroupComponent<CharacterState> {
   late double _lapAngleLast;

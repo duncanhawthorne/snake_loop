@@ -10,7 +10,6 @@ import '../../utils/helper.dart';
 import '../maze/maze.dart';
 import '../pacman_game.dart';
 import 'game_character.dart';
-import 'lap_angle.dart';
 import 'removal_actions.dart';
 import 'scaled_body_render.dart';
 

@@ -3,4 +3,7 @@ import 'package:flutter/foundation.dart';
 const String appTitle = "Pacman ROLL";
 final bool isiOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 
-const bool drawDebugBoxes = kDebugMode && true;
+const bool enableRotationRaceMode = kDebugMode && false;
+const bool enableMovingWalls = kDebugMode && false;
+
+const bool drawDebugBoxes = kDebugMode && false;

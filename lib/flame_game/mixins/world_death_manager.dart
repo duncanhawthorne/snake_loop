@@ -57,4 +57,9 @@ class WorldDeathManager extends WrapperNoEvents
       }
     }
   }
+
+  @override
+  Future<void> reset() async {
+    doingLevelResetFlourish = false;
+  }
 }

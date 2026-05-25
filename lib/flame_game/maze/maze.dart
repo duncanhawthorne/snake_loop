@@ -1,4 +1,4 @@
-import '../components/lap_angle.dart';
+import '../../utils/constants.dart';
 import 'maze_dimensions.dart';
 import 'maze_item_factory.dart';
 import 'maze_layout.dart';

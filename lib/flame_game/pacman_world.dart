@@ -4,12 +4,10 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flutter/foundation.dart';
 
-import '../../audio/sounds.dart';
+import '../utils/constants.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/ghost_layer.dart';
-import 'components/lap_angle.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/wall_dynamic_layer.dart';
@@ -42,7 +40,6 @@ class PacmanWorld extends Forge2DWorld
   ///ensures singleton [PacmanWorld]
   static PacmanWorld? _instance;
 
-  static const bool enableMovingWalls = kDebugMode && false;
   final Vector2 gravitySign = Vector2.zero();
 
   late final WorldDragRotationManager dragManager = WorldDragRotationManager(
@@ -60,24 +57,8 @@ class PacmanWorld extends Forge2DWorld
   final WorldDeathManager deathManager = WorldDeathManager();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
-  void play(SfxType type) {
-    const bool soundOn = true; //!(windows && !kIsWeb);
-    if (soundOn) {
-      game.audioController.playSfx(type);
-    }
-  }
-
-  void resetAfterGameWin() {
-    game.audioController.stopSound(SfxType.ghostsScared);
-    play(SfxType.endMusic);
-    ghosts.resetAfterGameWin();
-  }
-
   void reset({bool firstRun = false}) {
     dragManager.reset();
-    deathManager.doingLevelResetFlourish = false;
-    game.audioController.stopSound(SfxType.ghostsScared);
-
     if (!firstRun) {
       for (final WrapperNoEvents wrapper in wrappers) {
         assert(wrapper.isLoaded, wrapper);
@@ -87,7 +68,6 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void start() {
-    play(SfxType.startMusic);
     for (final WrapperNoEvents wrapper in wrappers) {
       wrapper.start();
     }
