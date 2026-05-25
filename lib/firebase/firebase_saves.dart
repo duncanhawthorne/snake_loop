@@ -24,8 +24,7 @@ class FBase {
   ///ensures singleton [FBase]
   static FBase? _instance;
 
-  static const bool firebaseOn =
-      true && firebaseOnReal; //!(windows && !kIsWeb);
+  static const bool firebaseOn = firebaseOnReal && true;
 
   static const String _mainDB = "records";
   static const String _userSaves = "userSaves";
