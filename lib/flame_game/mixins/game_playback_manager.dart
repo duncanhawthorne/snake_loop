@@ -22,7 +22,7 @@ class GamePlaybackManager extends WrapperNoEvents
   void recordAngle(double angle) {
     if (_recordMode && !playbackMode) {
       _recordedMovesLive.add(<double>[
-        ((this as PacmanGame).session.stopwatchMilliSeconds).toDouble(),
+        (game.session.stopwatchMilliSeconds).toDouble(),
         angle,
       ]);
       if (_recordedMovesLive.length % 100 == 0) {
@@ -33,23 +33,23 @@ class GamePlaybackManager extends WrapperNoEvents
 
   void playbackAngles() {
     if (playbackMode &&
-        (this as PacmanGame).isLive &&
-        (this as PacmanGame).world.activityMonitor.framesRendered > 30) {
+        game.isLive &&
+        game.world.activityMonitor.framesRendered > 30) {
       // && isLive && overlays.isActive(GameScreen.startDialogKey)
       if (_playbackModeCounter == -1) {
         _playbackModeCounter++;
-        (this as PacmanGame).lifecycle.startRegularItems();
+        game.lifecycle.startRegularItems();
       }
       while (!world.deathManager.doingLevelResetFlourish &&
           _playbackModeCounter < storedMoves.length &&
-          (this as PacmanGame).session.stopwatchMilliSeconds >
+          game.session.stopwatchMilliSeconds >
               storedMoves[_playbackModeCounter][0]) {
         world.dragManager.setMazeAngle(storedMoves[_playbackModeCounter][1]);
         _playbackModeCounter++;
       }
       if (!world.deathManager.doingLevelResetFlourish &&
-          (this as PacmanGame).session.stopwatchMilliSeconds > 20000) {
-        (this as PacmanGame).reset(); //if stuck, reset
+          game.session.stopwatchMilliSeconds > 20000) {
+        game.reset(); //if stuck, reset
       }
     }
   }
