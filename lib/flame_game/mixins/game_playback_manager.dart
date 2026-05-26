@@ -67,6 +67,11 @@ class GamePlaybackManager extends WrapperNoEvents
   }
 
   @override
+  Future<void> onMount() async {
+    resetPlayback(game.level); //FIXME
+  }
+
+  @override
   void start() {}
 
   @override

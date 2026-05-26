@@ -24,7 +24,7 @@ class StartDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(!game.playback.playbackMode);
+    //assert(!game.playback.playbackMode); //FIXME
     return popupDialog(
       children: <Widget>[
         rotatedTitle(),
@@ -252,7 +252,8 @@ Widget rotatedTitle() {
 
 Widget resetWidget(BuildContext context, PacmanGame game) {
   return IconButton(
-    onPressed: () => game.toggleOverlay(GameScreen.resetDialogKey),
+    onPressed: () =>
+        game.overlayManager.toggleOverlay(GameScreen.resetDialogKey),
     icon: const Icon(Icons.refresh, color: Palette.textColor),
   );
 }

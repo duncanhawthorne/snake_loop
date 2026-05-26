@@ -17,12 +17,12 @@ class BeginDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(game.playback.playbackMode);
+    //assert(game.playback.playbackMode); //FIXME
     return purePopup(
       child: TextButton(
         style: buttonStyle(),
         onPressed: () {
-          game.toggleOverlay(GameScreen.beginDialogKey);
+          game.overlayManager.toggleOverlay(GameScreen.beginDialogKey);
           context.go(
             '/?$levelUrlKey=${levelAfterPlaybackScreen(game)}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}',
           );

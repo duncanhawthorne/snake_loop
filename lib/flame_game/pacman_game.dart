@@ -16,7 +16,6 @@ import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/src/workarounds.dart';
 import 'components/physics_ball.dart';
-import 'game_screen.dart';
 import 'maze/maze.dart';
 import 'mixins/game_lifecycle.dart';
 import 'mixins/game_overlay_manager.dart';
@@ -49,7 +48,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         // ignore: always_specify_types
         HasQuadTreeCollisionDetection,
         SingleGameInstance,
-        GameOverlayManager,
         HasTimeScale {
   PacmanGame._({
     required this.level,
@@ -109,6 +107,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   final GameSession session = GameSession();
   final GameLifecycle lifecycle = GameLifecycle();
   final GamePlaybackManager playback = GamePlaybackManager();
+  final GameOverlayManager overlayManager = GameOverlayManager();
 
   bool get isLive => !paused && isLoaded && isMounted;
 
@@ -134,17 +133,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
     //audioController.soLoudReset();
-    cleanDialogs();
-    if (showStartDialog) {
-      playback.playbackMode
-          ? overlays.add(GameScreen.beginDialogKey)
-          : overlays.add(GameScreen.startDialogKey);
-    }
+
     if (!firstRun) {
       assert(world.isLoaded);
       world.reset();
     }
     collisionDetection.broadphase.tree.optimize();
+    overlayManager.customReset(showStartDialog: showStartDialog);
   }
 
   void resetAndStart() {
@@ -182,8 +177,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   @override
   Future<void> onRemove() async {
-    cleanDialogs();
-
     super.onRemove();
     await audioController.stopAllSounds();
   }
