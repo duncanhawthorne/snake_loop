@@ -49,7 +49,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         // ignore: always_specify_types
         HasQuadTreeCollisionDetection,
         SingleGameInstance,
-        GamePlaybackManager,
         GameOverlayManager,
         HasTimeScale {
   PacmanGame._({
@@ -109,6 +108,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final GameSession session = GameSession();
   final GameLifecycle lifecycle = GameLifecycle();
+  final GamePlaybackManager playback = GamePlaybackManager();
 
   bool get isLive => !paused && isLoaded && isMounted;
 
@@ -134,10 +134,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
     //audioController.soLoudReset();
-    resetPlayback(level);
     cleanDialogs();
     if (showStartDialog) {
-      playbackMode
+      playback.playbackMode
           ? overlays.add(GameScreen.beginDialogKey)
           : overlays.add(GameScreen.startDialogKey);
     }
@@ -179,12 +178,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       ),
     ); //assume maze size won't change
     reset(firstRun: true, showStartDialog: true);
-  }
-
-  @override
-  void update(double dt) {
-    playbackAngles();
-    super.update(dt);
   }
 
   @override

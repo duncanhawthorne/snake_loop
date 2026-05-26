@@ -26,7 +26,7 @@ class GameActivityMonitor extends WrapperNoEvents
         if (game.paused) {
           //already paused, no further action required, just cancel timer
           timer.cancel();
-        } else if (game.playbackMode) {
+        } else if (game.playback.playbackMode) {
           //want to continue playback in playbackMode
           timer.cancel();
         } else if (game.lifecycle.stopwatch.isRunning()) {

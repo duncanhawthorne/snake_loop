@@ -17,7 +17,7 @@ class BeginDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(game.playbackMode);
+    assert(game.playback.playbackMode);
     return purePopup(
       child: TextButton(
         style: buttonStyle(),

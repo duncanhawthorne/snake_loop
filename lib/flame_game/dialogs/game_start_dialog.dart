@@ -24,18 +24,19 @@ class StartDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(!game.playbackMode);
+    assert(!game.playback.playbackMode);
     return popupDialog(
       children: <Widget>[
         rotatedTitle(),
-        ...game.playbackMode
+        ...game.playback.playbackMode
             ? <Widget>[const SizedBox.shrink()]
             : <Widget>[
                 levelSelector(context, game),
                 mazeSelector(context, game),
               ],
         bottomRowWidget(
-          children: game.lifecycle.stopwatchStarted && !game.playbackMode
+          children:
+              game.lifecycle.stopwatchStarted && !game.playback.playbackMode
               ? <Widget>[
                   TextButton(
                     style: buttonStyle(borderColor: Palette.warning.color),
@@ -57,7 +58,7 @@ class StartDialog extends StatelessWidget {
                   TextButton(
                     style: buttonStyle(),
                     onPressed: () {
-                      if (game.playbackMode) {
+                      if (game.playback.playbackMode) {
                         context.go(
                           '/?$levelUrlKey=${Levels.minLevel}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}',
                         );
@@ -67,7 +68,7 @@ class StartDialog extends StatelessWidget {
                       }
                     },
                     child: Text(
-                      game.playbackMode ? 'Start' : 'Play',
+                      game.playback.playbackMode ? 'Start' : 'Play',
                       style: textStyleBody,
                     ),
                   ),

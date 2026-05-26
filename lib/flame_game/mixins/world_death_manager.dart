@@ -50,7 +50,7 @@ class WorldDeathManager extends WrapperNoEvents
       world.ghosts.resetInstantAfterPacmanDeath();
       world.dragManager.reset();
       doingLevelResetFlourish = false;
-      if (game.playbackMode) {
+      if (game.playback.playbackMode) {
         game.reset();
       } else {
         world.activityMonitor.reset();

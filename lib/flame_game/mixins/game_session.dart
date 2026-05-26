@@ -53,7 +53,7 @@ class GameSession extends WrapperNoEvents
     _deathListenerRef = () {
       if (numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths &&
           game.lifecycle.stopwatchStarted &&
-          !game.playbackMode) {
+          !game.playback.playbackMode) {
         assert(!isRemoving);
         assert(game.session.isWonOrLost);
         game.lifecycle.stopRegularItems();
@@ -63,7 +63,7 @@ class GameSession extends WrapperNoEvents
     _pelletListenerRef = () {
       if (world.pellets.pelletsRemainingNotifier.value <= 0 &&
           game.lifecycle.stopwatchStarted &&
-          !game.playbackMode) {
+          !game.playback.playbackMode) {
         assert(!isRemoving);
         assert(game.session.isWonOrLost);
         game.lifecycle.stopRegularItems();

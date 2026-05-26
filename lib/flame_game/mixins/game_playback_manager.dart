@@ -1,16 +1,17 @@
 import 'dart:core';
 
-import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flame_forge2d/forge2d_game.dart';
+import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../level_selection/levels.dart';
 import '../../utils/helper.dart';
 import '../../utils/stored_moves.dart';
+import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
-mixin GamePlaybackManager on Forge2DGame<PacmanWorld> {
+class GamePlaybackManager extends WrapperNoEvents
+    with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   late int _playbackModeCounter;
   bool playbackMode = false;
 
@@ -58,5 +59,19 @@ mixin GamePlaybackManager on Forge2DGame<PacmanWorld> {
     _playbackModeCounter = -1;
     playbackMode = !_recordMode && level.number == Levels.playbackModeLevel;
     _recordedMovesLive.clear();
+  }
+
+  @override
+  Future<void> reset() async {
+    resetPlayback(game.level);
+  }
+
+  @override
+  void start() {}
+
+  @override
+  void update(double dt) {
+    playbackAngles();
+    super.update(dt);
   }
 }

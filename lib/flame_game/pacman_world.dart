@@ -91,6 +91,7 @@ class PacmanWorld extends Forge2DWorld
       activityMonitor,
       game.session,
       game.lifecycle,
+      game.playback,
     ]);
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);

@@ -86,7 +86,7 @@ class WorldDragRotationManager {
     if (_cameraRotatableOnPacmanDeathFlourish &&
         game.isLive &&
         game.lifecycle.openingScreenCleared &&
-        !game.playbackMode) {
+        !game.playback.playbackMode) {
       setMazeAngle(cameraAngle + angleDelta);
       if (!world.deathManager.doingLevelResetFlourish &&
           !game.session.isWonOrLost) {
@@ -110,7 +110,7 @@ class WorldDragRotationManager {
   double _debugFakeAngle = 0;
 
   void setMazeAngle(double angle) {
-    game.recordAngle(angle);
+    game.playback.recordAngle(angle);
     cameraAngle = angle;
     downDirection
       ..setValues(-sin(angle), cos(angle))
