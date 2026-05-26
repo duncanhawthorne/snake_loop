@@ -17,7 +17,7 @@ const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;
 
 const double spriteVsPhysicsScale = spriteVsPhysicsScaleConstant ? 1 : 30;
 const bool spriteVsPhysicsScaleConstant =
-    false; //FIXME revert to true once flutter 3.45 sprite render bug resolved
+    true; //FIXME revert to true once flutter 3.45 sprite render issue resolved
 
 final Paint _activePaint = Paint()..color = Palette.pacman.color;
 final Paint _inactivePaint = Paint()..color = Palette.warning.color;

@@ -18,7 +18,7 @@ import 'pacman.dart';
 import 'removal_actions.dart';
 
 final Paint _highQualityPaint = Paint()
-  // work around flutter 3.45 sprite render issue
+  // FIXME revert code change to work around flutter 3.45 sprite render issue
   ..filterQuality = flameGameZoom == 30 ? FilterQuality.low : FilterQuality.high
   //..color = const Color.fromARGB(255, 255, 255, 255)
   ..isAntiAlias = true;
