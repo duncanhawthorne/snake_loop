@@ -34,14 +34,7 @@ class WorldDeathManager extends WrapperNoEvents
   }
 
   void _resetInstantAfterPacmanDeath() {
-    // ignore: dead_code
-    if (true || doingLevelResetFlourish) {
-      // originally thought must test doingLevelResetFlourish
-      // as could have been removed by reset during delay x 2
-      // but this code is only run from resetSlide,
-      // so if we have got here (accidentally) then resetSlide has run
-      // and rotation will be wrong
-      // so should clean up anyway
+    if (doingLevelResetFlourish) {
       if (game.level.infLives) {
         game.session.numberOfDeathsNotifier.value = 0;
         world.pacmans.pacmanDyingNotifier.value = 0;
