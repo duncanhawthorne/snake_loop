@@ -13,9 +13,9 @@ import 'components/pellet_layer.dart';
 import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
-import 'mixins/game_inactivity_monitor.dart';
-import 'mixins/world_death_manager.dart';
-import 'mixins/world_drag_rotation_manager.dart';
+import 'managers/game_inactivity_monitor.dart';
+import 'managers/world_death_manager.dart';
+import 'managers/world_drag_rotation_manager.dart';
 import 'pacman_game.dart';
 
 /// The world is where you place all the components that should live inside of

@@ -18,10 +18,10 @@ import '../utils/src/workarounds.dart';
 import 'components/physics_ball.dart';
 import 'game_screen.dart';
 import 'maze/maze.dart';
-import 'mixins/game_dialog_manager.dart';
-import 'mixins/game_lifecycle.dart';
-import 'mixins/game_playback_manager.dart';
-import 'mixins/game_session.dart';
+import 'managers/game_dialog_manager.dart';
+import 'managers/game_lifecycle.dart';
+import 'managers/game_playback_manager.dart';
+import 'managers/game_session.dart';
 import 'pacman_world.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -46,7 +46,7 @@ const double kVirtualGameSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld>
     with
-        // ignore: always_specify_types
+    // ignore: always_specify_types
         HasQuadTreeCollisionDetection,
         SingleGameInstance,
         HasTimeScale {
@@ -57,13 +57,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     required this.audioController,
     required this.appLifecycleStateNotifier,
   }) : super(
-         world: PacmanWorld(),
-         camera: CameraComponent.withFixedResolution(
-           width: kVirtualGameSize,
-           height: kVirtualGameSize,
-         ),
-         zoom: flameGameZoom * _visualZoomMultiplier,
-       ) {
+    world: PacmanWorld(),
+    camera: CameraComponent.withFixedResolution(
+      width: kVirtualGameSize,
+      height: kVirtualGameSize,
+    ),
+    zoom: flameGameZoom * _visualZoomMultiplier,
+  ) {
     this.mazeId = mazeId;
   }
 
@@ -107,8 +107,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final GameSession session = GameSession();
   final GameLifecycle lifecycle = GameLifecycle();
-  late final GamePlaybackManager playback = GamePlaybackManager()..game = this;
-  late final GameDialogManager dialogManager = GameDialogManager()..game = this;
+  late final GamePlaybackManager playback = GamePlaybackManager()
+    ..game = this;
+  late final GameDialogManager dialogManager = GameDialogManager()
+    ..game = this;
 
   bool get isLive => !paused && isLoaded && isMounted;
 
