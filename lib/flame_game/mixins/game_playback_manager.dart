@@ -11,16 +11,30 @@ import '../pacman_game.dart';
 import '../pacman_world.dart';
 
 class GamePlaybackManager extends WrapperNoEvents
-    with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
-  late int _playbackModeCounter;
-  bool playbackMode = false;
+    with HasWorldReference<PacmanWorld> {
+  late final PacmanGame game;
 
-  // ignore: dead_code
-  static const bool _recordMode = kDebugMode && false;
+  int _playbackModeCounter = -1;
+  bool _playbackModeEverDismissed = false;
+
+  static const bool recordMode = kDebugMode && false;
   final List<List<double>> _recordedMovesLive = <List<double>>[];
 
+  void enable() {
+    _playbackModeEverDismissed = false;
+  }
+
+  void disable() {
+    _playbackModeEverDismissed = true;
+  }
+
+  bool isPlaybackAppropriate() {
+    return !_playbackModeEverDismissed & !recordMode &&
+        game.level.number == Levels.playbackModeLevel;
+  }
+
   void recordAngle(double angle) {
-    if (_recordMode && !playbackMode) {
+    if (recordMode && !(game.playState == PlayState.playbackMode)) {
       _recordedMovesLive.add(<double>[
         (game.session.stopwatchMilliSeconds).toDouble(),
         angle,
@@ -32,9 +46,9 @@ class GamePlaybackManager extends WrapperNoEvents
   }
 
   void playbackAngles() {
-    if (playbackMode &&
+    if ((game.playState == PlayState.playbackMode) &&
         game.isLive &&
-        game.world.activityMonitor.framesRendered > 30) {
+        game.world.inactivityMonitor.framesRendered > 30) {
       // && isLive && overlays.isActive(GameScreen.startDialogKey)
       if (_playbackModeCounter == -1) {
         _playbackModeCounter++;
@@ -54,21 +68,15 @@ class GamePlaybackManager extends WrapperNoEvents
     }
   }
 
-  void resetPlayback(GameLevel level) {
+  void resetPlayback() {
     //audioController.soLoudReset();
     _playbackModeCounter = -1;
-    playbackMode = !_recordMode && level.number == Levels.playbackModeLevel;
     _recordedMovesLive.clear();
   }
 
   @override
   Future<void> reset() async {
-    resetPlayback(game.level);
-  }
-
-  @override
-  Future<void> onMount() async {
-    resetPlayback(game.level); //FIXME
+    resetPlayback();
   }
 
   @override

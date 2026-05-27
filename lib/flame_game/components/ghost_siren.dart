@@ -51,12 +51,14 @@ class GhostSiren extends WrapperNoEvents
   }
 
   double _averageGhostSpeed() {
-    assert(game.isLive); //test before call, else test here
-    assert(game.lifecycle.openingScreenCleared);
+    //test asserts below before call, else test here
+    assert(game.isLive);
     assert(
-      !world.pacmans.isMounted || world.pacmans.anyAlivePacman,
-    ); //test before call, else test here
-    assert(!game.session.isWonOrLost); //test before call, else test here
+      game.playState == PlayState.gaming ||
+          game.playState == PlayState.playbackMode,
+    );
+    assert(!world.pacmans.isMounted || world.pacmans.anyAlivePacman);
+    assert(!game.session.isWonOrLost);
     _tidyStrayGhosts();
     if (ghostList.isEmpty) {
       return 0;
@@ -77,20 +79,24 @@ class GhostSiren extends WrapperNoEvents
       if (!ghosts.isMounted) {
         return;
       }
-      assert(!game.session.isWonOrLost); //test before call, else test here
-      assert(game.isLive); //test before call, else test here
-      assert(game.lifecycle.openingScreenCleared);
+      //test asserts below before call, else test here
+      assert(!game.session.isWonOrLost);
+      assert(game.isLive);
+      assert(
+        game.playState == PlayState.gaming ||
+            game.playState == PlayState.playbackMode,
+      );
       _sirenTimer ??= async.Timer.periodic(const Duration(milliseconds: 250), (
         async.Timer timer,
       ) {
-        assert(!game.session.isWonOrLost); //timer cancelled already here
+        // timer cancelled already here
+        assert(!game.session.isWonOrLost);
+        assert(!world.pacmans.isMounted || world.pacmans.anyAlivePacman);
+        assert(!world.deathManager.doingLevelResetFlourish);
         assert(
-          !world.pacmans.isMounted || world.pacmans.anyAlivePacman,
-        ); //timer cancelled already here
-        assert(
-          !world.deathManager.doingLevelResetFlourish,
-        ); //timer cancelled already here
-        assert(game.lifecycle.openingScreenCleared);
+          game.playState == PlayState.gaming ||
+              game.playState == PlayState.playbackMode,
+        );
         if (game.isLive) {
           game.audioController.setSirenVolume(
             _averageGhostSpeed() * flameGameZoom / 30,
@@ -108,7 +114,7 @@ class GhostSiren extends WrapperNoEvents
       game.audioController.setSirenVolume(0);
       _sirenTimer!.cancel();
       _sirenTimer = null;
-      game.lifecycle.regularItemsStarted = false; //so that will restart later
+      game.lifecycle.noteThatSomeRegularItemHasStopped();
     }
   }
 }

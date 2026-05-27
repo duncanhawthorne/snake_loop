@@ -10,6 +10,7 @@ import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
+import 'game_playback_manager.dart';
 
 class WorldDragRotationManager {
   WorldDragRotationManager({required this.game, required this.world});
@@ -20,14 +21,14 @@ class WorldDragRotationManager {
   final Vector2 _eventOffset = Vector2.zero();
   double canvasRadius = 1.0;
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
-  bool _cameraRotatableOnPacmanDeathFlourish = true;
+  bool _cameraRotatable = true;
 
   void clear() {
     _fingersLastDragAngle.clear();
   }
 
-  void flourishReset(Function() callback) {
-    _cameraRotatableOnPacmanDeathFlourish = false;
+  void resetSlide(Function() callback) {
+    _cameraRotatable = false;
     resetSlideAngle(game.camera.viewfinder, onComplete: callback);
   }
 
@@ -36,7 +37,7 @@ class WorldDragRotationManager {
     //note, still leaves flourish variable hot, so fix below
     removeEffects(game.camera.viewfinder);
     setMazeAngle(0);
-    _cameraRotatableOnPacmanDeathFlourish = true;
+    _cameraRotatable = true;
   }
 
   void onDragStart(DragStartEvent event) {
@@ -83,10 +84,7 @@ class WorldDragRotationManager {
   }
 
   void _moveMazeAngleByDelta(double angleDelta) {
-    if (_cameraRotatableOnPacmanDeathFlourish &&
-        game.isLive &&
-        game.lifecycle.openingScreenCleared &&
-        !game.playback.playbackMode) {
+    if (_cameraRotatable && game.isLive && game.playState == PlayState.gaming) {
       setMazeAngle(cameraAngle + angleDelta);
       if (!world.deathManager.doingLevelResetFlourish &&
           !game.session.isWonOrLost) {
@@ -110,7 +108,7 @@ class WorldDragRotationManager {
   double _debugFakeAngle = 0;
 
   void setMazeAngle(double angle) {
-    game.playback.recordAngle(angle);
+    GamePlaybackManager.recordMode ? game.playback.recordAngle(angle) : null;
     cameraAngle = angle;
     downDirection
       ..setValues(-sin(angle), cos(angle))

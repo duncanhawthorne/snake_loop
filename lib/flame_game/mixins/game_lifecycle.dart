@@ -3,32 +3,33 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 
 import '../components/wrapper_no_events.dart';
-import '../game_screen.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
 class GameLifecycle extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   VoidCallback? _lifecycleListenerRef;
-  bool regularItemsStarted = false;
+  bool _regularItemsStarted = false;
 
   bool stopwatchStarted = false;
   final Timer stopwatch = Timer(double.infinity);
 
-  bool get openingScreenCleared =>
-      !(!stopwatchStarted && game.overlays.isActive(GameScreen.startDialogKey));
+  void noteThatSomeRegularItemHasStopped() {
+    //so that will restart later
+    _regularItemsStarted = false;
+  }
 
   void pauseGame() {
     game
       ..pause() //timeScale = 0;
       ..pauseEngine();
-    regularItemsStarted = false; //so restart things next time
+    noteThatSomeRegularItemHasStopped();
     //stopwatch.pause(); //shouldn't be necessary given timeScale = 0
   }
 
   void resumeGame() {
     if (game.paused) {
-      regularItemsStarted = false; //so restart things next time
+      noteThatSomeRegularItemHasStopped();
       game.audioController.workaroundiOSSafariAudioOnUserInteraction();
       game
         ..resume() //timeScale = 1.0;
@@ -37,23 +38,19 @@ class GameLifecycle extends WrapperNoEvents
   }
 
   void startRegularItems() {
-    if (!regularItemsStarted) {
+    if (!_regularItemsStarted) {
       game.audioController.workaroundiOSSafariAudioOnUserInteraction();
-      regularItemsStarted = true;
+      _regularItemsStarted = true;
       game.lifecycle.stopwatchStarted = true; //once per reset
       game.lifecycle.stopwatch.resume();
-      world.ghosts
-        ..addSpawner()
-        ..ghostSiren.startSirenVolumeUpdaterTimer();
+      world.ghosts.startRegularItems();
     }
   }
 
   void stopRegularItems() {
-    regularItemsStarted = false;
+    noteThatSomeRegularItemHasStopped();
     game.lifecycle.stopwatch.pause();
-    world.ghosts
-      ..removeSpawner()
-      ..ghostSiren.cancelSirenVolumeUpdaterTimer();
+    world.ghosts.stopRegularItems();
   }
 
   void _lifecycleChangeListener() {

@@ -6,7 +6,7 @@ import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
-class GameActivityMonitor extends WrapperNoEvents
+class GameInactivityMonitor extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   int framesRendered = 0;
 
@@ -26,7 +26,7 @@ class GameActivityMonitor extends WrapperNoEvents
         if (game.paused) {
           //already paused, no further action required, just cancel timer
           timer.cancel();
-        } else if (game.playback.playbackMode) {
+        } else if (game.playState == PlayState.playbackMode) {
           //want to continue playback in playbackMode
           timer.cancel();
         } else if (game.lifecycle.stopwatch.isRunning()) {

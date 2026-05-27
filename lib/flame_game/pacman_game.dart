@@ -16,9 +16,10 @@ import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/src/workarounds.dart';
 import 'components/physics_ball.dart';
+import 'game_screen.dart';
 import 'maze/maze.dart';
+import 'mixins/game_dialog_manager.dart';
 import 'mixins/game_lifecycle.dart';
-import 'mixins/game_overlay_manager.dart';
 import 'mixins/game_playback_manager.dart';
 import 'mixins/game_session.dart';
 import 'pacman_world.dart';
@@ -106,8 +107,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final GameSession session = GameSession();
   final GameLifecycle lifecycle = GameLifecycle();
-  final GamePlaybackManager playback = GamePlaybackManager();
-  final GameOverlayManager overlayManager = GameOverlayManager();
+  late final GamePlaybackManager playback = GamePlaybackManager()..game = this;
+  late final GameDialogManager dialogManager = GameDialogManager()..game = this;
 
   bool get isLive => !paused && isLoaded && isMounted;
 
@@ -139,7 +140,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       world.reset();
     }
     collisionDetection.broadphase.tree.optimize();
-    overlayManager.customReset(showStartDialog: showStartDialog);
+    if (showStartDialog) {
+      playback.isPlaybackAppropriate()
+          ? playState = PlayState.playbackMode
+          : playState = PlayState.levelChooseScreen;
+    }
   }
 
   void resetAndStart() {
@@ -180,6 +185,33 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     super.onRemove();
     await audioController.stopAllSounds();
   }
+
+  PlayState _playState = PlayState.playbackMode;
+
+  PlayState get playState => _playState;
+
+  set playState(PlayState s) => _setState(s);
+
+  void _setState(PlayState s) {
+    if (_playState == s && s == PlayState.gaming) {
+      return;
+    }
+    _playState = s;
+    switch (s) {
+      case PlayState.playbackMode:
+        playback.enable();
+        dialogManager.cleanDialogs();
+        overlays.add(GameScreen.beginDialogKey);
+      case PlayState.levelChooseScreen:
+        playback.disable();
+        dialogManager.cleanDialogs();
+        overlays.add(GameScreen.startDialogKey);
+      case PlayState.gaming:
+        playback.disable();
+        dialogManager.cleanDialogs();
+        start();
+    }
+  }
 }
 
 Vector2 _sanitizeScreenSize(Vector2 size) {
@@ -189,3 +221,5 @@ Vector2 _sanitizeScreenSize(Vector2 size) {
     return Vector2(kVirtualGameSize, kVirtualGameSize * size.y / size.x);
   }
 }
+
+enum PlayState { playbackMode, levelChooseScreen, gaming }

@@ -53,7 +53,7 @@ class GameSession extends WrapperNoEvents
     _deathListenerRef = () {
       if (numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths &&
           game.lifecycle.stopwatchStarted &&
-          !game.playback.playbackMode) {
+          !(game.playState == PlayState.playbackMode)) {
         assert(!isRemoving);
         assert(game.session.isWonOrLost);
         game.lifecycle.stopRegularItems();
@@ -63,7 +63,7 @@ class GameSession extends WrapperNoEvents
     _pelletListenerRef = () {
       if (world.pellets.pelletsRemainingNotifier.value <= 0 &&
           game.lifecycle.stopwatchStarted &&
-          !game.playback.playbackMode) {
+          !(game.playState == PlayState.playbackMode)) {
         assert(!isRemoving);
         assert(game.session.isWonOrLost);
         game.lifecycle.stopRegularItems();
@@ -79,6 +79,7 @@ class GameSession extends WrapperNoEvents
     assert(game.session.isWonOrLost);
     assert(!game.lifecycle.stopwatch.isRunning());
     assert(game.lifecycle.stopwatchStarted);
+    assert(!(game.playState == PlayState.playbackMode));
     if (world.pellets.pelletsRemainingNotifier.value <= 0) {
       game.play(SfxType.endMusic);
       world.ghosts.resetAfterGameWin();
@@ -88,7 +89,7 @@ class GameSession extends WrapperNoEvents
         fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
       }
       game.playerProgress.saveLevelComplete(_getCurrentGameState());
-      game.overlayManager.cleanDialogs();
+      game.dialogManager.cleanDialogs();
       game.overlays.add(GameScreen.wonDialogKey);
     }
   }
@@ -98,7 +99,7 @@ class GameSession extends WrapperNoEvents
     assert(game.session.isWonOrLost);
     assert(game.lifecycle.stopwatchStarted);
     game.audioController.stopAllSounds();
-    game.overlayManager.cleanDialogs();
+    game.dialogManager.cleanDialogs();
     game.overlays.add(GameScreen.loseDialogKey);
   }
 

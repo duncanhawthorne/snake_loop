@@ -79,7 +79,7 @@ class Ghosts extends WrapperNoEvents
     _ghostSpawner?.removeFromParent();
     _ghostSpawner = null; //FIXME shouldn't be necessary
     _ghostSpawner?.timer.reset(); //so next spawn based on time of reset
-    game.lifecycle.regularItemsStarted = false; //so that will restart later
+    game.lifecycle.noteThatSomeRegularItemHasStopped();
   }
 
   void _removeAllGhosts() {
@@ -95,6 +95,16 @@ class Ghosts extends WrapperNoEvents
       removeEffects(ghost);
       ghost.setPhysicsState(PhysicsState.none); //sync
     }
+  }
+
+  void startRegularItems() {
+    addSpawner();
+    ghostSiren.startSirenVolumeUpdaterTimer();
+  }
+
+  void stopRegularItems() {
+    removeSpawner();
+    ghostSiren.cancelSirenVolumeUpdaterTimer();
   }
 
   void resetAfterGameWin() {

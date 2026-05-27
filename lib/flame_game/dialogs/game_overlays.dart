@@ -83,9 +83,9 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
 Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
   return IconButton(
     onPressed: () {
-      game.playback.playbackMode
+      game.playState == PlayState.playbackMode
           ? null
-          : game.overlayManager.toggleOverlay(GameScreen.startDialogKey);
+          : game.dialogManager.toggleDialog(GameScreen.startDialogKey);
     },
     icon: const Icon(Icons.menu, color: Palette.textColor),
   );
@@ -124,7 +124,7 @@ Widget _clockWidget(PacmanGame game) {
   return GestureDetector(
     onLongPress: () {
       if (detailedAudioLog) {
-        game.overlayManager.toggleOverlay(GameScreen.debugDialogKey);
+        game.dialogManager.toggleDialog(GameScreen.debugDialogKey);
       }
     },
     child: Padding(
@@ -152,7 +152,7 @@ Widget _raceProgressWidget(PacmanGame game) {
   return GestureDetector(
     onLongPress: () {
       if (detailedAudioLog) {
-        game.overlayManager.toggleOverlay(GameScreen.debugDialogKey);
+        game.dialogManager.toggleDialog(GameScreen.debugDialogKey);
       }
     },
     child: Padding(

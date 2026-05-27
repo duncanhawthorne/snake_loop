@@ -34,7 +34,9 @@ class GameLoseDialog extends StatelessWidget {
               style: buttonStyle(),
               onPressed: () {
                 game.overlays.remove(GameScreen.loseDialogKey);
-                game.resetAndStart();
+                game
+                  ..resetAndStart()
+                  ..playState = PlayState.gaming;
               },
               child: const Text('Retry', style: textStyleBody),
             ),

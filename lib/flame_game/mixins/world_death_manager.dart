@@ -22,7 +22,7 @@ class WorldDeathManager extends WrapperNoEvents
     game.audioController.stopSound(SfxType.ghostsScared);
     if (!game.session.isWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
-        world.dragManager.flourishReset(_resetInstantAfterPacmanDeath);
+        world.dragManager.resetSlide(_resetInstantAfterPacmanDeath);
         dyingPacman.resetSlideAfterDeath();
         world.ghosts.resetSlideAfterPacmanDeath();
       } else {
@@ -43,10 +43,10 @@ class WorldDeathManager extends WrapperNoEvents
       world.ghosts.resetInstantAfterPacmanDeath();
       world.dragManager.reset();
       doingLevelResetFlourish = false;
-      if (game.playback.playbackMode) {
+      if (game.playState == PlayState.playbackMode) {
         game.reset();
       } else {
-        world.activityMonitor.reset();
+        world.inactivityMonitor.reset();
       }
     }
   }
