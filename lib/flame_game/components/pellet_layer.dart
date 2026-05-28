@@ -19,6 +19,9 @@ class PelletWrapper extends WrapperNoEvents
   @override
   final int priority = -2;
 
+  bool get winState =>
+      ((!kDebugMode || isMounted) && pelletsRemainingNotifier.value <= 0);
+
   final ValueNotifier<int> pelletsRemainingNotifier = ValueNotifier<int>(0);
 
   @override

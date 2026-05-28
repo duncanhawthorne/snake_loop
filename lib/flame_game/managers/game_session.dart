@@ -26,15 +26,19 @@ class GameSession extends WrapperNoEvents
           : min(game.level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
                 _deathPenaltyMillis);
 
-  bool get isWonOrLost =>
-      ((!kDebugMode || world.pellets.isMounted) &&
-          world.pellets.pelletsRemainingNotifier.value <= 0) ||
+  bool get isWon => world.pellets.winState;
+
+  bool get isLost =>
       numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths;
 
-  VoidCallback? _deathListenerRef;
-  VoidCallback? _pelletListenerRef;
+  bool get isWonOrLost => isWon || isLost;
+
+  VoidCallback? _deathsListenerRef;
+  VoidCallback? _itemsListenerRef;
 
   final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
+  late final ValueNotifier<int> itemsRemainingNotifier =
+      world.pellets.pelletsRemainingNotifier;
 
   Map<String, Object> _getCurrentGameState() {
     final Map<String, Object> gameStateTmp = <String, Object>{};
@@ -47,57 +51,49 @@ class GameSession extends WrapperNoEvents
   }
 
   void _winOrLoseGameListener() {
-    assert(
-      !game.lifecycle.stopwatchStarted,
-    ); //so no instant trigger of listeners
-    _deathListenerRef = () {
-      if (numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths &&
+    assert(!game.lifecycle.stopwatchStarted); //so no instant trigger
+    _deathsListenerRef = () {
+      if (isLost &&
           game.lifecycle.stopwatchStarted &&
-          !(game.playState == PlayState.playbackMode)) {
-        assert(!isRemoving);
-        assert(game.session.isWonOrLost);
-        game.lifecycle.stopRegularItems();
+          game.playState != PlayState.playbackMode) {
         _handleLoseGame();
       }
     };
-    _pelletListenerRef = () {
-      if (world.pellets.pelletsRemainingNotifier.value <= 0 &&
+    _itemsListenerRef = () {
+      if (isWon &&
           game.lifecycle.stopwatchStarted &&
-          !(game.playState == PlayState.playbackMode)) {
-        assert(!isRemoving);
-        assert(game.session.isWonOrLost);
-        game.lifecycle.stopRegularItems();
+          game.playState != PlayState.playbackMode) {
         _handleWinGame();
       }
     };
-    numberOfDeathsNotifier.addListener(_deathListenerRef!);
-    world.pellets.pelletsRemainingNotifier.addListener(_pelletListenerRef!);
+    numberOfDeathsNotifier.addListener(_deathsListenerRef!);
+    itemsRemainingNotifier.addListener(_itemsListenerRef!);
   }
 
   void _handleWinGame() {
     assert(!isRemoving);
-    assert(game.session.isWonOrLost);
+    assert(isWonOrLost);
     assert(!game.lifecycle.stopwatch.isRunning());
     assert(game.lifecycle.stopwatchStarted);
     assert(!(game.playState == PlayState.playbackMode));
-    if (world.pellets.pelletsRemainingNotifier.value <= 0) {
-      game.play(SfxType.endMusic);
-      world.ghosts.resetAfterGameWin();
-      const int minRecordableWinTimeMillis = 10 * 1000;
-      if (game.session.stopwatchMilliSeconds > minRecordableWinTimeMillis &&
-          !game.level.isTutorial) {
-        fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
-      }
-      game.playerProgress.saveLevelComplete(_getCurrentGameState());
-      game.dialogs.clean();
-      game.overlays.add(GameScreen.wonDialogKey);
+    game.lifecycle.stopRegularItems();
+    game.play(SfxType.endMusic);
+    world.ghosts.resetAfterGameWin();
+    const int minRecordableWinTimeMillis = 10 * 1000;
+    if (stopwatchMilliSeconds > minRecordableWinTimeMillis &&
+        !game.level.isTutorial) {
+      fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
     }
+    game.playerProgress.saveLevelComplete(_getCurrentGameState());
+    game.dialogs.clean();
+    game.overlays.add(GameScreen.wonDialogKey);
   }
 
   void _handleLoseGame() {
     assert(!isRemoving);
-    assert(game.session.isWonOrLost);
+    assert(isWonOrLost);
     assert(game.lifecycle.stopwatchStarted);
+    game.lifecycle.stopRegularItems();
     game.audioController.stopAllSounds();
     game.dialogs.clean();
     game.overlays.add(GameScreen.loseDialogKey);
@@ -116,14 +112,13 @@ class GameSession extends WrapperNoEvents
 
   @override
   Future<void> onRemove() async {
-    if (_deathListenerRef != null) {
-      numberOfDeathsNotifier.removeListener(_deathListenerRef!);
+    if (_deathsListenerRef != null) {
+      numberOfDeathsNotifier.removeListener(_deathsListenerRef!);
     }
-    if (_pelletListenerRef != null) {
-      world.pellets.pelletsRemainingNotifier.removeListener(
-        _pelletListenerRef!,
-      );
+    if (_itemsListenerRef != null) {
+      itemsRemainingNotifier.removeListener(_itemsListenerRef!);
     }
+    itemsRemainingNotifier.dispose();
     numberOfDeathsNotifier.dispose();
     super.onRemove();
   }
