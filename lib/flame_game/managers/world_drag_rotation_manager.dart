@@ -85,7 +85,10 @@ class WorldDragRotationManager {
   }
 
   void _moveMazeAngleByDelta(double angleDelta) {
-    if (_cameraRotatable && game.isLive && game.playState == PlayState.gaming) {
+    if (_cameraRotatable &&
+        game.isLive &&
+        (game.playState == PlayState.gaming ||
+            game.playState == PlayState.flourish)) {
       setMazeAngle(cameraAngle + angleDelta);
     }
   }
