@@ -7,10 +7,14 @@ import '../game_screen.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
+/// Manages the display and cleaning of game dialog overlays.
+///
+/// This includes start, lose, won, tutorial, reset, and debug dialogs.
 class DialogManager extends WrapperNoEvents
     with HasWorldReference<PacmanWorld> {
   late final PacmanGame game;
 
+  /// Removes all active game dialog overlays.
   void clean() {
     game.overlays
       ..remove(GameScreen.startDialogKey)
@@ -21,6 +25,10 @@ class DialogManager extends WrapperNoEvents
       ..remove(GameScreen.debugDialogKey);
   }
 
+  /// Toggles the visibility of a specific dialog overlay.
+  ///
+  /// If the dialog is currently visible, it will be removed. Otherwise,
+  /// all other dialogs will be cleaned, and the specified dialog will be added.
   void toggle(String overlayKey) {
     if (game.overlays.activeOverlays.contains(overlayKey)) {
       game.overlays.remove(overlayKey);

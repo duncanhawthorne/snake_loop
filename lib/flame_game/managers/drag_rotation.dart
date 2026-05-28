@@ -12,6 +12,10 @@ import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'playback.dart';
 
+/// Manages the rotation of the maze based on user drag input.
+///
+/// This class handles the conversion of drag events into maze rotation,
+/// which in turn affects the gravity in the game world.
 class DragRotation {
   DragRotation({required this.game, required this.world});
 
@@ -23,16 +27,19 @@ class DragRotation {
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
   bool _cameraRotatable = true;
 
+  /// Clears any tracked drag information.
   void clear() {
     _fingersLastDragAngle.clear();
   }
 
+  /// Initiates a sliding reset of the maze angle to its default.
   void resetSlide(Function() callback) {
     assert(game.playState == PlayState.flourish);
     _cameraRotatable = false;
     resetSlideAngle(game.camera.viewfinder, onComplete: callback);
   }
 
+  /// Resets the maze angle to zero instantly and stops any ongoing rotation effects.
   void reset() {
     //stop any rotation effect added to camera
     //note, still leaves flourish variable hot, so fix below
@@ -41,6 +48,7 @@ class DragRotation {
     _cameraRotatable = true;
   }
 
+  /// Handles the start of a drag event to begin rotating the maze.
   void onDragStart(DragStartEvent event) {
     if (isiOSWeb) {
       _fingersLastDragAngle[event.pointerId] = null;
@@ -52,6 +60,7 @@ class DragRotation {
     }
   }
 
+  /// Handles the update of a drag event, calculating the rotation delta and applying it.
   void onDragUpdate(DragUpdateEvent event) {
     game.lifecycle.resumeGame();
     _eventOffset.setValues(
@@ -80,10 +89,12 @@ class DragRotation {
     }
   }
 
+  /// Handles the end of a drag event.
   void onDragEnd(DragEndEvent event) {
     _fingersLastDragAngle.remove(event.pointerId);
   }
 
+  /// Moves the maze angle by the specified delta if rotation is allowed.
   void _moveMazeAngleByDelta(double angleDelta) {
     if (_cameraRotatable &&
         game.isLive &&
@@ -93,20 +104,24 @@ class DragRotation {
     }
   }
 
+  /// The current direction of gravity based on the maze rotation.
   final Vector2 downDirection = Vector2.zero();
 
   static const bool _updateGravityOnRotation = true;
 
   static const bool _kRotatingCamera = !kDebugMode || true;
 
+  /// Gets the current camera (maze) angle.
   double get cameraAngle =>
       _kRotatingCamera ? game.camera.viewfinder.angle : _debugFakeAngle;
 
+  /// Sets the current camera (maze) angle.
   set cameraAngle(double z) =>
       _kRotatingCamera ? game.camera.viewfinder.angle = z : _debugFakeAngle = z;
 
   double _debugFakeAngle = 0;
 
+  /// Sets the maze angle and updates gravity and related game state.
   void setMazeAngle(double angle, {bool noStartRegularItems = false}) {
     if (!noStartRegularItems &&
         game.playState != PlayState.flourish &&

@@ -13,12 +13,16 @@ import '../maze/maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
+/// Manages the current game session's state, including scoring, winning, and losing.
+///
+/// Tracks the number of deaths, items remaining, and game time.
 class GameSession extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   String _userString = "";
 
   static const int _deathPenaltyMillis = 5000;
 
+  /// Returns the current game time in milliseconds, including death penalties.
   int get stopwatchMilliSeconds =>
       (game.lifecycle.stopwatch.current * 1000).toInt() +
       (game.level.isTutorial
@@ -26,20 +30,27 @@ class GameSession extends WrapperNoEvents
           : min(game.level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
                 _deathPenaltyMillis);
 
+  /// Returns true if the player has won the game (all items collected).
   bool get isWon => world.pellets.winState;
 
+  /// Returns true if the player has lost the game (exceeded max allowed deaths).
   bool get isLost =>
       numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths;
 
+  /// Returns true if the game is over, either by winning or losing.
   bool get isWonOrLost => isWon || isLost;
 
   VoidCallback? _deathsListenerRef;
   VoidCallback? _itemsListenerRef;
 
+  /// Notifies listeners when the number of deaths changes.
   final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
+
+  /// Notifies listeners when the number of items remaining changes.
   late final ValueNotifier<int> itemsRemainingNotifier =
       world.pellets.pelletsRemainingNotifier;
 
+  /// Gathers relevant state for saving or uploading scores.
   Map<String, Object> _getCurrentGameState() {
     final Map<String, Object> gameStateTmp = <String, Object>{};
     gameStateTmp["userString"] = _userString;
@@ -50,6 +61,7 @@ class GameSession extends WrapperNoEvents
     return gameStateTmp;
   }
 
+  /// Sets up listeners to monitor win/loss conditions.
   void _winOrLoseGameListener() {
     assert(!game.lifecycle.stopwatchStarted); //so no instant trigger
     _deathsListenerRef = () {
@@ -70,6 +82,7 @@ class GameSession extends WrapperNoEvents
     itemsRemainingNotifier.addListener(_itemsListenerRef!);
   }
 
+  /// Handles the game win state, including playing music and saving progress.
   void _handleWinGame() {
     assert(!isRemoving);
     assert(isWonOrLost);
@@ -89,6 +102,7 @@ class GameSession extends WrapperNoEvents
     game.overlays.add(GameScreen.wonDialogKey);
   }
 
+  /// Handles the game lose state, including stopping sounds and showing the lose dialog.
   void _handleLoseGame() {
     assert(!isRemoving);
     assert(isWonOrLost);

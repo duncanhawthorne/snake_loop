@@ -7,19 +7,24 @@ import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
+/// Automatically pauses the game engine when no activity is detected to save resources.
+///
+/// It monitors frames rendered and game state to determine if the engine
+/// should be paused during inactivity (e.g., at the start of a level before play begins).
 class EngineAutoPauser extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   int _framesRendered = 0;
 
   async.Timer? _activityCheckTimer;
 
+  /// Starts a timer to check for inactivity and pause the engine if necessary.
   void _pauseEngineIfNoActivity() {
     game.resumeEngine(); //for any catch up animation, if not already resumed
     _framesRendered = 0;
     _activityCheckTimer?.cancel(); // Kill any preexisting active loops
     // If all characters at starting position and nothing happening,
     // pause engine to save resources and avoid unnecessary animation
-    // check every 10ms, but only pause if nothing happening and still at starting position
+    // check every 1000ms, but only pause if nothing happening and still at starting position
     // if something is happening, or not at starting position, then cancel timer and don't pause
     _activityCheckTimer = async.Timer.periodic(
       const Duration(milliseconds: 1000),

@@ -6,16 +6,22 @@ import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
+/// Manages the reset logic when Pacman dies.
+///
+/// This includes stopping sounds, sliding characters back to their start
+/// positions, and resetting the game state.
 class DeathReset extends WrapperNoEvents
     with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
   DeathReset();
 
   static const bool _slideCharactersAfterPacmanDeath = true;
 
+  /// Initiates the reset process after Pacman dies.
   void resetAfterPacmanDeath(Pacman dyingPacman) {
     _resetSlideAfterPacmanDeath(dyingPacman);
   }
 
+  /// Resets the positions of characters with a sliding animation if enabled.
   void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
     game.audioController.stopSound(SfxType.ghostsScared);
@@ -32,6 +38,7 @@ class DeathReset extends WrapperNoEvents
     }
   }
 
+  /// Performs an instant reset of the characters and game state.
   void _resetInstantAfterPacmanDeath() {
     if (game.playState == PlayState.flourish) {
       if (game.level.infLives) {
@@ -49,6 +56,7 @@ class DeathReset extends WrapperNoEvents
     }
   }
 
+  /// Transitions the game state from flourish to unflourish.
   void _resetFlourishState() {
     if (game.playState == PlayState.flourish) {
       game.playState = PlayState.unflourish;

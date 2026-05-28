@@ -10,28 +10,36 @@ import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
+/// Manages the recording and playback of maze rotation moves.
+///
+/// This is used for a special "playback mode" level.
 class Playback extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
   late final PacmanGame game;
 
   int _counter = 0;
   bool _playbackModeEverDismissed = false;
 
+  /// If true, the game will record moves during play.
   static const bool recordMode = kDebugMode && false;
   final List<List<double>> _recordedMovesLive = <List<double>>[];
 
+  /// Enables the playback mode functionality.
   void enable() {
     _playbackModeEverDismissed = false;
   }
 
+  /// Disables the playback mode functionality.
   void disable() {
     _playbackModeEverDismissed = true;
   }
 
+  /// Checks if playback mode should be active for the current level and state.
   bool isPlaybackAppropriate() {
     return !_playbackModeEverDismissed & !recordMode &&
         game.level.number == Levels.playbackModeLevel;
   }
 
+  /// Records the current maze angle at the current game time.
   void recordAngle(double angle) {
     if (!(recordMode && !(game.playState == PlayState.playbackMode))) return;
     _recordedMovesLive.add(<double>[
@@ -43,6 +51,7 @@ class Playback extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
     }
   }
 
+  /// Replays recorded moves by setting the maze angle based on the stopwatch time.
   void _playbackAngles() {
     if (!(game.playState == PlayState.playbackMode && game.isLive)) return;
     final int stopwatch = game.session.stopwatchMilliSeconds;
@@ -57,6 +66,7 @@ class Playback extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
     world.dragManager.setMazeAngle(storedMoves[_counter][1]);
   }
 
+  /// Resets the playback counter and cleared any recorded live moves.
   void resetPlayback() {
     _counter = 0;
     _recordedMovesLive.clear();
