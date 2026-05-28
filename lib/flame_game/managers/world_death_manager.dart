@@ -47,11 +47,10 @@ class WorldDeathManager extends WrapperNoEvents
       world.pacmans.resetInstantAfterPacmanDeath();
       world.ghosts.resetInstantAfterPacmanDeath();
       world.dragManager.reset();
+      world.inactivityMonitor.reset();
       _resetFlourishState();
       if (game.playState == PlayState.playbackMode) {
         game.reset();
-      } else {
-        world.inactivityMonitor.reset();
       }
     }
   }
