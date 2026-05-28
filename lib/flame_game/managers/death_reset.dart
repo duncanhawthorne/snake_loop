@@ -12,12 +12,6 @@ class DeathReset extends WrapperNoEvents
 
   static const bool _slideCharactersAfterPacmanDeath = true;
 
-  void _resetFlourishState() {
-    if (game.playState == PlayState.flourish) {
-      game.playState = PlayState.unflourish;
-    }
-  }
-
   void resetAfterPacmanDeath(Pacman dyingPacman) {
     _resetSlideAfterPacmanDeath(dyingPacman);
   }
@@ -52,6 +46,12 @@ class DeathReset extends WrapperNoEvents
       if (game.playState == PlayState.playbackMode) {
         game.reset();
       }
+    }
+  }
+
+  void _resetFlourishState() {
+    if (game.playState == PlayState.flourish) {
+      game.playState = PlayState.unflourish;
     }
   }
 

@@ -200,16 +200,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     switch (s) {
       case PlayState.playbackMode:
         playback.enable();
-        dialogs.cleanDialogs();
+        dialogs.clean();
         overlays.add(GameScreen.beginDialogKey);
       case PlayState.levelChooseScreen:
         playback.disable();
-        dialogs.cleanDialogs();
+        dialogs.clean();
         overlays.add(GameScreen.startDialogKey);
       case PlayState.gaming:
         playback.disable();
         if (!session.isWonOrLost) {
-          dialogs.cleanDialogs();
+          dialogs.clean();
         }
         if (origState == PlayState.levelChooseScreen) {
           start();

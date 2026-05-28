@@ -11,7 +11,7 @@ class DialogManager extends WrapperNoEvents
     with HasWorldReference<PacmanWorld> {
   late final PacmanGame game;
 
-  void cleanDialogs() {
+  void clean() {
     game.overlays
       ..remove(GameScreen.startDialogKey)
       ..remove(GameScreen.loseDialogKey)
@@ -21,17 +21,17 @@ class DialogManager extends WrapperNoEvents
       ..remove(GameScreen.debugDialogKey);
   }
 
-  void toggleDialog(String overlayKey) {
+  void toggle(String overlayKey) {
     if (game.overlays.activeOverlays.contains(overlayKey)) {
       game.overlays.remove(overlayKey);
     } else {
-      cleanDialogs();
+      clean();
       game.overlays.add(overlayKey);
     }
   }
 
   @override
   Future<void> onRemove() async {
-    cleanDialogs();
+    clean();
   }
 }
