@@ -26,8 +26,6 @@ class Ghosts extends WrapperNoEvents
   SpawnComponent? _ghostSpawner;
   final GhostSiren ghostSiren = GhostSiren();
 
-  bool get ghostsLoaded => ghostList.isNotEmpty && ghostList[0].isLoaded;
-
   void _addThreeGhosts() {
     assert(ghostList.isEmpty);
     final List<int> positions = game.level.numStartingGhosts == 3

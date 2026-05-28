@@ -14,7 +14,7 @@ class GamePlaybackManager extends WrapperNoEvents
     with HasWorldReference<PacmanWorld> {
   late final PacmanGame game;
 
-  int _playbackModeCounter = -1;
+  int _counter = 0;
   bool _playbackModeEverDismissed = false;
 
   static const bool recordMode = kDebugMode && false;
@@ -45,32 +45,25 @@ class GamePlaybackManager extends WrapperNoEvents
     }
   }
 
-  void playbackAngles() {
-    if ((game.playState == PlayState.playbackMode) &&
+  void _playbackAngles() {
+    if (game.playState == PlayState.playbackMode &&
         game.isLive &&
-        game.world.inactivityMonitor.framesRendered > 30) {
-      // && isLive && overlays.isActive(GameScreen.startDialogKey)
-      if (_playbackModeCounter == -1) {
-        _playbackModeCounter++;
-        game.lifecycle.startRegularItems();
-      }
-      while (!world.deathManager.doingLevelResetFlourish &&
-          _playbackModeCounter < storedMoves.length &&
-          game.session.stopwatchMilliSeconds >
-              storedMoves[_playbackModeCounter][0]) {
-        world.dragManager.setMazeAngle(storedMoves[_playbackModeCounter][1]);
-        _playbackModeCounter++;
-      }
-      if (!world.deathManager.doingLevelResetFlourish &&
-          game.session.stopwatchMilliSeconds > 20000) {
+        !world.deathManager.doingLevelResetFlourish) {
+      final int stopwatch = game.session.stopwatchMilliSeconds;
+      if (stopwatch > 20000) {
         game.reset(); //if stuck, reset
+        return;
       }
+      while (_counter + 1 < storedMoves.length &&
+          storedMoves[_counter + 1][0] < stopwatch) {
+        _counter++;
+      }
+      world.dragManager.setMazeAngle(storedMoves[_counter][1]);
     }
   }
 
   void resetPlayback() {
-    //audioController.soLoudReset();
-    _playbackModeCounter = -1;
+    _counter = 0;
     _recordedMovesLive.clear();
   }
 
@@ -84,7 +77,7 @@ class GamePlaybackManager extends WrapperNoEvents
 
   @override
   void update(double dt) {
-    playbackAngles();
+    _playbackAngles();
     super.update(dt);
   }
 }

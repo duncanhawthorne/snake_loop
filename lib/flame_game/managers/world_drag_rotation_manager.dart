@@ -36,7 +36,7 @@ class WorldDragRotationManager {
     //stop any rotation effect added to camera
     //note, still leaves flourish variable hot, so fix below
     removeEffects(game.camera.viewfinder);
-    setMazeAngle(0);
+    setMazeAngle(0, noStartRegularItems: true);
     _cameraRotatable = true;
   }
 
@@ -86,10 +86,6 @@ class WorldDragRotationManager {
   void _moveMazeAngleByDelta(double angleDelta) {
     if (_cameraRotatable && game.isLive && game.playState == PlayState.gaming) {
       setMazeAngle(cameraAngle + angleDelta);
-      if (!world.deathManager.doingLevelResetFlourish &&
-          !game.session.isWonOrLost) {
-        game.lifecycle.startRegularItems();
-      }
     }
   }
 
@@ -107,7 +103,12 @@ class WorldDragRotationManager {
 
   double _debugFakeAngle = 0;
 
-  void setMazeAngle(double angle) {
+  void setMazeAngle(double angle, {bool noStartRegularItems = false}) {
+    if (!noStartRegularItems &&
+        !world.deathManager.doingLevelResetFlourish &&
+        !game.session.isWonOrLost) {
+      game.lifecycle.startRegularItems();
+    }
     GamePlaybackManager.recordMode ? game.playback.recordAngle(angle) : null;
     cameraAngle = angle;
     downDirection
