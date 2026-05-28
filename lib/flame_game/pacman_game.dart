@@ -14,14 +14,15 @@ import '../audio/sounds.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
+import '../utils/helper.dart';
 import '../utils/src/workarounds.dart';
 import 'components/physics_ball.dart';
 import 'game_screen.dart';
-import 'maze/maze.dart';
 import 'managers/game_dialog_manager.dart';
 import 'managers/game_lifecycle.dart';
 import 'managers/game_playback_manager.dart';
 import 'managers/game_session.dart';
+import 'maze/maze.dart';
 import 'pacman_world.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -46,7 +47,7 @@ const double kVirtualGameSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld>
     with
-    // ignore: always_specify_types
+        // ignore: always_specify_types
         HasQuadTreeCollisionDetection,
         SingleGameInstance,
         HasTimeScale {
@@ -57,13 +58,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     required this.audioController,
     required this.appLifecycleStateNotifier,
   }) : super(
-    world: PacmanWorld(),
-    camera: CameraComponent.withFixedResolution(
-      width: kVirtualGameSize,
-      height: kVirtualGameSize,
-    ),
-    zoom: flameGameZoom * _visualZoomMultiplier,
-  ) {
+         world: PacmanWorld(),
+         camera: CameraComponent.withFixedResolution(
+           width: kVirtualGameSize,
+           height: kVirtualGameSize,
+         ),
+         zoom: flameGameZoom * _visualZoomMultiplier,
+       ) {
     this.mazeId = mazeId;
   }
 
@@ -107,10 +108,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final GameSession session = GameSession();
   final GameLifecycle lifecycle = GameLifecycle();
-  late final GamePlaybackManager playback = GamePlaybackManager()
-    ..game = this;
-  late final GameDialogManager dialogManager = GameDialogManager()
-    ..game = this;
+  late final GamePlaybackManager playback = GamePlaybackManager()..game = this;
+  late final GameDialogManager dialogManager = GameDialogManager()..game = this;
 
   bool get isLive => !paused && isLoaded && isMounted;
 
@@ -195,9 +194,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   set playState(PlayState s) => _setState(s);
 
   void _setState(PlayState s) {
-    if (_playState == s && s == PlayState.gaming) {
-      return;
-    }
+    logGlobal(s);
+    final PlayState origState = _playState;
     _playState = s;
     switch (s) {
       case PlayState.playbackMode:
@@ -211,7 +209,18 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       case PlayState.gaming:
         playback.disable();
         dialogManager.cleanDialogs();
-        start();
+        if (origState == PlayState.levelChooseScreen) {
+          start();
+        }
+      case PlayState.flourish:
+        null;
+      case PlayState.unflourish:
+        assert(origState == PlayState.flourish);
+        if (playback.isPlaybackAppropriate()) {
+          playState = PlayState.playbackMode;
+        } else {
+          playState = PlayState.gaming;
+        }
     }
   }
 }
@@ -224,4 +233,4 @@ Vector2 _sanitizeScreenSize(Vector2 size) {
   }
 }
 
-enum PlayState { playbackMode, levelChooseScreen, gaming }
+enum PlayState { playbackMode, levelChooseScreen, gaming, flourish, unflourish }

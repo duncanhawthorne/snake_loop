@@ -34,32 +34,28 @@ class GamePlaybackManager extends WrapperNoEvents
   }
 
   void recordAngle(double angle) {
-    if (recordMode && !(game.playState == PlayState.playbackMode)) {
-      _recordedMovesLive.add(<double>[
-        (game.session.stopwatchMilliSeconds).toDouble(),
-        angle,
-      ]);
-      if (_recordedMovesLive.length % 100 == 0) {
-        logGlobal(_recordedMovesLive);
-      }
+    if (!(recordMode && !(game.playState == PlayState.playbackMode))) return;
+    _recordedMovesLive.add(<double>[
+      (game.session.stopwatchMilliSeconds).toDouble(),
+      angle,
+    ]);
+    if (_recordedMovesLive.length % 100 == 0) {
+      logGlobal(_recordedMovesLive);
     }
   }
 
   void _playbackAngles() {
-    if (game.playState == PlayState.playbackMode &&
-        game.isLive &&
-        !world.deathManager.doingLevelResetFlourish) {
-      final int stopwatch = game.session.stopwatchMilliSeconds;
-      if (stopwatch > 20000) {
-        game.reset(); //if stuck, reset
-        return;
-      }
-      while (_counter + 1 < storedMoves.length &&
-          storedMoves[_counter + 1][0] < stopwatch) {
-        _counter++;
-      }
-      world.dragManager.setMazeAngle(storedMoves[_counter][1]);
+    if (!(game.playState == PlayState.playbackMode && game.isLive)) return;
+    final int stopwatch = game.session.stopwatchMilliSeconds;
+    if (stopwatch > 20000) {
+      game.reset(); //if stuck, reset
+      return;
     }
+    while (_counter + 1 < storedMoves.length &&
+        storedMoves[_counter + 1][0] < stopwatch) {
+      _counter++;
+    }
+    world.dragManager.setMazeAngle(storedMoves[_counter][1]);
   }
 
   void resetPlayback() {

@@ -8,6 +8,7 @@ import '../effects/null_effect.dart';
 import '../effects/remove_effects.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze/maze.dart';
+import '../pacman_game.dart';
 import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';
@@ -143,7 +144,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _dieFromGhost() {
-    if (world.deathManager.doingLevelResetFlourish) {
+    if (game.playState == PlayState.flourish) {
       // avoid race condition
       // already doing a level reset flourish from somewhere else
       return;
@@ -158,7 +159,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       }
       world.pacmans.pacmanDyingNotifier.value++;
       if (world.pacmans.pacmanDeathIsFinalPacman) {
-        world.deathManager.doingLevelResetFlourish = true;
+        game.playState = PlayState.flourish;
         game.lifecycle.stopRegularItems();
       }
       add(
@@ -173,9 +174,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void _dieFromGhostActionAfterDeathAnimation() {
     if (current == CharacterState.dead && !game.session.isWonOrLost) {
       if (world.pacmans.pacmanDeathIsFinalPacman) {
-        if (world.deathManager.doingLevelResetFlourish) {
-          // must test doingLevelResetFlourish
-          // as could have been removed by reset during delay
+        if (game.playState == PlayState.flourish) {
+          /// must test [PlayState.flourish]
+          /// as could have been removed by reset during delay
           game.session.numberOfDeathsNotifier.value++; //score counting deaths
           world.deathManager.resetAfterPacmanDeath(this);
         }

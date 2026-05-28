@@ -10,8 +10,13 @@ class WorldDeathManager extends WrapperNoEvents
     with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
   WorldDeathManager();
 
-  bool doingLevelResetFlourish = false;
   static const bool _slideCharactersAfterPacmanDeath = true;
+
+  void _resetFlourishState() {
+    if (game.playState == PlayState.flourish) {
+      game.playState = PlayState.unflourish;
+    }
+  }
 
   void resetAfterPacmanDeath(Pacman dyingPacman) {
     _resetSlideAfterPacmanDeath(dyingPacman);
@@ -29,12 +34,12 @@ class WorldDeathManager extends WrapperNoEvents
         _resetInstantAfterPacmanDeath();
       }
     } else {
-      doingLevelResetFlourish = false;
+      _resetFlourishState();
     }
   }
 
   void _resetInstantAfterPacmanDeath() {
-    if (doingLevelResetFlourish) {
+    if (game.playState == PlayState.flourish) {
       if (game.level.infLives) {
         game.session.numberOfDeathsNotifier.value = 0;
         world.pacmans.pacmanDyingNotifier.value = 0;
@@ -42,7 +47,7 @@ class WorldDeathManager extends WrapperNoEvents
       world.pacmans.resetInstantAfterPacmanDeath();
       world.ghosts.resetInstantAfterPacmanDeath();
       world.dragManager.reset();
-      doingLevelResetFlourish = false;
+      _resetFlourishState();
       if (game.playState == PlayState.playbackMode) {
         game.reset();
       } else {
@@ -53,6 +58,6 @@ class WorldDeathManager extends WrapperNoEvents
 
   @override
   Future<void> reset() async {
-    doingLevelResetFlourish = false;
+    _resetFlourishState();
   }
 }

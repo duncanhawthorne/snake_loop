@@ -92,7 +92,6 @@ class GhostSiren extends WrapperNoEvents
         // timer cancelled already here
         assert(!game.session.isWonOrLost);
         assert(!world.pacmans.isMounted || world.pacmans.anyAlivePacman);
-        assert(!world.deathManager.doingLevelResetFlourish);
         assert(
           game.playState == PlayState.gaming ||
               game.playState == PlayState.playbackMode,

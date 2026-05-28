@@ -83,7 +83,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
 Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
   return IconButton(
     onPressed: () {
-      game.playState == PlayState.playbackMode
+      game.overlays.activeOverlays.contains(GameScreen.beginDialogKey)
           ? null
           : game.dialogManager.toggleDialog(GameScreen.startDialogKey);
     },

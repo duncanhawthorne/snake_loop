@@ -28,6 +28,7 @@ class WorldDragRotationManager {
   }
 
   void resetSlide(Function() callback) {
+    assert(game.playState == PlayState.flourish);
     _cameraRotatable = false;
     resetSlideAngle(game.camera.viewfinder, onComplete: callback);
   }
@@ -105,7 +106,7 @@ class WorldDragRotationManager {
 
   void setMazeAngle(double angle, {bool noStartRegularItems = false}) {
     if (!noStartRegularItems &&
-        !world.deathManager.doingLevelResetFlourish &&
+        game.playState != PlayState.flourish &&
         !game.session.isWonOrLost) {
       game.lifecycle.startRegularItems();
     }
