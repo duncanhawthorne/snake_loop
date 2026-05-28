@@ -10,10 +10,10 @@ import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
-import 'game_playback_manager.dart';
+import 'playback.dart';
 
-class WorldDragRotationManager {
-  WorldDragRotationManager({required this.game, required this.world});
+class DragRotation {
+  DragRotation({required this.game, required this.world});
 
   PacmanGame game;
   PacmanWorld world;
@@ -113,7 +113,7 @@ class WorldDragRotationManager {
         !game.session.isWonOrLost) {
       game.lifecycle.startRegularItems();
     }
-    GamePlaybackManager.recordMode ? game.playback.recordAngle(angle) : null;
+    Playback.recordMode ? game.playback.recordAngle(angle) : null;
     cameraAngle = angle;
     downDirection
       ..setValues(-sin(angle), cos(angle))

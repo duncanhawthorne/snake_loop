@@ -6,9 +6,9 @@ import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
-class WorldDeathManager extends WrapperNoEvents
+class DeathReset extends WrapperNoEvents
     with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
-  WorldDeathManager();
+  DeathReset();
 
   static const bool _slideCharactersAfterPacmanDeath = true;
 
@@ -47,7 +47,7 @@ class WorldDeathManager extends WrapperNoEvents
       world.pacmans.resetInstantAfterPacmanDeath();
       world.ghosts.resetInstantAfterPacmanDeath();
       world.dragManager.reset();
-      world.inactivityMonitor.reset();
+      world.autoPauser.reset();
       _resetFlourishState();
       if (game.playState == PlayState.playbackMode) {
         game.reset();

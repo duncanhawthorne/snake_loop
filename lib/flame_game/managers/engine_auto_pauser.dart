@@ -7,7 +7,7 @@ import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
-class GameInactivityMonitor extends WrapperNoEvents
+class EngineAutoPauser extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   int _framesRendered = 0;
 

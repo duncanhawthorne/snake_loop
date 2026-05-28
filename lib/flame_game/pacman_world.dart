@@ -13,9 +13,9 @@ import 'components/pellet_layer.dart';
 import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
-import 'managers/game_inactivity_monitor.dart';
-import 'managers/world_death_manager.dart';
-import 'managers/world_drag_rotation_manager.dart';
+import 'managers/death_reset.dart';
+import 'managers/drag_rotation.dart';
+import 'managers/engine_auto_pauser.dart';
 import 'pacman_game.dart';
 
 /// The world is where you place all the components that should live inside of
@@ -43,10 +43,7 @@ class PacmanWorld extends Forge2DWorld
 
   final Vector2 gravitySign = Vector2.zero();
 
-  late final WorldDragRotationManager dragManager = WorldDragRotationManager(
-    game: game,
-    world: this,
-  );
+  late final DragRotation dragManager = DragRotation(game: game, world: this);
 
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
   final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
@@ -57,8 +54,8 @@ class PacmanWorld extends Forge2DWorld
   final WallWrapper _walls = WallWrapper();
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
   final MovingWallWrapper _movingWalls = MovingWallWrapper();
-  final WorldDeathManager deathManager = WorldDeathManager();
-  final GameInactivityMonitor inactivityMonitor = GameInactivityMonitor();
+  final DeathReset deathReset = DeathReset();
+  final EngineAutoPauser autoPauser = EngineAutoPauser();
 
   void reset({bool firstRun = false}) {
     dragManager.reset();
@@ -87,12 +84,12 @@ class PacmanWorld extends Forge2DWorld
       _walls,
       _blocking,
       if (enableMovingWalls) _movingWalls,
-      deathManager,
-      inactivityMonitor,
+      deathReset,
+      autoPauser,
       game.session,
       game.lifecycle,
       game.playback,
-      game.dialogManager,
+      game.dialogs,
     ]);
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);

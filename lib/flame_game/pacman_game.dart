@@ -18,10 +18,10 @@ import '../utils/helper.dart';
 import '../utils/src/workarounds.dart';
 import 'components/physics_ball.dart';
 import 'game_screen.dart';
-import 'managers/game_dialog_manager.dart';
+import 'managers/dialog_manager.dart';
 import 'managers/game_lifecycle.dart';
-import 'managers/game_playback_manager.dart';
 import 'managers/game_session.dart';
+import 'managers/playback.dart';
 import 'maze/maze.dart';
 import 'pacman_world.dart';
 
@@ -108,8 +108,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final GameSession session = GameSession();
   final GameLifecycle lifecycle = GameLifecycle();
-  late final GamePlaybackManager playback = GamePlaybackManager()..game = this;
-  late final GameDialogManager dialogManager = GameDialogManager()..game = this;
+  late final Playback playback = Playback()..game = this;
+  late final DialogManager dialogs = DialogManager()..game = this;
 
   bool get isLive => !paused && isLoaded && isMounted;
 
@@ -200,16 +200,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     switch (s) {
       case PlayState.playbackMode:
         playback.enable();
-        dialogManager.cleanDialogs();
+        dialogs.cleanDialogs();
         overlays.add(GameScreen.beginDialogKey);
       case PlayState.levelChooseScreen:
         playback.disable();
-        dialogManager.cleanDialogs();
+        dialogs.cleanDialogs();
         overlays.add(GameScreen.startDialogKey);
       case PlayState.gaming:
         playback.disable();
         if (!session.isWonOrLost) {
-          dialogManager.cleanDialogs();
+          dialogs.cleanDialogs();
         }
         if (origState == PlayState.levelChooseScreen) {
           start();

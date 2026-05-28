@@ -10,8 +10,7 @@ import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
-class GamePlaybackManager extends WrapperNoEvents
-    with HasWorldReference<PacmanWorld> {
+class Playback extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
   late final PacmanGame game;
 
   int _counter = 0;

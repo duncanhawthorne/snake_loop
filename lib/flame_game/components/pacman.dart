@@ -178,7 +178,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           /// must test [PlayState.flourish]
           /// as could have been removed by reset during delay
           game.session.numberOfDeathsNotifier.value++; //score counting deaths
-          world.deathManager.resetAfterPacmanDeath(this);
+          world.deathReset.resetAfterPacmanDeath(this);
         }
       } else {
         assert(multipleSpawningPacmans);

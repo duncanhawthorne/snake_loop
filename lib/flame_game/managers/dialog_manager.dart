@@ -7,7 +7,7 @@ import '../game_screen.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
-class GameDialogManager extends WrapperNoEvents
+class DialogManager extends WrapperNoEvents
     with HasWorldReference<PacmanWorld> {
   late final PacmanGame game;
 

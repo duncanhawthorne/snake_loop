@@ -239,7 +239,7 @@ Widget rotatedTitle() {
 
 Widget resetWidget(BuildContext context, PacmanGame game) {
   return IconButton(
-    onPressed: () => game.dialogManager.toggleDialog(GameScreen.resetDialogKey),
+    onPressed: () => game.dialogs.toggleDialog(GameScreen.resetDialogKey),
     icon: const Icon(Icons.refresh, color: Palette.textColor),
   );
 }

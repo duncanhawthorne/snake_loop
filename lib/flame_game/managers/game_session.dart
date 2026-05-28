@@ -89,7 +89,7 @@ class GameSession extends WrapperNoEvents
         fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
       }
       game.playerProgress.saveLevelComplete(_getCurrentGameState());
-      game.dialogManager.cleanDialogs();
+      game.dialogs.cleanDialogs();
       game.overlays.add(GameScreen.wonDialogKey);
     }
   }
@@ -99,7 +99,7 @@ class GameSession extends WrapperNoEvents
     assert(game.session.isWonOrLost);
     assert(game.lifecycle.stopwatchStarted);
     game.audioController.stopAllSounds();
-    game.dialogManager.cleanDialogs();
+    game.dialogs.cleanDialogs();
     game.overlays.add(GameScreen.loseDialogKey);
   }
 
