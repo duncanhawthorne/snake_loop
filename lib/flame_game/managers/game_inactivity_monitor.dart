@@ -30,7 +30,7 @@ class GameInactivityMonitor extends WrapperNoEvents
         } else if (game.playState == PlayState.playbackMode) {
           //want to continue playback in playbackMode
           timer.cancel();
-        } else if (game.lifecycle.stopwatch.isRunning()) {
+        } else if (game.lifecycle.stopwatchStarted) {
           //some game activity has happened, no need to pause, just cancel timer
           timer.cancel();
         } else if (_framesRendered >= 60) {

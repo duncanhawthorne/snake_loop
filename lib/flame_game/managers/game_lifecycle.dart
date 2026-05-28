@@ -11,7 +11,9 @@ class GameLifecycle extends WrapperNoEvents
   VoidCallback? _lifecycleListenerRef;
   bool _regularItemsStarted = false;
 
-  bool stopwatchStarted = false;
+  bool _stopwatchStarted = false;
+
+  bool get stopwatchStarted => _stopwatchStarted;
   final Timer stopwatch = Timer(double.infinity);
 
   void noteThatSomeRegularItemHasStopped() {
@@ -41,15 +43,15 @@ class GameLifecycle extends WrapperNoEvents
     if (!_regularItemsStarted) {
       game.audioController.workaroundiOSSafariAudioOnUserInteraction();
       _regularItemsStarted = true;
-      game.lifecycle.stopwatchStarted = true; //once per reset
-      game.lifecycle.stopwatch.resume();
+      _stopwatchStarted = true; //once per reset
+      stopwatch.resume();
       world.ghosts.startRegularItems();
     }
   }
 
   void stopRegularItems() {
     noteThatSomeRegularItemHasStopped();
-    game.lifecycle.stopwatch.pause();
+    stopwatch.pause();
     world.ghosts.stopRegularItems();
   }
 
@@ -69,7 +71,7 @@ class GameLifecycle extends WrapperNoEvents
     stopwatch
       ..pause()
       ..reset();
-    stopwatchStarted = false;
+    _stopwatchStarted = false;
   }
 
   @override
