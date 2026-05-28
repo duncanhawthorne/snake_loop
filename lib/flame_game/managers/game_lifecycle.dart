@@ -98,6 +98,7 @@ class GameLifecycle extends WrapperNoEvents
     if (_lifecycleListenerRef != null) {
       game.appLifecycleStateNotifier.removeListener(_lifecycleListenerRef!);
     }
+    game.appLifecycleStateNotifier.dispose();
     super.onRemove();
   }
 

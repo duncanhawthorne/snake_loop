@@ -128,7 +128,7 @@ class DragRotation {
         !game.session.isWonOrLost) {
       game.lifecycle.startRegularItems();
     }
-    Playback.recordMode ? game.playback.recordAngle(angle) : null;
+    Playback.recordMode ? game.playback.recordAngle(angle) : null; //disabled
     cameraAngle = angle;
     downDirection
       ..setValues(-sin(angle), cos(angle))
