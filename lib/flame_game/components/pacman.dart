@@ -151,9 +151,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
     if (!typical) return;
     if (!game.session.isWonOrLost) {
-      game.play(SfxType.pacmanDeath);
       current = CharacterState.dead;
       setPhysicsState(PhysicsState.none);
+      game.play(SfxType.pacmanDeath);
       if (_freezeGhostsOnKillPacman) {
         world.ghosts.disconnectGhostsFromBalls();
       }
