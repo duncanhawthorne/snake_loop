@@ -8,11 +8,11 @@ import '../game_screen.dart';
 import '../maze/maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
+import 'base_component.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_head.dart';
-import 'wrapper_no_events.dart';
 
 final Paint snakePaint = Paint()..color = Palette.seed.color;
 final Paint snakeWarningPaint = Paint()..color = Palette.warning.color;
@@ -23,7 +23,7 @@ final int snakeBitsOverlaps = 3;
 final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
 final Vector2 offscreen = Vector2(400, 400);
 
-class SnakeWrapper extends WrapperNoEvents
+class SnakeWrapper extends BaseComponent
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
   final int priority = 1;
@@ -52,9 +52,9 @@ class SnakeWrapper extends WrapperNoEvents
 
   bool get _activeGameplay =>
       game.isLive &&
-      game.stopwatchMilliSeconds > 0 &&
+      game.session.stopwatchMilliSeconds > 0 &&
       !(game.overlays.isActive(GameScreen.loseDialogKey)) &&
-      !game.isWonOrLost;
+      !game.session.isWonOrLost;
 
   final Vector2 _volatileV2 = Vector2.all(0);
   Vector2 getSafePositionForFood() {
@@ -115,7 +115,6 @@ class SnakeWrapper extends WrapperNoEvents
   }
 
   void addToStartOfSnake() {
-    assert(!snakeHead.atStartingPosition);
     if (tooManyBits) {
       return;
     }
@@ -136,7 +135,7 @@ class SnakeWrapper extends WrapperNoEvents
     world.pellets.pelletsRemainingNotifier.value =
         1 + 2 * (game.level.number - 1);
     _snakeBitsLimit = 3 * snakeBitsOverlaps;
-    game.numberOfDeathsNotifier.value = 0;
+    game.session.numberOfDeathsNotifier.value = 0;
   }
 
   @override

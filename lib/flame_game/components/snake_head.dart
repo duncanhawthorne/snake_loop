@@ -51,8 +51,8 @@ class SnakeHead extends SpriteComponent
   void _updateAngle() {
     angle =
         -atan2(
-          world.dragManager.downDirection.x,
-          world.dragManager.downDirection.y,
+          world.dragRotate.downDirection.x,
+          world.dragRotate.downDirection.y,
         ) +
         tau / 2;
   }
@@ -65,7 +65,7 @@ class SnakeHead extends SpriteComponent
   bool get atStartingPosition => position.x == 0 && position.y == 0;
 
   void move(double dt) {
-    position.addScaled(world.dragManager.downDirection, -dt);
+    position.addScaled(world.dragRotate.downDirection, -dt);
     _updateAngle();
   }
 
@@ -85,11 +85,11 @@ class SnakeHead extends SpriteComponent
       case SnakeBodyBit():
         if (other != snakeWrapper.snakeNeck) {
           // don't count collisions with snakeBit just added
-          game.numberOfDeathsNotifier.value++;
+          game.session.numberOfDeathsNotifier.value++;
           logGlobal("trail intersect");
         }
       case WallRectangleVisual():
-        game.numberOfDeathsNotifier.value++;
+        game.session.numberOfDeathsNotifier.value++;
     }
   }
 
@@ -98,8 +98,8 @@ class SnakeHead extends SpriteComponent
     food
       ..position = snakeWrapper.getSafePositionForFood()
       ..angle = -atan2(
-        world.dragManager.downDirection.x,
-        world.dragManager.downDirection.y,
+        world.dragRotate.downDirection.x,
+        world.dragRotate.downDirection.y,
       );
     world.pellets.pelletsRemainingNotifier.value -= 1;
   }

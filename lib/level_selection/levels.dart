@@ -26,17 +26,8 @@ class Levels {
   }
 
   GameLevel getLevel(int levelNum) {
-    assert(
-      levelNum <= maxLevel && levelNum >= minLevel ||
-          levelNum == playbackModeLevel,
-    );
-    bool playbackMode = false;
-    if (levelNum == playbackModeLevel) {
-      levelNum = firstRealLevel;
-      playbackMode = true;
-    }
     final GameLevel result = (
-      number: playbackMode ? playbackModeLevel : levelNum,
+      number: levelNum,
       maxAllowedDeaths: 1,
       superPelletsEnabled: levelNum <= 1 ? true : false,
       multipleSpawningGhosts: levelNum <= 2 ? false : true,

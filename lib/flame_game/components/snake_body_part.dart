@@ -53,8 +53,8 @@ class SnakeBodyBit extends SpriteComponent
   void _updateAngle() {
     angle =
         -atan2(
-          world.dragManager.downDirection.x,
-          world.dragManager.downDirection.y,
+          world.dragRotate.downDirection.x,
+          world.dragRotate.downDirection.y,
         ) +
         tau / 2;
   }

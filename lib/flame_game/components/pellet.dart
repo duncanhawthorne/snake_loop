@@ -49,8 +49,8 @@ class Pellet extends SpriteComponent
     await super.onLoad();
     sprite = await Sprite.load('apple.png');
     angle = -atan2(
-      world.dragManager.downDirection.x,
-      world.dragManager.downDirection.y,
+      world.dragRotate.downDirection.x,
+      world.dragRotate.downDirection.y,
     );
     add(_hitbox);
   }

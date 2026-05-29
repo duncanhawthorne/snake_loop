@@ -26,24 +26,21 @@ class StartDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(!game.playbackMode);
+    assert(!(game.playState == PlayState.playbackMode));
     return popupDialog(
       children: <Widget>[
         rotatedTitle(),
-        ...game.playbackMode
-            ? <Widget>[const SizedBox.shrink()]
-            : <Widget>[
-                levelSelector(context, game),
-                mazeSelector(context, game),
-              ],
+        ...<Widget>[levelSelector(context, game), mazeSelector(context, game)],
         bottomRowWidget(
-          children: game.stopwatchStarted && !game.playbackMode
+          children: game.lifecycle.stopwatchStarted
               ? <Widget>[
                   TextButton(
                     style: buttonStyle(borderColor: Palette.warning.color),
                     onPressed: () {
                       game.overlays.remove(GameScreen.startDialogKey);
-                      game.resetAndStart();
+                      game
+                        ..resetAndStart()
+                        ..playState = PlayState.gaming;
                     },
                     child: const Text('Reset', style: textStyleBody),
                   ),
@@ -59,19 +56,10 @@ class StartDialog extends StatelessWidget {
                   TextButton(
                     style: buttonStyle(),
                     onPressed: () {
-                      if (game.playbackMode) {
-                        context.go(
-                          '/?$levelUrlKey=${Levels.minLevel}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}',
-                        );
-                      } else {
-                        game.overlays.remove(GameScreen.startDialogKey);
-                        game.start();
-                      }
+                      game.overlays.remove(GameScreen.startDialogKey);
+                      game.playState = PlayState.gaming;
                     },
-                    child: Text(
-                      game.playbackMode ? 'Start' : 'Play',
-                      style: textStyleBody,
-                    ),
+                    child: const Text('Play', style: textStyleBody),
                   ),
                 ],
         ),
@@ -252,7 +240,7 @@ Widget rotatedTitle() {
 
 Widget resetWidget(BuildContext context, PacmanGame game) {
   return IconButton(
-    onPressed: () => game.toggleOverlay(GameScreen.resetDialogKey),
+    onPressed: () => game.dialogs.toggle(GameScreen.resetDialogKey),
     icon: const Icon(Icons.refresh, color: Palette.textColor),
   );
 }
