@@ -12,8 +12,6 @@ import '../pacman_world.dart';
 /// positions, and resetting the game state.
 class DeathReset extends WrapperNoEvents
     with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
-  DeathReset();
-
   static const bool _slideCharactersAfterPacmanDeath = true;
 
   /// Initiates the reset process after Pacman dies.
@@ -27,7 +25,7 @@ class DeathReset extends WrapperNoEvents
     game.audioController.stopSound(SfxType.ghostsScared);
     if (!game.session.isWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
-        world.dragManager.resetSlide(_resetInstantAfterPacmanDeath);
+        world.dragRotate.resetSlide(_resetInstantAfterPacmanDeath);
         dyingPacman.resetSlideAfterDeath();
         world.ghosts.resetSlideAfterPacmanDeath();
       } else {
@@ -47,7 +45,7 @@ class DeathReset extends WrapperNoEvents
       }
       world.pacmans.resetInstantAfterPacmanDeath();
       world.ghosts.resetInstantAfterPacmanDeath();
-      world.dragManager.reset();
+      world.dragRotate.reset();
       world.autoPauser.reset();
       _resetFlourishState();
       if (game.playState == PlayState.playbackMode) {

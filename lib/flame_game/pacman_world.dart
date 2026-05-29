@@ -43,7 +43,7 @@ class PacmanWorld extends Forge2DWorld
 
   final Vector2 gravitySign = Vector2.zero();
 
-  late final DragRotation dragManager = DragRotation(game: game, world: this);
+  late final DragRotation dragRotate = DragRotation(game: game, world: this);
 
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
   final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
@@ -58,7 +58,7 @@ class PacmanWorld extends Forge2DWorld
   final EngineAutoPauser autoPauser = EngineAutoPauser();
 
   void reset({bool firstRun = false}) {
-    dragManager.reset();
+    dragRotate.reset();
     if (!firstRun) {
       for (final WrapperNoEvents wrapper in wrappers) {
         assert(wrapper.isLoaded, wrapper);
@@ -99,7 +99,7 @@ class PacmanWorld extends Forge2DWorld
 
   @override
   void onRemove() {
-    dragManager.clear();
+    dragRotate.reset();
     wrappers.clear();
     super.onRemove();
   }
@@ -107,24 +107,24 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
-    dragManager.canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
+    dragRotate.canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
   }
 
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    dragManager.onDragStart(event);
+    dragRotate.onDragStart(event);
   }
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    dragManager.onDragUpdate(event);
+    dragRotate.onDragUpdate(event);
   }
 
   @override
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
-    dragManager.onDragEnd(event);
+    dragRotate.onDragEnd(event);
   }
 }

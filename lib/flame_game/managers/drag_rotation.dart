@@ -28,7 +28,7 @@ class DragRotation {
   bool _cameraRotatable = true;
 
   /// Clears any tracked drag information.
-  void clear() {
+  void _clear() {
     _fingersLastDragAngle.clear();
   }
 
@@ -46,6 +46,7 @@ class DragRotation {
     removeEffects(game.camera.viewfinder);
     setMazeAngle(0, noStartRegularItems: true);
     _cameraRotatable = true;
+    _clear();
   }
 
   /// Handles the start of a drag event to begin rotating the maze.

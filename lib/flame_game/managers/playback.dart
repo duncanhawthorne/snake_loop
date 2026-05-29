@@ -63,7 +63,7 @@ class Playback extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
         storedMoves[_counter + 1][0] < stopwatch) {
       _counter++;
     }
-    world.dragManager.setMazeAngle(storedMoves[_counter][1]);
+    world.dragRotate.setMazeAngle(storedMoves[_counter][1]);
   }
 
   /// Resets the playback counter and cleared any recorded live moves.

@@ -22,23 +22,24 @@ class GameSession extends WrapperNoEvents
 
   static const int _deathPenaltyMillis = 5000;
 
+  int get _deathPenalty => (game.level.isTutorial
+      ? 0
+      : min(game.level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
+            _deathPenaltyMillis);
+
   /// Returns the current game time in milliseconds, including death penalties.
   int get stopwatchMilliSeconds =>
-      (game.lifecycle.stopwatch.current * 1000).toInt() +
-      (game.level.isTutorial
-          ? 0
-          : min(game.level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
-                _deathPenaltyMillis);
+      (game.lifecycle.stopwatch.current * 1000).toInt() + _deathPenalty;
 
   /// Returns true if the player has won the game (all items collected).
-  bool get isWon => world.pellets.winState;
+  bool get _isWon => world.pellets.winState;
 
   /// Returns true if the player has lost the game (exceeded max allowed deaths).
-  bool get isLost =>
+  bool get _isLost =>
       numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths;
 
   /// Returns true if the game is over, either by winning or losing.
-  bool get isWonOrLost => isWon || isLost;
+  bool get isWonOrLost => _isWon || _isLost;
 
   VoidCallback? _deathsListenerRef;
   VoidCallback? _itemsListenerRef;
@@ -65,14 +66,14 @@ class GameSession extends WrapperNoEvents
   void _winOrLoseGameListener() {
     assert(!game.lifecycle.stopwatchStarted); //so no instant trigger
     _deathsListenerRef = () {
-      if (isLost &&
+      if (_isLost &&
           game.lifecycle.stopwatchStarted &&
           game.playState != PlayState.playbackMode) {
         _handleLoseGame();
       }
     };
     _itemsListenerRef = () {
-      if (isWon &&
+      if (_isWon &&
           game.lifecycle.stopwatchStarted &&
           game.playState != PlayState.playbackMode) {
         _handleWinGame();
