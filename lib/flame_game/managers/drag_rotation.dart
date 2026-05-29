@@ -106,7 +106,9 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
         game.isLive &&
         (game.playState == PlayState.gaming ||
             game.playState == PlayState.flourish)) {
-      setMazeAngle(cameraAngle + angleDelta);
+      setMazeAngle(
+        cameraAngle + (_reversedRotation ? -angleDelta : angleDelta),
+      );
     }
   }
 
@@ -114,6 +116,8 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
   final Vector2 downDirection = Vector2.zero();
 
   static const bool _updateGravityOnRotation = true;
+
+  static const bool _reversedRotation = false;
 
   static const bool _kRotatingCamera = !kDebugMode || true;
 
