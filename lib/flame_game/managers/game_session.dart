@@ -130,11 +130,9 @@ class GameSession extends BaseComponent
     if (_deathsListenerRef != null) {
       numberOfDeathsNotifier.removeListener(_deathsListenerRef!);
     }
-    numberOfDeathsNotifier.dispose();
     if (_itemsListenerRef != null) {
       itemsRemainingNotifier.removeListener(_itemsListenerRef!);
     }
-    itemsRemainingNotifier.dispose();
     super.onRemove();
   }
 }

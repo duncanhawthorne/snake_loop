@@ -17,33 +17,49 @@ import 'managers/drag_rotation.dart';
 import 'managers/engine_auto_pauser.dart';
 import 'pacman_game.dart';
 
-/// The world is where you place all the components that should live inside of
-/// the game, like the player, enemies, obstacles and points for example.
+/// The game world responsible for managing the lifecycle, physics, and hierarchy
+/// of all active gameplay elements in the Pacman game.
 ///
-/// The [PacmanWorld] has two mixins added to it:
-///  - The [DragCallbacks] that makes it possible to react to taps and drags
-///  (or mouse clicks) on the world.
-///  - The [HasGameReference] that gives the world access to a variable called
-///  `game`, which is a reference to the game class that the world is attached
-///  to.
-
+/// This includes the player, enemies, obstacles, and game state managers.
+///
+/// **Mixins:**
+/// * [DragCallbacks]: Enables the world to intercept and respond to user touch,
+///   drag, and mouse interactions.
+/// * [HasGameReference]: Provides direct access to the parent [PacmanGame]
+///   instance via the `game` property.
 class PacmanWorld extends Forge2DWorld
     with HasGameReference<PacmanGame>, DragCallbacks {
+  /// Private constructor to enforce the singleton pattern.
   PacmanWorld._();
 
+  /// Factory constructor that returns the single initialized instance of [PacmanWorld].
+  ///
+  /// Throws an [AssertionError] if an attempt is made to instantiate more than once.
   factory PacmanWorld() {
-    assert(_instance == null);
+    assert(
+      _instance == null,
+      'PacmanWorld is a singleton and can only be initialized once.',
+    );
     _instance ??= PacmanWorld._();
     return _instance!;
   }
 
-  ///ensures singleton [PacmanWorld]
+  /// The internal singleton instance of the world.
   static PacmanWorld? _instance;
 
+  /// Vector tracking the directional sign of the world's gravity.
   final Vector2 gravitySign = Vector2.zero();
 
+  /// Internal tracking list containing all system managers and game wrappers.
   final List<BaseComponent> _wrappers = <BaseComponent>[];
+
+  /// A passive visual container used to hold components that do not require
+  /// gesture event dispatching.
   final BaseComponent _noEvents = BaseComponent();
+
+  // ==========================================
+  // Core Component & Manager Definitions
+  // ==========================================
 
   final Pacmans pacmans = Pacmans();
   final Ghosts ghosts = Ghosts();
@@ -55,15 +71,23 @@ class PacmanWorld extends Forge2DWorld
   final EngineAutoPauser autoPauser = EngineAutoPauser();
   late final DragRotation dragRotate = DragRotation()..world = this;
 
+  /// Resets the game state for all managed wrappers.
+  ///
+  /// If [firstRun] is true, the reset cycle is skipped, as components are
+  /// expected to initialize to their default states natively during [onLoad].
   void reset({bool firstRun = false}) {
     if (!firstRun) {
       for (final BaseComponent wrapper in _wrappers) {
-        assert(wrapper.isLoaded, wrapper);
+        assert(
+          wrapper.isLoaded,
+          'Attempted to reset a component that has not finished loading: $wrapper',
+        );
         wrapper.reset();
       }
     }
   }
 
+  /// Signals all tracked wrappers to begin their primary game execution routines.
   void start() {
     for (final BaseComponent wrapper in _wrappers) {
       wrapper.start();
@@ -73,7 +97,11 @@ class PacmanWorld extends Forge2DWorld
   @override
   Future<void> onLoad() async {
     super.onLoad();
+
+    // Mount the non-event container directly to the world.
     add(_noEvents);
+
+    // Register all core gameplay elements, configuration layers, and systems.
     _wrappers.addAll(<BaseComponent>[
       pacmans,
       ghosts,
@@ -89,12 +117,15 @@ class PacmanWorld extends Forge2DWorld
       game.playback,
       game.dialogs,
     ]);
+
     for (final BaseComponent wrapper in _wrappers) {
-      /// Add inside [noEventsWrapper] to minimise number of components in world
-      /// Speeds up loops running through all child components
-      /// Especially on drag events deliverAtPoint
+      /// Optimization: Nesting wrappers inside [_noEvents] keeps the flat count
+      /// of root-level world components minimal. This speeds up Flame's internal
+      /// element tree traversals, significantly optimizing gesture hit-testing
+      /// methods like `deliverAtPoint` during drag interactions.
       _noEvents.add(wrapper);
     }
+
     reset(firstRun: true);
   }
 
@@ -103,6 +134,10 @@ class PacmanWorld extends Forge2DWorld
     _wrappers.clear();
     super.onRemove();
   }
+
+  // ==========================================
+  // Drag Input Event Handlers
+  // ==========================================
 
   @override
   void onDragStart(DragStartEvent event) {

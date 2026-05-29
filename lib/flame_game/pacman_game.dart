@@ -25,32 +25,33 @@ import 'managers/playback.dart';
 import 'maze/maze.dart';
 import 'pacman_world.dart';
 
-/// This is the base of the game which is added to the [GameWidget].
+/// The core physics-driven game loop class that mounts inside the [GameWidget].
 ///
-/// This class defines a few different properties for the game:
-///  - That it should have a [FixedResolutionViewport] containing
-///  a square of size [kVirtualGameSize]
-///  this means that even if you resize the window, the square itself will keep
-///  the defined virtual resolution.
-///  - That the default world that the camera is looking at should be the
-///  [PacmanWorld].
+/// This class handles the initialization, state management, and lifecycle events
+/// of the Pacman simulation. It configures:
+/// * A [FixedResolutionViewport] mapping to a square [kVirtualGameSize] canvas to
+///   ensure aspect ratio consistency across diverse device screens.
+/// * A specialized [Forge2DGame] simulation utilizing a dedicated [PacmanWorld].
+/// * Custom QuadTree broadphase collision optimizations appropriate for high-density maps.
 ///
-/// Note that both of the last are passed in to the super constructor, they
-/// could also be set inside of `onLoad` for example.
-
-// flame_forge2d has a maximum allowed speed for physical objects.
-// Reducing map size 30x, scaling up gravity 30x, & zooming 30x changes nothing,
-// but reduces chance of hitting maximum allowed speed
+/// Both the world and fixed-resolution camera configurations are directly initialized
+/// through the super constructor to guarantee stable object layout scaling upon instantiation.
+///
+/// Note flame_forge2d has a maximum allowed speed for physical objects.
+/// Reducing map size 30x, scaling up gravity 30x, & zooming 30x changes nothing,
+/// but reduces chance of hitting maximum allowed speed.
 const double flameGameZoom = 30.0 / spriteVsPhysicsScale;
 const double _visualZoomMultiplier = 0.92;
-const double kVirtualGameSize = 1700; //determines speed of game
+
+/// Determines the baseline layout coordinates and relative speed of the game.
+const double kVirtualGameSize = 1700;
 
 class PacmanGame extends Forge2DGame<PacmanWorld>
     with
-        // ignore: always_specify_types
-        HasQuadTreeCollisionDetection,
+        HasQuadTreeCollisionDetection<PacmanWorld>,
         SingleGameInstance,
         HasTimeScale {
+  /// Private generative constructor initialized by the singleton factory wrapper.
   PacmanGame._({
     required this.level,
     required int mazeId,
@@ -68,6 +69,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     this.mazeId = mazeId;
   }
 
+  /// Factory constructor managing a single global instance of [PacmanGame].
+  ///
+  /// On subsequent calls, instead of re-instantiating, it updates the mutable configuration properties
+  /// of the existing instance and issues an internal soft reset sequence.
   factory PacmanGame({
     required GameLevel level,
     required int mazeId,
@@ -92,18 +97,23 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     return _instance!;
   }
 
-  ///ensures singleton [PacmanGame]
+  /// Cached reference enforcing the singleton instance pattern.
   static PacmanGame? _instance;
 
-  /// What the properties of the level that is played has.
+  /// Holds structural metadata configuration relating to the current stage/level.
   GameLevel level;
 
   set mazeId(int id) => maze.mazeId = id;
 
   int get mazeId => maze.mazeId;
 
+  /// General audio controller handling sound effects, loops, and device integrations.
   final AudioController audioController;
+
+  /// Notifier handling application focus state changes from the OS host platform layer.
   final AppLifecycleStateNotifier appLifecycleStateNotifier;
+
+  /// Component mapping user persistent state progress records.
   final PlayerProgress playerProgress;
 
   final GameSession session = GameSession();
@@ -111,13 +121,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   late final Playback playback = Playback()..game = this;
   late final DialogManager dialogs = DialogManager()..game = this;
 
+  /// Evaluates whether the simulation frame is ready, running, and active inside the widget tree.
   bool get isLive => !paused && isLoaded && isMounted;
 
+  /// Universal source for random calculations.
   final Random random = Random();
 
   @override
   Color backgroundColor() => Palette.background.color;
 
+  /// Plays audio through the global [audioController].
   void play(SfxType type) {
     const bool soundOn = true;
     if (soundOn) {
@@ -126,16 +139,18 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   @override
-  Future<void> onGameResize(Vector2 size) async {
+  void onGameResize(Vector2 size) {
     camera.viewport = FixedResolutionViewport(
       resolution: _sanitizeScreenSize(size),
     );
     super.onGameResize(size);
   }
 
+  /// Resets game and world.
+  ///
+  /// * Set [firstRun] to `true` on initial canvas allocation to avoid resetting unbuilt items.
+  /// * Set [showStartDialog] to `true` to push standard overlays over the current viewport layer.
   void reset({bool firstRun = false, bool showStartDialog = false}) {
-    //audioController.soLoudReset();
-
     if (!firstRun) {
       assert(world.isLoaded);
       world.reset();
@@ -148,6 +163,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     }
   }
 
+  /// Orchestrates a clean state wipe sequence and immediately begins game loops.
   void resetAndStart() {
     reset();
     start();
@@ -156,7 +172,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void start() {
     audioController.workaroundiOSSafariAudioOnUserInteraction();
     play(SfxType.startMusic);
-    //resumeEngine();
     world.start();
   }
 
@@ -164,8 +179,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     setStatusBarColor(Palette.background.color);
   }
 
-  /// In the [onLoad] method you load different type of assets and set things
-  /// that only needs to be set once when the level starts up.
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -177,14 +190,14 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         maze.dimensions.mazeWidth,
         maze.dimensions.mazeHeight,
       ),
-    ); //assume maze size won't change
+    ); // assumes maze size won't change
     reset(firstRun: true, showStartDialog: true);
   }
 
   @override
   Future<void> onRemove() async {
-    super.onRemove();
     await audioController.stopAllSounds();
+    super.onRemove();
   }
 
   PlayState _playState = PlayState.playbackMode;
@@ -193,6 +206,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   set playState(PlayState s) => _setState(s);
 
+  /// State handler managing state shifts.
   void _setState(PlayState s) {
     logGlobal(s);
     final PlayState origState = _playState;
@@ -227,12 +241,12 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 }
 
+/// Helper recalculating appropriate canvas dimensions to ensure core square game area unchanged.
 Vector2 _sanitizeScreenSize(Vector2 size) {
-  if (size.x > size.y) {
-    return Vector2(kVirtualGameSize * size.x / size.y, kVirtualGameSize);
-  } else {
-    return Vector2(kVirtualGameSize, kVirtualGameSize * size.y / size.x);
-  }
+  final double aspectRatio = size.x / size.y;
+  return size.x > size.y
+      ? Vector2(kVirtualGameSize * aspectRatio, kVirtualGameSize)
+      : Vector2(kVirtualGameSize, kVirtualGameSize / aspectRatio);
 }
 
 enum PlayState { playbackMode, levelChooseScreen, gaming, flourish, unflourish }
