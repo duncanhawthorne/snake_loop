@@ -132,8 +132,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   /// Plays audio through the global [audioController].
   void play(SfxType type) {
-    // ignore: dead_code
     const bool soundOn = true;
+    // ignore: dead_code
     if (soundOn) {
       audioController.playSfx(type);
     }
