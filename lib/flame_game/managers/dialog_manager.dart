@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 
-import '../components/wrapper_no_events.dart';
+import '../components/base_component.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -10,8 +10,7 @@ import '../pacman_world.dart';
 /// Manages the display and cleaning of game dialog overlays.
 ///
 /// This includes start, lose, won, tutorial, reset, and debug dialogs.
-class DialogManager extends WrapperNoEvents
-    with HasWorldReference<PacmanWorld> {
+class DialogManager extends BaseComponent with HasWorldReference<PacmanWorld> {
   late final PacmanGame game;
 
   /// Removes all active game dialog overlays.

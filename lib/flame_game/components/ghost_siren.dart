@@ -6,12 +6,12 @@ import 'package:flutter/foundation.dart';
 import '../../utils/helper.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
+import 'base_component.dart';
 import 'ghost.dart';
 import 'ghost_layer.dart';
 import 'sprite_character.dart';
-import 'wrapper_no_events.dart';
 
-class GhostSiren extends WrapperNoEvents
+class GhostSiren extends BaseComponent
     with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
   late final Ghosts ghosts = world.ghosts;
   late final List<Ghost> ghostList = ghosts.ghostList;

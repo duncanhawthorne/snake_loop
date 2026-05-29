@@ -5,6 +5,7 @@ import 'package:flame/events.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../utils/constants.dart';
+import '../components/base_component.dart';
 import '../components/physics_ball.dart';
 import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
@@ -16,14 +17,11 @@ import 'playback.dart';
 ///
 /// This class handles the conversion of drag events into maze rotation,
 /// which in turn affects the gravity in the game world.
-class DragRotation {
-  DragRotation({required this.game, required this.world});
-
-  PacmanGame game;
-  PacmanWorld world;
+class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
+  late final PacmanWorld world;
 
   final Vector2 _eventOffset = Vector2.zero();
-  double canvasRadius = 1.0;
+  double _canvasRadius = 1.0;
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
   bool _cameraRotatable = true;
 
@@ -40,13 +38,20 @@ class DragRotation {
   }
 
   /// Resets the maze angle to zero instantly and stops any ongoing rotation effects.
-  void reset() {
+  @override
+  Future<void> reset() async {
     //stop any rotation effect added to camera
     //note, still leaves flourish variable hot, so fix below
     removeEffects(game.camera.viewfinder);
     setMazeAngle(0, noStartRegularItems: true);
     _cameraRotatable = true;
     _clear();
+  }
+
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    _canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
   }
 
   /// Handles the start of a drag event to begin rotating the maze.
@@ -69,7 +74,7 @@ class DragRotation {
       event.canvasStartPosition.y - game.canvasSize.y / 2,
     );
     final double eventVectorLengthProportion =
-        _eventOffset.length / canvasRadius;
+        _eventOffset.length / _canvasRadius;
     final double fingerCurrentDragAngle = atan2(_eventOffset.x, _eventOffset.y);
     // Need separate contains and null check due to isiOSWeb approach in onDragStart
     if (_fingersLastDragAngle.containsKey(event.pointerId)) {

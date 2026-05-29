@@ -6,15 +6,15 @@ import '../../audio/sounds.dart';
 import '../effects/remove_effects.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
+import 'base_component.dart';
 import 'game_character.dart';
 import 'ghost.dart';
 import 'ghost_siren.dart';
 import 'sprite_character.dart';
-import 'wrapper_no_events.dart';
 
 const int _kGhostScaredTimeMillis = 6000;
 
-class Ghosts extends WrapperNoEvents
+class Ghosts extends BaseComponent
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
   final int priority = 1;

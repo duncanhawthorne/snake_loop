@@ -5,16 +5,16 @@ import 'package:flutter/foundation.dart';
 
 import '../maze/maze.dart';
 import '../pacman_game.dart';
+import 'base_component.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
-import 'wrapper_no_events.dart';
 
 /// Use wrappers to minimise number of components directly in main world
 /// Helps due to loops running through all child components
 /// Especially on drag events deliverAtPoint
 /// Also set IgnoreEvents to speed up deliverAtPoint for all components queried
 
-class PelletWrapper extends WrapperNoEvents
+class PelletWrapper extends BaseComponent
     with HasGameReference<PacmanGame>, Snapshot {
   @override
   final int priority = -2;

@@ -1,18 +1,17 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../utils/constants.dart';
+import 'components/base_component.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/ghost_layer.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
-import 'components/wrapper_no_events.dart';
 import 'managers/death_reset.dart';
 import 'managers/drag_rotation.dart';
 import 'managers/engine_auto_pauser.dart';
@@ -43,10 +42,8 @@ class PacmanWorld extends Forge2DWorld
 
   final Vector2 gravitySign = Vector2.zero();
 
-  late final DragRotation dragRotate = DragRotation(game: game, world: this);
-
-  final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
-  final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
+  final List<BaseComponent> _wrappers = <BaseComponent>[];
+  final BaseComponent _noEvents = BaseComponent();
 
   final Pacmans pacmans = Pacmans();
   final Ghosts ghosts = Ghosts();
@@ -56,11 +53,11 @@ class PacmanWorld extends Forge2DWorld
   final MovingWallWrapper _movingWalls = MovingWallWrapper();
   final DeathReset deathReset = DeathReset();
   final EngineAutoPauser autoPauser = EngineAutoPauser();
+  late final DragRotation dragRotate = DragRotation()..world = this;
 
   void reset({bool firstRun = false}) {
-    dragRotate.reset();
     if (!firstRun) {
-      for (final WrapperNoEvents wrapper in wrappers) {
+      for (final BaseComponent wrapper in _wrappers) {
         assert(wrapper.isLoaded, wrapper);
         wrapper.reset();
       }
@@ -68,7 +65,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void start() {
-    for (final WrapperNoEvents wrapper in wrappers) {
+    for (final BaseComponent wrapper in _wrappers) {
       wrapper.start();
     }
   }
@@ -76,8 +73,8 @@ class PacmanWorld extends Forge2DWorld
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(noEventsWrapper);
-    wrappers.addAll(<WrapperNoEvents>[
+    add(_noEvents);
+    _wrappers.addAll(<BaseComponent>[
       pacmans,
       ghosts,
       if (!enableRotationRaceMode) pellets,
@@ -86,28 +83,25 @@ class PacmanWorld extends Forge2DWorld
       if (enableMovingWalls) _movingWalls,
       deathReset,
       autoPauser,
+      dragRotate,
       game.session,
       game.lifecycle,
       game.playback,
       game.dialogs,
     ]);
-    for (final WrapperNoEvents wrapper in wrappers) {
-      noEventsWrapper.add(wrapper);
+    for (final BaseComponent wrapper in _wrappers) {
+      /// Add inside [noEventsWrapper] to minimise number of components in world
+      /// Speeds up loops running through all child components
+      /// Especially on drag events deliverAtPoint
+      _noEvents.add(wrapper);
     }
     reset(firstRun: true);
   }
 
   @override
   void onRemove() {
-    dragRotate.reset();
-    wrappers.clear();
+    _wrappers.clear();
     super.onRemove();
-  }
-
-  @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    dragRotate.canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
   }
 
   @override

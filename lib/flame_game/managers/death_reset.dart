@@ -1,8 +1,8 @@
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
+import '../components/base_component.dart';
 import '../components/pacman.dart';
-import '../components/wrapper_no_events.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
@@ -10,7 +10,7 @@ import '../pacman_world.dart';
 ///
 /// This includes stopping sounds, sliding characters back to their start
 /// positions, and resetting the game state.
-class DeathReset extends WrapperNoEvents
+class DeathReset extends BaseComponent
     with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
   static const bool _slideCharactersAfterPacmanDeath = true;
 

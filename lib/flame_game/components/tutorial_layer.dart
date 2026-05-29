@@ -5,10 +5,9 @@ import 'package:flame/components.dart';
 import '../../level_selection/levels.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
-import 'wrapper_no_events.dart';
+import 'base_component.dart';
 
-class TutorialWrapper extends WrapperNoEvents
-    with HasGameReference<PacmanGame> {
+class TutorialWrapper extends BaseComponent with HasGameReference<PacmanGame> {
   bool _tutorialEverManuallyHidden = false;
   static const Duration _tutorialDelay = Duration(milliseconds: 3000);
 

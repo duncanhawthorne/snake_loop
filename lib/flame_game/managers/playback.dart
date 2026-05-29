@@ -6,14 +6,14 @@ import 'package:flutter/foundation.dart';
 import '../../level_selection/levels.dart';
 import '../../utils/helper.dart';
 import '../../utils/stored_moves.dart';
-import '../components/wrapper_no_events.dart';
+import '../components/base_component.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
 /// Manages the recording and playback of maze rotation moves.
 ///
 /// This is used for a special "playback mode" level.
-class Playback extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
+class Playback extends BaseComponent with HasWorldReference<PacmanWorld> {
   late final PacmanGame game;
 
   int _counter = 0;

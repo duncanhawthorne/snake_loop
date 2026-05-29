@@ -4,9 +4,9 @@ import 'package:flame/components.dart';
 
 import '../maze/maze.dart';
 import '../pacman_game.dart';
-import 'wrapper_no_events.dart';
+import 'base_component.dart';
 
-class BlockingBarWrapper extends WrapperNoEvents
+class BlockingBarWrapper extends BaseComponent
     with HasGameReference<PacmanGame>, Snapshot {
   @override
   final int priority = 1000;

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 
-import '../components/wrapper_no_events.dart';
+import '../components/base_component.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
@@ -10,7 +10,7 @@ import '../pacman_world.dart';
 ///
 /// Handles application lifecycle changes and coordinates the starting/stopping
 /// of game elements.
-class GameLifecycle extends WrapperNoEvents
+class GameLifecycle extends BaseComponent
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   VoidCallback? _lifecycleListenerRef;
   bool _regularItemsStarted = false;

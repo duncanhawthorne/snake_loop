@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import '../../audio/sounds.dart';
 import '../../firebase/firebase_saves.dart';
 import '../../utils/string_helper.dart';
-import '../components/wrapper_no_events.dart';
+import '../components/base_component.dart';
 import '../game_screen.dart';
 import '../maze/maze.dart';
 import '../pacman_game.dart';
@@ -16,7 +16,7 @@ import '../pacman_world.dart';
 /// Manages the current game session's state, including scoring, winning, and losing.
 ///
 /// Tracks the number of deaths, items remaining, and game time.
-class GameSession extends WrapperNoEvents
+class GameSession extends BaseComponent
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   String _userString = "";
 

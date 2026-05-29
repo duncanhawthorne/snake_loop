@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import '../maze/maze.dart';
-import 'wrapper_no_events.dart';
+import 'base_component.dart';
 
-class MovingWallWrapper extends WrapperNoEvents {
+class MovingWallWrapper extends BaseComponent {
   @override
   Future<void> reset() async {
     if (children.isNotEmpty) {

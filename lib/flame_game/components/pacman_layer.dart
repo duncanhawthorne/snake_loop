@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 
 import '../maze/maze.dart';
 import '../pacman_game.dart';
+import 'base_component.dart';
 import 'pacman.dart';
 import 'sprite_character.dart';
-import 'wrapper_no_events.dart';
 
-class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
+class Pacmans extends BaseComponent with HasGameReference<PacmanGame> {
   @override
   final int priority = 2;
 

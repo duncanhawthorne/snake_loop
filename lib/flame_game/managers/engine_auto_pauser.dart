@@ -3,7 +3,7 @@ import 'dart:async' as async;
 import 'package:flame/components.dart';
 
 import '../../utils/helper.dart';
-import '../components/wrapper_no_events.dart';
+import '../components/base_component.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 
@@ -11,7 +11,7 @@ import '../pacman_world.dart';
 ///
 /// It monitors frames rendered and game state to determine if the engine
 /// should be paused during inactivity (e.g., at the start of a level before play begins).
-class EngineAutoPauser extends WrapperNoEvents
+class EngineAutoPauser extends BaseComponent
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   int _framesRendered = 0;
 
