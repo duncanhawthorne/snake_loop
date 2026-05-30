@@ -19,7 +19,7 @@ class EngineAutoPauser extends BaseComponent
 
   /// Starts a timer to check for inactivity and pause the engine if necessary.
   void _pauseEngineIfNoActivity() {
-    game.resumeEngine(); //for any catch up animation, if not already resumed
+    game.lifecycle.resumeGame(); //resume first, so any pause is intentional
     _framesRendered = 0;
     _activityCheckTimer?.cancel(); // Kill any preexisting active loops
     // If all characters at starting position and nothing happening,
