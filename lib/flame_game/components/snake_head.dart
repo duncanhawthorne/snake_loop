@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
@@ -49,12 +47,7 @@ class SnakeHead extends SpriteComponent
   }
 
   void _updateAngle() {
-    angle =
-        -atan2(
-          world.dragRotate.downDirection.x,
-          world.dragRotate.downDirection.y,
-        ) +
-        tau / 2;
+    angle = world.dragRotate.downAngle + tau / 2;
   }
 
   void reset() {
@@ -97,10 +90,7 @@ class SnakeHead extends SpriteComponent
     snakeWrapper.extendSnake();
     food
       ..position = snakeWrapper.getSafePositionForFood()
-      ..angle = -atan2(
-        world.dragRotate.downDirection.x,
-        world.dragRotate.downDirection.y,
-      );
+      ..angle = world.dragRotate.downAngle;
     world.pellets.pelletsRemainingNotifier.value -= 1;
   }
 }

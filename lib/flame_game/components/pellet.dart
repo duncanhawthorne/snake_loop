@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
@@ -48,10 +46,7 @@ class Pellet extends SpriteComponent
   Future<void> onLoad() async {
     await super.onLoad();
     sprite = await Sprite.load('apple.png');
-    angle = -atan2(
-      world.dragRotate.downDirection.x,
-      world.dragRotate.downDirection.y,
-    );
+    angle = world.dragRotate.downAngle;
     add(_hitbox);
   }
 }
