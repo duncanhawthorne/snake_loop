@@ -25,11 +25,6 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
   bool _cameraRotatable = true;
 
-  /// Clears any tracked drag information.
-  void _clear() {
-    _fingersLastDragAngle.clear();
-  }
-
   /// Initiates a sliding reset of the maze angle to its default.
   void resetSlide(Function() callback) {
     assert(game.playState == PlayState.flourish);
@@ -45,7 +40,6 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
     removeEffects(game.camera.viewfinder);
     setMazeAngle(0, noStartRegularItems: true);
     _cameraRotatable = true;
-    _clear();
   }
 
   @override
