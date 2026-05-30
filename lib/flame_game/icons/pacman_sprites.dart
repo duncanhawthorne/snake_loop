@@ -68,13 +68,7 @@ class PacmanSprites {
   int? _pacmanSpriteCacheSize;
 
   Future<List<Sprite>> _lf2fl(List<Future<Sprite>> lf) async {
-    //converts list of futures to a future of a list
-    final List<Sprite> finalItems = <Sprite>[];
-    for (final Future<Sprite> item in lf) {
-      final Sprite finalItem = await item;
-      finalItems.add(finalItem);
-    }
-    return finalItems;
+    return Future.wait(lf);
   }
 
   Future<List<Sprite>> pacmanNormalSprites(int size) async {
@@ -121,7 +115,7 @@ class PacmanSprites {
       _pacmanSpriteAtFracCache.clear();
       for (int index = 0; index < pacmanCircleIncrements + 1; index++) {
         //_savePictureAtFrac(index);
-        if (!_pacmanSpriteAtFracCache.keys.contains(index)) {
+        if (!_pacmanSpriteAtFracCache.containsKey(index)) {
           //avoid redoing if done previously
           _pacmanSpriteAtFracCache[index] = _pacmanAtFracReal(size, index);
         }
@@ -129,11 +123,11 @@ class PacmanSprites {
     }
   }
 
-  Future<Sprite> _pacmanAtFrac(int size, int mouthWidth) async {
+  Future<Sprite> _pacmanAtFrac(int size, int mouthWidth) {
     _precacheAllPacmanAtFrac(size);
     mouthWidth = mouthWidth.clamp(0, pacmanCircleIncrements);
     return _pacmanSpriteAtFracCache[mouthWidth]!;
   }
 }
 
-PacmanSprites pacmanSprites = PacmanSprites();
+final PacmanSprites pacmanSprites = PacmanSprites();

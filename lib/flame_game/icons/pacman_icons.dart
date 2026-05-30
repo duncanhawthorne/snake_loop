@@ -14,14 +14,10 @@ Widget animatedPacmanIcon(PacmanGame game, int index) {
           begin: pacmanCircleIncrements ~/ 4,
           end:
               pacmanCircleIncrements ~/ 4 +
-              ((pacmanCircleIncrements * 3) ~/ 4) *
-                  (game.world.pacmans.pacmanDyingNotifier.value - index).clamp(
-                    0,
-                    1,
-                  ),
+              ((pacmanCircleIncrements * 3) ~/ 4) * (value - index).clamp(0, 1),
         ),
         duration: Duration(
-          milliseconds: game.world.pacmans.pacmanDyingNotifier.value <= index
+          milliseconds: value <= index
               ? 0 //when reset game
               : kPacmanDeadResetTimeAnimationMillis,
         ),
@@ -52,14 +48,13 @@ final Rect _pacmanRect = Rect.fromCenter(
 );
 
 class _PacmanPainter extends CustomPainter {
-  _PacmanPainter({required this.mouthSize});
+  const _PacmanPainter({required this.mouthSize});
 
-  int mouthSize;
+  final int mouthSize;
 
   @override
   void paint(Canvas canvas, Size size) {
-    double mouthWidth = mouthSize / pacmanCircleIncrements;
-    mouthWidth = mouthWidth.clamp(0, 1);
+    final double mouthWidth = (mouthSize / pacmanCircleIncrements).clamp(0, 1);
     canvas.drawArc(
       _pacmanRect,
       tau / 2 + tau * ((mouthWidth / 2) + 0.5),

@@ -49,14 +49,7 @@ Widget bodyWidget({required Widget child}) {
 Widget bottomRowWidget({required List<Widget> children}) {
   return Padding(
     padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-    child: Row(
-      spacing: 10,
-      children: List<Widget>.generate(
-        children.length,
-        (int index) => children[index],
-        growable: false,
-      ),
-    ),
+    child: Row(spacing: 10, children: children),
   );
 }
 

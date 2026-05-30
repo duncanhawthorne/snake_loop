@@ -184,6 +184,6 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
 double _smallMod(double value, double mod) {
   //produces number between -mod / 2 and +mod / 2
-  value = value % mod;
-  return value > mod / 2 ? value - mod : value;
+  final double remainder = value % mod;
+  return remainder > mod / 2 ? remainder - mod : remainder;
 }

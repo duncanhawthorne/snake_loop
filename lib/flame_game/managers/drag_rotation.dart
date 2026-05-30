@@ -26,7 +26,7 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
   bool _cameraRotatable = true;
 
   /// Initiates a sliding reset of the maze angle to its default.
-  void resetSlide(Function() callback) {
+  void resetSlide(VoidCallback callback) {
     assert(game.playState == PlayState.flourish);
     _cameraRotatable = false;
     resetSlideAngle(game.camera.viewfinder, onComplete: callback);
