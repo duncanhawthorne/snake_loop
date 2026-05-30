@@ -41,7 +41,7 @@ class EngineAutoPauser extends BaseComponent
         } else if (_framesRendered >= 60) {
           //everything loaded and rendered, and still no game activity
           logGlobal("inactive");
-          game.pauseEngine();
+          game.lifecycle.pauseGame();
           timer.cancel();
           if (_activityCheckTimer == timer) _activityCheckTimer = null;
         }

@@ -40,6 +40,9 @@ class GameLifecycle extends BaseComponent
 
   /// Resumes the game engine and time scale if it was paused.
   void resumeGame() {
+    if (game.timeScale == 0) {
+      game.timeScale = 1;
+    }
     if (game.paused) {
       noteThatSomeRegularItemHasStopped();
       game.audioController.workaroundiOSSafariAudioOnUserInteraction();
