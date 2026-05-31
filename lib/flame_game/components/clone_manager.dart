@@ -7,10 +7,12 @@ import 'ghost.dart';
 import 'pacman.dart';
 import 'sprite_character.dart';
 
+/// Mixin that manages the lifecycle of visual clones for character wrapping.
 mixin CloneManager on SpriteCharacter {
   bool _cloneEverMade = false; //could just test clone is null
   GameCharacter? _clone;
 
+  /// Initializes the character's clone if it hasn't been created yet.
   void _createClone() {
     if (!_cloneEverMade) {
       assert(_clone == null);
@@ -26,6 +28,7 @@ mixin CloneManager on SpriteCharacter {
     }
   }
 
+  /// Adds or removes the visual clone based on whether the character is near the maze edges.
   void _addRemoveClone() {
     if (isClone) {
       //i.e. no cascade of clones

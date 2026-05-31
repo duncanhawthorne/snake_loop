@@ -17,6 +17,7 @@ const bool movingWallsDamage = kDebugMode && false;
 
 final Paint _movingWallPaint = Paint()..color = Palette.text.color;
 
+/// A physical wall component that can move or be affected by physics.
 class WallDynamic extends BodyComponent<PacmanGame>
     with IgnoreEvents, ScaledBodyRender {
   WallDynamic({required super.fixtureDefs, required Vector2 position})

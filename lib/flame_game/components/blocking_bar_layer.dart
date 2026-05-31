@@ -6,6 +6,7 @@ import '../maze/maze.dart';
 import '../pacman_game.dart';
 import 'base_component.dart';
 
+/// A container component for static visual boundaries at the edges of the maze.
 class BlockingBarWrapper extends BaseComponent
     with HasGameReference<PacmanGame>, Snapshot {
   @override

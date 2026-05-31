@@ -8,7 +8,10 @@ import 'level_selection/levels.dart';
 /// The router describes the game's navigational hierarchy, from the main
 /// screen through settings screens all the way to each individual level.
 
+/// Key for the level parameter in the URL.
 const String levelUrlKey = "level";
+
+/// Key for the maze parameter in the URL.
 const String mazeUrlKey = "maze";
 
 final Map<String, int> _reversedMazeNames = <String, int>{
@@ -16,6 +19,7 @@ final Map<String, int> _reversedMazeNames = <String, int>{
     entry.value: entry.key,
 };
 
+/// Main router configuration for the application.
 final GoRouter router = GoRouter(
   routes: <RouteBase>[
     GoRoute(

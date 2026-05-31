@@ -7,6 +7,7 @@ import '../components/wall_dynamic.dart';
 import 'maze_dimensions.dart';
 import 'maze_layout.dart';
 
+/// Factory for creating physical bodies and fixtures for the maze walls.
 class MazePhysicsFactory {
   MazePhysicsFactory({
     required MazeLayout layout,
@@ -111,6 +112,7 @@ class MazePhysicsFactory {
     );
   }
 
+  /// Generates the static walls of the maze, both their physical bodies and visuals.
   List<Component> walls({
     bool includeGround = true,
     bool includeVisualWalls = true,
@@ -215,6 +217,7 @@ class MazePhysicsFactory {
     return result;
   }
 
+  /// Generates the moving walls of the maze.
   List<Component> movingWalls({
     bool includeGround = true,
     bool includeVisualWalls = true,

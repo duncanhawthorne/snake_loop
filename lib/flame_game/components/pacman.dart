@@ -30,9 +30,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     : super(velocity: Vector2.zero(), radius: playerSize);
 
   final Vector2 _screenSizeLast = Vector2.zero();
+
+  /// Timer used to control the mouth-closing animation duration when eating.
   final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
 
   @override
+  /// Loads or retrieves animations for Pacman (Normal, Eating, Dying, Spawning).
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
@@ -71,6 +74,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     };
   }
 
+  /// Triggers the eating animation and plays the appropriate sound effect.
   void _eat({required bool isPellet}) {
     assert(typical);
     if (current == CharacterState.normal) {
@@ -88,6 +92,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     //if in eating state, just let that sequence complete normally
   }
 
+  /// Handles collision with other components like pellets and ghosts.
   void onCollideWith(PositionComponent other) {
     if (isClone) {
       (original! as Pacman).onCollideWith(other);
@@ -133,6 +138,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
+  /// Initiates the ghost-eating sequence, awarding points and resetting the ghost.
   void _eatGhost(Ghost ghost) {
     assert(typical);
     assert(ghost.typical);
@@ -143,6 +149,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
+  /// Handles Pacman's death sequence when colliding with a ghost.
   void _dieFromGhost() {
     if (game.playState == PlayState.flourish) {
       // avoid race condition
@@ -171,6 +178,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
+  /// Action performed after the death animation finishes, such as reducing lives or resetting the level.
   void _dieFromGhostActionAfterDeathAnimation() {
     if (current == CharacterState.dead && !game.session.isWonOrLost) {
       if (world.pacmans.pacmanDeathIsFinalPacman) {
@@ -188,6 +196,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
+  /// Resets Pacman's position with a sliding animation after death.
   void resetSlideAfterDeath() {
     removeEffects(this);
     setPositionStillStatic(maze.dimensions.pacmanStart);
@@ -195,6 +204,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     current = CharacterState.spawning;
   }
 
+  /// Instantly resets Pacman to the starting position without animation.
   void resetInstantAfterDeath() {
     removeEffects(this);
     setPositionStillActive(maze.dimensions.pacmanStart);
@@ -202,6 +212,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     current = CharacterState.normal;
   }
 
+  /// Manages the state transitions (e.g., from Eating back to Normal).
   void _stateSequence(double dt) {
     if (isClone) {
       return;

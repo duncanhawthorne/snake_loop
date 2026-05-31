@@ -16,16 +16,19 @@ final Paint _wallGroundPaint = Paint()..color = Palette.seed.color;
 
 final BodyDef _staticBodyDef = BodyDef(type: BodyType.static);
 
+/// Visual representation of a rectangular wall section.
 class WallRectangleVisual extends RectangleComponent with IgnoreEvents {
   WallRectangleVisual({required super.position, required super.size})
     : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
+/// Visual representation of a circular wall section.
 class WallCircleVisual extends CircleComponent with IgnoreEvents {
   WallCircleVisual({required super.radius, required super.position})
     : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
+/// Physical body representing the combined static walls of the maze.
 class WallGround extends BodyComponent<PacmanGame>
     with IgnoreEvents, ScaledBodyRender {
   WallGround({required super.fixtureDefs})

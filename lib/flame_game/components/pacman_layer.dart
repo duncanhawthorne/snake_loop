@@ -10,6 +10,7 @@ import 'base_component.dart';
 import 'pacman.dart';
 import 'sprite_character.dart';
 
+/// A container component that manages all Pacman instances in the game.
 class Pacmans extends BaseComponent with HasGameReference<PacmanGame> {
   @override
   final int priority = 2;
@@ -21,13 +22,16 @@ class Pacmans extends BaseComponent with HasGameReference<PacmanGame> {
   bool get pacmanDeathIsFinalPacman =>
       !multipleSpawningPacmans || pacmanList.length == 1 || !anyAlivePacman;
 
+  /// Returns the target position for ghosts when they are in a homing state.
   Vector2 get ghostHomingTarget => pacmanList.isNotEmpty
       ? pacmanList[0].position
       : maze.dimensions.pacmanStart;
 
+  /// Checks if there are any Pacman instances currently alive.
   bool get anyAlivePacman =>
       pacmanList.any((Pacman pacman) => pacman.current != CharacterState.dead);
 
+  /// Instantly resets the primary Pacman instance after a death.
   void resetInstantAfterPacmanDeath() {
     assert(pacmanList.length == 1);
     pacmanList[0].resetInstantAfterDeath(); //dying pacman

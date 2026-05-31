@@ -9,6 +9,7 @@ import '../audio/audio_controller.dart';
 
 final Logger _globalLog = Logger('GL');
 
+/// Logs a message to the global logger.
 void logGlobal(dynamic x) {
   _globalLog.info(x);
 }
@@ -17,6 +18,7 @@ final List<String> debugLogList = <String>[""];
 const int debugLogListMaxLength = 30;
 final ValueNotifier<int> debugLogListNotifier = ValueNotifier<int>(0);
 
+/// Configures the global logging system and hooks into [debugPrint] and a local log buffer.
 void setupGlobalLogger() {
   Logger.root.level = (kDebugMode || detailedAudioLog)
       ? Level.FINE

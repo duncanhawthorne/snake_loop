@@ -14,18 +14,24 @@ import 'sprite_character.dart';
 
 const int _kGhostScaredTimeMillis = 6000;
 
+/// A container component that manages all active ghosts in the game.
 class Ghosts extends BaseComponent
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
   final int priority = 1;
 
+  /// List of all active ghosts managed by this layer.
   final List<Ghost> ghostList = <Ghost>[];
 
+  /// Shared character state for all ghosts (e.g., Normal, Scared).
   CharacterState current = CharacterState.normal;
   Timer _ghostsScaredTimer = Timer(0); //length set in reset
   SpawnComponent? _ghostSpawner;
+
+  /// Helper to manage the ghost siren sound effects.
   final GhostSiren ghostSiren = GhostSiren();
 
+  /// Adds initial ghosts to the maze based on level configuration.
   void _addThreeGhosts() {
     assert(ghostList.isEmpty);
     final List<int> positions = game.level.numStartingGhosts == 3
@@ -38,6 +44,7 @@ class Ghosts extends BaseComponent
     }
   }
 
+  /// Changes the state of all ghosts to "scared" and starts the scared timer.
   void scareGhosts() {
     if (!isMounted) {
       return;
@@ -52,6 +59,7 @@ class Ghosts extends BaseComponent
     }
   }
 
+  /// Enables the continuous spawning of bonus ghosts during gameplay.
   void addSpawner() {
     if (!isMounted) {
       return; //else cant use game references
@@ -70,6 +78,7 @@ class Ghosts extends BaseComponent
     }
   }
 
+  /// Disables spawning and cleans up the spawner component.
   void removeSpawner() {
     if (!isMounted) {
       return; //else cant use game references
@@ -88,6 +97,7 @@ class Ghosts extends BaseComponent
     removeSpawner();
   }
 
+  /// Disconnects ghosts from their physical bodies, effectively freezing them.
   void disconnectGhostsFromBalls() {
     for (final Ghost ghost in ghostList) {
       removeEffects(ghost);
@@ -95,16 +105,19 @@ class Ghosts extends BaseComponent
     }
   }
 
+  /// Starts periodic ghost activities like spawning and sound effects.
   void startRegularItems() {
     addSpawner();
     ghostSiren.startSirenVolumeUpdaterTimer();
   }
 
+  /// Stops periodic ghost activities.
   void stopRegularItems() {
     removeSpawner();
     ghostSiren.cancelSirenVolumeUpdaterTimer();
   }
 
+  /// Cleans up ghosts and resets state after the player wins.
   void resetAfterGameWin() {
     game.audioController.stopSound(SfxType.ghostsScared);
     current = CharacterState.normal;

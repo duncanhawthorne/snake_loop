@@ -11,6 +11,7 @@ import 'ghost.dart';
 import 'ghost_layer.dart';
 import 'sprite_character.dart';
 
+/// Manages the dynamic volume of the ghost siren sound based on ghost speed.
 class GhostSiren extends BaseComponent
     with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
   late final Ghosts ghosts = world.ghosts;
@@ -50,6 +51,7 @@ class GhostSiren extends BaseComponent
     }
   }
 
+  /// Calculates the average speed of all ghosts currently in a normal state.
   double _averageGhostSpeed() {
     //test asserts below before call, else test here
     assert(game.isLive);
@@ -73,6 +75,7 @@ class GhostSiren extends BaseComponent
     }
   }
 
+  /// Starts a periodic timer to update the siren volume based on ghost activity.
   async.Future<void> startSirenVolumeUpdaterTimer() async {
     final bool sirenEnabled = game.audioController.canDoVariableVolume;
     if (sirenEnabled) {
@@ -108,6 +111,7 @@ class GhostSiren extends BaseComponent
     }
   }
 
+  /// Cancels the siren volume updater and silences the siren.
   void cancelSirenVolumeUpdaterTimer() {
     if (_sirenTimer != null) {
       game.audioController.setSirenVolume(0);

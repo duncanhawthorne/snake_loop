@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../maze/maze.dart';
 
+/// A collectible item that Pacman eats to gain points and progress.
 class Pellet extends CircleComponent with IgnoreEvents {
   Pellet({
     required super.position,

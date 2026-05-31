@@ -111,10 +111,12 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
 
   static final Vector2 _reusableVector = Vector2.zero();
 
+  /// Direction of gravity in physics units.
   Vector2 get _downDirectionPhysics => _reusableVector
     ..setFrom(downDirection)
     ..scale(1 / spriteVsPhysicsScale);
 
+  /// Current angle pointing towards "down" in the maze.
   double get downAngle => -atan2(downDirection.x, downDirection.y);
 
   static const bool _updateGravityOnRotation = true;

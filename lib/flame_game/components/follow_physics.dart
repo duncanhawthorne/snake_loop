@@ -8,6 +8,7 @@ import 'game_character.dart';
 import 'physics_ball.dart';
 import 'removal_actions.dart';
 
+/// A component that syncs a character's position and angle with its physical [PhysicsBall].
 class Physics extends Component
     with HasWorldReference<PacmanWorld>, RemovalActions, IgnoreEvents {
   Physics({required this.owner});
@@ -35,12 +36,14 @@ class Physics extends Component
 
   late final bool _freeRotation = true;
 
+  /// Returns the current speed of the physical ball.
   double get speed => !_ball.isMounted ? 0 : _ballVel.length;
 
   late final double _invInitialRadius = 1 / (owner.size.x / 2);
 
   bool _isActive = true;
 
+  /// Updates the physical radius of the connected ball.
   void setBallRadius(double x) {
     if (isMounted && _ball.isMounted) {
       _ball.radius = x;
@@ -69,6 +72,7 @@ class Physics extends Component
     _ball.body.angularVelocity = owner.angularVelocity;
   }
 
+  /// Resynchronizes the physical ball's state with the owner's current state and activates it.
   void initaliseFromOwnerAndSetDynamic() {
     assert(_ball.isLoaded);
     _initaliseFromOwner();
@@ -76,6 +80,7 @@ class Physics extends Component
     _isActive = true;
   }
 
+  /// One frame of physics synchronization, updating the owner's visual properties from the ball's simulation.
   void _oneFrameOfPhysics(double dt) {
     if (!isMounted || !_ball.isMounted || !_ball.isLoaded) {
       return;
@@ -126,6 +131,7 @@ class Physics extends Component
     super.removalActions();
   }
 
+  /// Deactivates the physical ball and stops physics synchronization.
   void deactivate() {
     // disable _isActive before _ball first reference
     // as _ball is initialised by referencing _ball as late final

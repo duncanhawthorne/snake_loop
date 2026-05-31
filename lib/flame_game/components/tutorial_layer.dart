@@ -7,11 +7,13 @@ import '../game_screen.dart';
 import '../pacman_game.dart';
 import 'base_component.dart';
 
+/// Manages the display of tutorial instructions during specified levels.
 class TutorialWrapper extends BaseComponent with HasGameReference<PacmanGame> {
   bool _tutorialEverManuallyHidden = false;
   static const Duration _tutorialDelay = Duration(milliseconds: 3000);
 
   @override
+  /// Initiates a delayed check to show the tutorial dialog if the user hasn't started playing.
   void start() {
     Future<void>.delayed(_tutorialDelay, () {
       if (!game.lifecycle.stopwatchStarted &&
@@ -23,6 +25,7 @@ class TutorialWrapper extends BaseComponent with HasGameReference<PacmanGame> {
     });
   }
 
+  /// Hides the tutorial dialog and marks it as manually dismissed.
   void hide() {
     if (!_tutorialEverManuallyHidden && isMounted) {
       game.overlays.remove(GameScreen.tutorialDialogKey);

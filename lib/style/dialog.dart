@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'palette.dart';
 
+/// Creates a standard styled popup dialog with a background, border, and vertical children.
 Widget popupDialog({required List<Widget> children, double spacing = 16}) {
   return purePopup(
     child: Container(
@@ -23,6 +24,7 @@ Widget popupDialog({required List<Widget> children, double spacing = 16}) {
   );
 }
 
+/// Base popup wrapper that centers and scales its child.
 Widget purePopup({required Widget child}) {
   return Center(
     child: FittedBox(
@@ -75,6 +77,7 @@ const TextStyle textStyleBodyPacman = TextStyle(
 
 const Color _defaultButtonStyleBorderColor = Palette.seedColor;
 
+/// Returns a standard [ButtonStyle] used for game buttons.
 ButtonStyle buttonStyle({
   Color? borderColor = _defaultButtonStyleBorderColor,
   bool small = false,

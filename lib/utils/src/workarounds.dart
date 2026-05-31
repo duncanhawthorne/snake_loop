@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'workarounds_stub.dart'
     if (dart.library.js_interop) 'workarounds_web.dart';
 
+/// Sets the system status and navigation bar colors.
 void setStatusBarColor(Color color) {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(

@@ -23,6 +23,7 @@ final Paint _highQualityPaint = Paint()
   //..color = const Color.fromARGB(255, 255, 255, 255)
   ..isAntiAlias = true;
 
+/// Component that handles the visual animation and collision hitbox for game characters.
 class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
         HasWorldReference<PacmanWorld>,
@@ -33,13 +34,16 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   SpriteCharacter({super.position, this.original})
     : super(anchor: Anchor.center, paint: _highQualityPaint);
 
+  /// Reference to the original character if this is a visual clone.
   late final GameCharacter? original;
 
   String defaultSpritePath = "";
 
+  /// Returns true if the character is in a "typical" gameplay state (e.g., not dead or spawning).
   bool get stateTypical =>
       current != CharacterState.dead && current != CharacterState.spawning;
 
+  /// Default collision behavior based on character type and game mode.
   late final CollisionType defaultCollisionType = _getDefaultCollisionType();
 
   CollisionType _getDefaultCollisionType() {
@@ -58,6 +62,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     anchor: Anchor.center,
   )..debugMode = drawDebugBoxes;
 
+  /// Returns a map with a single sprite animation for the current state.
   Future<Map<CharacterState, SpriteAnimation>> getSingleSprite([
     int size = 1,
   ]) async {
@@ -68,6 +73,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     };
   }
 
+  /// Asynchronously loads all sprite animations required for the character.
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
@@ -85,6 +91,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
+  /// Updates the collision and debug visualization based on the target physics state.
   @mustCallSuper
   void setPhysicsState(PhysicsState targetState) {
     assert(!isClone); //not called on clones
@@ -117,4 +124,5 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 }
 
+/// Represents the possible visual and behavioral states of a character.
 enum CharacterState { normal, scared, scaredIsh, eating, dead, spawning }

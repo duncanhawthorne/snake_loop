@@ -10,14 +10,17 @@ import '../pacman_world.dart';
 import 'ghost.dart';
 import 'sprite_character.dart';
 
+/// Mixin to track the cumulative angular progress of a character around the maze center.
 mixin LapAngle on SpriteAnimationGroupComponent<CharacterState> {
   late double _lapAngleLast;
   double lapAngleProgress = 0;
 
+  /// Returns the current angular position of the character relative to the center.
   double _getLapAngle() {
     return position.screenAngle();
   }
 
+  /// Updates the cumulative lap progress by measuring the change in angular position.
   void _updateLapAngle() {
     if (!enableRotationRaceMode) {
       return;
@@ -45,6 +48,7 @@ mixin LapAngle on SpriteAnimationGroupComponent<CharacterState> {
   }
 }
 
+/// Calculates the overall progress of the race by comparing Pacman's laps to the ghosts'.
 double getRaceProgress(PacmanWorld world) {
   assert(enableRotationRaceMode);
   if (!enableRotationRaceMode) {

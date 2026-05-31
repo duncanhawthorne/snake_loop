@@ -1,5 +1,7 @@
+/// Multiplier applied to all game sounds.
 const double volumeScalar = 0.5;
 
+/// Definitions of all sound effects used in the game.
 enum SfxType {
   waka('pacman_waka_waka.mp3', 1.0),
   startMusic('pacman_beginning.mp3', 1.0),

@@ -5,6 +5,7 @@ import '../dialogs/game_overlays.dart';
 import '../pacman_game.dart';
 import 'pacman_sprites.dart';
 
+/// Returns an animated Pacman icon that reflects whether a life has been lost.
 Widget animatedPacmanIcon(PacmanGame game, int index) {
   return ValueListenableBuilder<int>(
     valueListenable: game.world.pacmans.pacmanDyingNotifier,
@@ -47,6 +48,7 @@ final Rect _pacmanRect = Rect.fromCenter(
   height: pacmanIconSize,
 );
 
+/// Painter that draws a Pacman shape with a variable mouth opening, e.g. for eating animation.
 class _PacmanPainter extends CustomPainter {
   const _PacmanPainter({required this.mouthSize});
 

@@ -16,6 +16,7 @@ const Map<int, String> _ghostSpritePaths = <int, String>{
 final Map<int, Map<CharacterState, SpriteAnimation>>
 _ghostSpriteAnimationCache = <int, Map<CharacterState, SpriteAnimation>>{};
 
+/// Component representing a ghost enemy in the game.
 class Ghost extends GameCharacter {
   Ghost({required this.ghostID, super.original})
     : super(
@@ -24,11 +25,14 @@ class Ghost extends GameCharacter {
         radius: playerSize,
       );
 
+  /// Unique identifier for the ghost, often used to determine its starting position and behavior.
   final int ghostID;
 
+  /// Determines if the ghost should spawn in a "flying" state (e.g., for additional ghosts).
   bool get _shouldFlyingSpawn => ghostID >= 3;
 
   @override
+  /// Loads or retrieves cached animations for the ghost based on its ID.
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
@@ -66,6 +70,7 @@ class Ghost extends GameCharacter {
     return _ghostSpriteAnimationCache[ghostIconNumber]!;
   }
 
+  /// Sets the ghost to a "scared" state when Pacman eats a super pellet.
   void setScared() {
     if (game.session.isWonOrLost) {
       return;
@@ -77,6 +82,7 @@ class Ghost extends GameCharacter {
     }
   }
 
+  /// Transitions the ghost from a scared state to a blinking "scaredIsh" state as the power-up wears off.
   void setScaredToScaredIsh() {
     if (game.session.isWonOrLost) {
       return;
@@ -86,6 +92,7 @@ class Ghost extends GameCharacter {
     }
   }
 
+  /// Returns the ghost to its normal state after the scared period fully ends.
   void setScaredIshToNormal() {
     if (game.session.isWonOrLost) {
       return;
@@ -95,6 +102,7 @@ class Ghost extends GameCharacter {
     }
   }
 
+  /// Sets the ghost to a "dead" state after being eaten by Pacman.
   void setDead() {
     if (game.session.isWonOrLost) {
       return;
@@ -117,6 +125,7 @@ class Ghost extends GameCharacter {
     }
   }
 
+  /// Initiates an additional ghost's spawning sequence, moving it from the lair/cage to its starting position.
   void _setSpawning() {
     if (game.session.isWonOrLost) {
       return;
@@ -136,6 +145,7 @@ class Ghost extends GameCharacter {
     );
   }
 
+  /// Slides the ghost back to its starting position after Pacman dies.
   void resetSlideAfterPacmanDeath() {
     current = CharacterState.normal;
     removeEffects(this);
@@ -153,6 +163,7 @@ class Ghost extends GameCharacter {
     resetSlideAngle(this);
   }
 
+  /// Instantly teleports the ghost back to its starting position and resets its state.
   void resetInstantAfterPacmanDeath() {
     removeEffects(this);
     current = CharacterState.normal;

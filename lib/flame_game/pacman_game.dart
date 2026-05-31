@@ -116,9 +116,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   /// Component mapping user persistent state progress records.
   final PlayerProgress playerProgress;
 
+  /// Manages the scoring, win/loss conditions, and session data.
   final GameSession session = GameSession();
+
+  /// Manages the game lifecycle, pausing/resuming, and stopwatch.
   final GameLifecycle lifecycle = GameLifecycle();
+
+  /// Handles recording and replaying of maze rotations.
   late final Playback playback = Playback()..game = this;
+
+  /// Manages game overlays and dialog visibility.
   late final DialogManager dialogs = DialogManager()..game = this;
 
   /// Evaluates whether the simulation frame is ready, running, and active inside the widget tree.
@@ -170,6 +177,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     start();
   }
 
+  /// Begins primary gameplay activities, including audio and world updates.
   void start() {
     audioController.workaroundiOSSafariAudioOnUserInteraction();
     play(SfxType.startMusic);
@@ -203,8 +211,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   PlayState _playState = PlayState.playbackMode;
 
+  /// Returns the current high-level state of the game.
   PlayState get playState => _playState;
 
+  /// Updates the game state and handles transition logic (e.g., showing/hiding overlays).
   set playState(PlayState s) => _setState(s);
 
   /// State handler managing state shifts.
