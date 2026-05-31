@@ -82,12 +82,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       _eatTimer.start();
       if (isPellet) {
         //only play waka if not recently played waka
-        game.play(SfxType.waka);
+        game.audioController.playSfx(SfxType.waka);
       }
     }
     if (!isPellet) {
       //play eatGhost irrespective of current state
-      game.play(SfxType.eatGhost);
+      game.audioController.playSfx(SfxType.eatGhost);
     }
     //if in eating state, just let that sequence complete normally
   }
@@ -160,7 +160,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (!game.session.isWonOrLost) {
       current = CharacterState.dead;
       setPhysicsState(PhysicsState.none);
-      game.play(SfxType.pacmanDeath);
+      game.audioController.playSfx(SfxType.pacmanDeath);
       if (_freezeGhostsOnKillPacman) {
         world.ghosts.disconnectGhostsFromBalls();
       }

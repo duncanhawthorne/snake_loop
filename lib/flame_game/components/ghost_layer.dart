@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
+import '../../utils/helper.dart';
 import '../effects/remove_effects.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -51,7 +52,7 @@ class Ghosts extends BaseComponent
     }
     current = CharacterState.scared;
     if (!game.session.isWonOrLost) {
-      game.play(SfxType.ghostsScared);
+      game.audioController.playSfx(SfxType.ghostsScared);
       for (final Ghost ghost in ghostList) {
         ghost.setScared();
       }
@@ -67,8 +68,7 @@ class Ghosts extends BaseComponent
     assert(!game.session.isWonOrLost); //test before call, else test here
     if (game.level.multipleSpawningGhosts) {
       _ghostSpawner ??= SpawnComponent(
-        factory: (int i) =>
-            Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
+        factory: (int i) => Ghost(ghostID: <int>[3, 4, 5][random.nextInt(3)]),
         selfPositioning: true,
         period: game.level.ghostSpawnTimerLength.toDouble(),
       );

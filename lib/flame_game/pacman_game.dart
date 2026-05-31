@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/camera.dart';
@@ -131,20 +130,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   /// Evaluates whether the simulation frame is ready, running, and active inside the widget tree.
   bool get isLive => !paused && isLoaded && isMounted;
 
-  /// Universal source for random calculations.
-  final Random random = Random();
-
   @override
   Color backgroundColor() => Palette.background.color;
-
-  /// Plays audio through the global [audioController].
-  void play(SfxType type) {
-    const bool soundOn = true;
-    // ignore: dead_code
-    if (soundOn) {
-      audioController.playSfx(type);
-    }
-  }
 
   @override
   void onGameResize(Vector2 size) {
@@ -179,19 +166,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   /// Begins primary gameplay activities, including audio and world updates.
   void start() {
-    audioController.workaroundiOSSafariAudioOnUserInteraction();
-    play(SfxType.startMusic);
+    audioController
+      ..workaroundiOSSafariAudioOnUserInteraction()
+      ..playSfx(SfxType.startMusic);
     world.start();
-  }
-
-  void _bugFixes() {
-    setStatusBarColor(Palette.background.color);
   }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    _bugFixes();
+    bugFixes();
     initializeCollisionDetection(
       mapDimensions: Rect.fromLTWH(
         -maze.dimensions.mazeWidth / 2,

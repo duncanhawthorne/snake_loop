@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
@@ -6,6 +7,9 @@ import 'package:logging/logging.dart';
 import '../audio/audio_controller.dart';
 
 /// This file has utilities used by other bits of code
+
+/// Universal source for random calculations.
+final Random random = Random();
 
 final Logger _globalLog = Logger('GL');
 
