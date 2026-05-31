@@ -75,6 +75,10 @@ class GameLifecycle extends BaseComponent
         assert(!isRemoving);
         pauseGame();
       }
+      if (game.appLifecycleStateNotifier.value == AppLifecycleState.resumed) {
+        assert(!isRemoving);
+        resumeGame();
+      }
     };
     game.appLifecycleStateNotifier.addListener(_lifecycleListenerRef!);
   }
