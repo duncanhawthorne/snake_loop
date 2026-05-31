@@ -18,6 +18,7 @@ const int pacmanEatingHalfIncrements = (pacmanCircleIncrements * 1) ~/ 4;
 final Paint pacmanPaint = Paint()..color = Palette.pacman.color;
 const bool _loadFromFile = false;
 
+/// Generates and caches procedural sprite animations for Pacman.
 class PacmanSprites {
   // ignore: unused_element
   Future<void> _savePictureAtFrac(int size, int mouthWidthAsInt) async {
@@ -32,6 +33,7 @@ class PacmanSprites {
     ).writeAsBytes(imageBytes!.buffer.asUint8List());
   }
 
+  /// Generates a [Picture] of Pacman with a specific mouth width, e.g. for eating animation.
   Picture _pacmanRecorderAtFrac(int size, int mouthWidthAsInt) {
     double mouthWidth = mouthWidthAsInt / pacmanCircleIncrements;
     mouthWidth = mouthWidth.clamp(0, 1);
@@ -68,15 +70,10 @@ class PacmanSprites {
   int? _pacmanSpriteCacheSize;
 
   Future<List<Sprite>> _lf2fl(List<Future<Sprite>> lf) async {
-    //converts list of futures to a future of a list
-    final List<Sprite> finalItems = <Sprite>[];
-    for (final Future<Sprite> item in lf) {
-      final Sprite finalItem = await item;
-      finalItems.add(finalItem);
-    }
-    return finalItems;
+    return Future.wait(lf);
   }
 
+  /// Returns a list of sprites for Pacman's normal state.
   Future<List<Sprite>> pacmanNormalSprites(int size) async {
     final List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
       1,
@@ -85,6 +82,7 @@ class PacmanSprites {
     return _lf2fl(lf);
   }
 
+  /// Returns a list of sprites for Pacman's eating animation.
   Future<List<Sprite>> pacmanEatingSprites(int size) async {
     final List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
       pacmanEatingHalfIncrements * 2, //open and close
@@ -94,6 +92,7 @@ class PacmanSprites {
     return _lf2fl(lf);
   }
 
+  /// Returns a list of sprites for Pacman's death animation.
   Future<List<Sprite>> pacmanDyingSprites(int size) async {
     final List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
       pacmanDeadIncrements + 1, //open and close
@@ -121,7 +120,7 @@ class PacmanSprites {
       _pacmanSpriteAtFracCache.clear();
       for (int index = 0; index < pacmanCircleIncrements + 1; index++) {
         //_savePictureAtFrac(index);
-        if (!_pacmanSpriteAtFracCache.keys.contains(index)) {
+        if (!_pacmanSpriteAtFracCache.containsKey(index)) {
           //avoid redoing if done previously
           _pacmanSpriteAtFracCache[index] = _pacmanAtFracReal(size, index);
         }
@@ -129,11 +128,11 @@ class PacmanSprites {
     }
   }
 
-  Future<Sprite> _pacmanAtFrac(int size, int mouthWidth) async {
+  Future<Sprite> _pacmanAtFrac(int size, int mouthWidth) {
     _precacheAllPacmanAtFrac(size);
     mouthWidth = mouthWidth.clamp(0, pacmanCircleIncrements);
     return _pacmanSpriteAtFracCache[mouthWidth]!;
   }
 }
 
-PacmanSprites pacmanSprites = PacmanSprites();
+final PacmanSprites pacmanSprites = PacmanSprites();

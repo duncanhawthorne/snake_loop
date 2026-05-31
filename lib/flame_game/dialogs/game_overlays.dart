@@ -20,6 +20,7 @@ const double gIconSize = pacmanIconSize * 4 / 3;
 const double circleIconSize = 10 * _statusWidgetHeightFactor;
 const double _pelletsSpacing = 2 * _statusWidgetHeightFactor;
 
+/// Top-level status widget displayed over the game.
 Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   return Center(
     child: Padding(

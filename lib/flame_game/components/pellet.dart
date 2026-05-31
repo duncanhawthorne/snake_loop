@@ -11,6 +11,7 @@ final Vector2 _reusableVector = Vector2.zero(); //shared across all pellets
 double get pelletScaleFactor => _pelletScaleFactor;
 const double _spriteFactor = 1.2;
 
+/// A collectible item that Pacman eats to gain points and progress.
 class Pellet extends SpriteComponent
     with IgnoreEvents, HasWorldReference<PacmanWorld> {
   Pellet({

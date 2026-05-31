@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 import '../../style/palette.dart';
+import '../../utils/helper.dart';
 import '../game_screen.dart';
 import '../maze/maze.dart';
 import '../pacman_game.dart';
@@ -62,12 +63,12 @@ class SnakeWrapper extends BaseComponent
     while (!safePos) {
       _volatileV2
         ..x =
-            (game.random.nextDouble() - 0.5) *
+            (random.nextDouble() - 0.5) *
             (maze.dimensions.mazeWidth -
                 2 * maze.dimensions.blockWidth -
                 snakeRadius * 2)
         ..y =
-            (game.random.nextDouble() - 0.5) *
+            (random.nextDouble() - 0.5) *
             (maze.dimensions.mazeHeight -
                 2 * maze.dimensions.blockWidth -
                 snakeRadius * 2);

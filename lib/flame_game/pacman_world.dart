@@ -57,9 +57,16 @@ class PacmanWorld extends Forge2DWorld
   // Core Component & Manager Definitions
   // ==========================================
 
+  /// Layer managing pellets and power-ups.
   final PelletWrapper pellets = PelletWrapper();
+
+  /// Layer managing static walls.
   final WallWrapper _walls = WallWrapper();
+
+  /// Logic for auto-pausing the engine during inactivity.
   final EngineAutoPauser autoPauser = EngineAutoPauser();
+
+  /// Handler for maze rotation gestures.
   late final DragRotation dragRotate = DragRotation()..world = this;
 
   /// Resets the game state for all managed wrappers.
