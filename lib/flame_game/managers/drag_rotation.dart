@@ -20,8 +20,7 @@ import 'playback.dart';
 class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
   late final PacmanWorld world;
 
-  final Vector2 _eventOffset = Vector2.zero();
-  double _canvasRadius = 1.0;
+  double _canvasRadiusInv = 1.0;
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
   bool _cameraRotatable = true;
 
@@ -45,17 +44,19 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
-    _canvasRadius = min(game.canvasSize.x, game.canvasSize.y) / 2;
+    _canvasRadiusInv = 1 / (min(game.canvasSize.x, game.canvasSize.y) / 2);
   }
 
   /// Handles the start of a drag event to begin rotating the maze.
   void onDragStart(DragStartEvent event) {
     if (isiOSWeb) {
+      /// Enter null as first angle is unreliable
+      /// And fix in [onDragUpdate] below where angle is reliable
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
       _fingersLastDragAngle[event.pointerId] = atan2(
-        event.canvasPosition.x - game.canvasSize.x / 2,
-        event.canvasPosition.y - game.canvasSize.y / 2,
+        event.canvasPosition.x - game.canvasSize.x * 0.5,
+        event.canvasPosition.y - game.canvasSize.y * 0.5,
       );
     }
   }
@@ -63,30 +64,26 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
   /// Handles the update of a drag event, calculating the rotation delta and applying it.
   void onDragUpdate(DragUpdateEvent event) {
     game.lifecycle.resumeGame();
-    _eventOffset.setValues(
-      event.canvasStartPosition.x - game.canvasSize.x / 2,
-      event.canvasStartPosition.y - game.canvasSize.y / 2,
-    );
-    final double eventVectorLengthProportion =
-        _eventOffset.length / _canvasRadius;
-    final double fingerCurrentDragAngle = atan2(_eventOffset.x, _eventOffset.y);
-    // Need separate contains and null check due to isiOSWeb approach in onDragStart
-    if (_fingersLastDragAngle.containsKey(event.pointerId)) {
-      final double? lastAngle = _fingersLastDragAngle[event.pointerId];
-      if (lastAngle != null) {
-        final double angleDelta = smallAngle(
-          fingerCurrentDragAngle - lastAngle,
-        );
-        const double maxSpinMultiplierRadius = 0.75;
-        final double spinMultiplier =
-            4 *
-            game.level.spinSpeedFactor *
-            min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
-
-        _moveMazeAngleByDelta(angleDelta * spinMultiplier);
-      }
-      _fingersLastDragAngle[event.pointerId] = fingerCurrentDragAngle;
+    final double dx = event.canvasStartPosition.x - game.canvasSize.x * 0.5;
+    final double dy = event.canvasStartPosition.y - game.canvasSize.y * 0.5;
+    final double fingerCurrentDragAngle = atan2(dx, dy);
+    final double? lastAngle = _fingersLastDragAngle[event.pointerId];
+    if (lastAngle != null) {
+      final double eventVectorLengthProportion =
+          sqrt(dx * dx + dy * dy) * _canvasRadiusInv;
+      final double angleDelta = smallAngle(fingerCurrentDragAngle - lastAngle);
+      const double maxSpinMultiplierRadiusInv = 1 / 0.75;
+      final double spinMultiplier =
+          4 *
+          game.level.spinSpeedFactor *
+          min(1, eventVectorLengthProportion * maxSpinMultiplierRadiusInv);
+      _moveMazeAngleByDelta(angleDelta * spinMultiplier);
     }
+
+    /// For iOSWeb first entry is [onDragStart] enters null,
+    /// so now switch null to current angle to track going forward
+    /// like on other platforms
+    _fingersLastDragAngle[event.pointerId] = fingerCurrentDragAngle;
   }
 
   /// Handles the end of a drag event.
