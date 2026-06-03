@@ -27,7 +27,7 @@ const bool _freezeGhostsOnKillPacman = false;
 /// controlling.
 class Pacman extends GameCharacter with CollisionCallbacks {
   Pacman({required super.position, super.original})
-    : super(velocity: Vector2.zero(), radius: playerSize);
+    : super(velocity: Vector2.zero(), radius: maze.dimensions.spriteWidth / 2);
 
   final Vector2 _screenSizeLast = Vector2.zero();
 

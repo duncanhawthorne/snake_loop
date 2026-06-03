@@ -9,6 +9,7 @@ import '../../style/palette.dart';
 import '../../utils/constants.dart';
 import '../effects/remove_effects.dart';
 import '../icons/stub_sprites.dart';
+import '../maze/maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'clones.dart';
@@ -57,8 +58,8 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   late final CircleHitbox hitBox = CircleHitbox(
     isSolid: true,
     collisionType: defaultCollisionType,
-    radius: playerSize,
-    position: Vector2.all(playerSize),
+    radius: maze.dimensions.spriteWidth / 2,
+    position: Vector2.all(maze.dimensions.spriteWidth / 2),
     anchor: Anchor.center,
   )..debugMode = drawDebugBoxes;
 

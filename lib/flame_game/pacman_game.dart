@@ -65,7 +65,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
          ),
          zoom: flameGameZoom * _visualZoomMultiplier,
        ) {
-    this.mazeId = mazeId;
+    maze.mazeId = mazeId;
   }
 
   /// Factory constructor managing a single global instance of [PacmanGame].
@@ -88,9 +88,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         appLifecycleStateNotifier: appLifecycleStateNotifier,
       );
     } else {
+      maze.mazeId = mazeId;
       _instance!
         ..level = level
-        ..mazeId = mazeId
         ..reset(firstRun: false, showStartDialog: true);
     }
     return _instance!;
@@ -101,10 +101,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   /// Holds structural metadata configuration relating to the current stage/level.
   GameLevel level;
-
-  set mazeId(int id) => maze.mazeId = id;
-
-  int get mazeId => maze.mazeId;
 
   /// General audio controller handling sound effects, loops, and device integrations.
   final AudioController audioController;

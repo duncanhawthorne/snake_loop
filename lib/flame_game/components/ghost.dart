@@ -22,7 +22,7 @@ class Ghost extends GameCharacter {
     : super(
         position: maze.dimensions.ghostSpawnForId(ghostID),
         velocity: Vector2.zero(),
-        radius: playerSize,
+        radius: maze.dimensions.spriteWidth / 2,
       );
 
   /// Unique identifier for the ghost, often used to determine its starting position and behavior.
