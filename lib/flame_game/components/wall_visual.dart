@@ -1,20 +1,14 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../../style/palette.dart';
-import '../pacman_game.dart';
-import 'scaled_body_render.dart';
 
 final Paint _wallVisualPaint = Paint()..color = Palette.background.color;
-final Paint _wallGroundPaint = Paint()..color = Palette.seed.color;
 
 //..filterQuality = FilterQuality.none
 ////..color = Color.fromARGB(50, 100, 100, 100)
 //..isAntiAlias = false
-
-final BodyDef _staticBodyDef = BodyDef(type: BodyType.static);
 
 /// Visual representation of a rectangular wall section.
 class WallRectangleVisual extends RectangleComponent with IgnoreEvents {
@@ -26,14 +20,4 @@ class WallRectangleVisual extends RectangleComponent with IgnoreEvents {
 class WallCircleVisual extends CircleComponent with IgnoreEvents {
   WallCircleVisual({required super.radius, required super.position})
     : super(anchor: Anchor.center, paint: _wallVisualPaint);
-}
-
-/// Physical body representing the combined static walls of the maze.
-class WallGround extends BodyComponent<PacmanGame>
-    with IgnoreEvents, ScaledBodyRender {
-  WallGround({required super.fixtureDefs})
-    : super(paint: _wallGroundPaint, bodyDef: _staticBodyDef);
-
-  @override
-  final int priority = -3;
 }
