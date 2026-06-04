@@ -98,7 +98,7 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
         (game.playState == PlayState.gaming ||
             game.playState == PlayState.flourish)) {
       setMazeAngle(
-        cameraAngle + (_reversedRotation ? -angleDelta : angleDelta),
+        _cameraAngle + (_reversedRotation ? -angleDelta : angleDelta),
       );
     }
   }
@@ -123,11 +123,11 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
   static const bool _kRotatingCamera = !kDebugMode || true;
 
   /// Gets the current camera (maze) angle.
-  double get cameraAngle =>
+  double get _cameraAngle =>
       _kRotatingCamera ? game.camera.viewfinder.angle : _debugFakeAngle;
 
   /// Sets the current camera (maze) angle.
-  set cameraAngle(double z) =>
+  set _cameraAngle(double z) =>
       _kRotatingCamera ? game.camera.viewfinder.angle = z : _debugFakeAngle = z;
 
   double _debugFakeAngle = 0;
@@ -140,7 +140,7 @@ class DragRotation extends BaseComponent with HasGameReference<PacmanGame> {
       game.lifecycle.startRegularItems();
     }
     Playback.recordMode ? game.playback.recordAngle(angle) : null; //disabled
-    cameraAngle = angle;
+    _cameraAngle = angle;
     downDirection
       ..setValues(-sin(angle), cos(angle))
       ..scale(game.level.levelSpeed);
