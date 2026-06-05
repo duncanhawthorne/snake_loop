@@ -1,9 +1,7 @@
 import 'dart:async' as async;
 
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 
-import '../../utils/helper.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'base_component.dart';
@@ -19,38 +17,6 @@ class GhostSiren extends BaseComponent
 
   async.Timer? _sirenTimer;
 
-  void _tidyStrayGhosts() {
-    const bool testStrayGhosts = false;
-    if (!testStrayGhosts) {
-      return;
-    }
-    // ignore: dead_code
-    if (kDebugMode && !game.level.multipleSpawningGhosts) {
-      if (ghostList.length > game.level.numStartingGhosts) {
-        //create a new list toList so can iterate and remove simultaneously
-        final List<Ghost> tmpList = ghostList.toList();
-        for (Ghost ghost in tmpList) {
-          if (!ghost.isMounted) {
-            logGlobal("tidy stray ghost 1"); //shouldn't happen
-            ghost.removeFromParent();
-          }
-        }
-      }
-      if (ghosts.children.whereType<Ghost>().length != ghostList.length) {
-        //create a new list toList so can iterate and remove simultaneously
-        final List<Component> tmpList = ghosts.children
-            .whereType<Ghost>()
-            .toList();
-        for (Component child in tmpList) {
-          if (!ghostList.contains(child)) {
-            logGlobal("tidy stray ghost 2"); //shouldn't happen
-            child.removeFromParent();
-          }
-        }
-      }
-    }
-  }
-
   /// Calculates the average speed of all ghosts currently in a normal state.
   double _averageGhostSpeed() {
     //test asserts below before call, else test here
@@ -61,7 +27,6 @@ class GhostSiren extends BaseComponent
     );
     assert(!world.pacmans.isMounted || world.pacmans.anyAlivePacman);
     assert(!game.session.isWonOrLost);
-    _tidyStrayGhosts();
     if (ghostList.isEmpty) {
       return 0;
     } else {
