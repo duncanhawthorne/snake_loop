@@ -100,8 +100,7 @@ Widget levelSelectorRow(
   int maxLevelToShowCache,
   int rowIndex,
 ) {
-  final bool showResetButton =
-      true; //maxLevelToShow(game) > Levels.firstRealLevel;
+  final bool showResetButton = true;
   return Row(
     spacing: 4,
     children: <Widget>[
@@ -167,8 +166,6 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
 Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
   const bool enableMazeSelector = true;
   final int maxLevelToShowCache = _maxLevelToShow(game);
-  // ignore: dead_code
-  final bool showText = false && maxLevelToShowCache <= 2;
   return !enableMazeSelector ||
           maxLevelToShowCache == 1 ||
           game.level.isTutorial
@@ -178,19 +175,10 @@ Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
             children: <Widget>[
               Row(
                 spacing: 4,
-                children: <Widget>[
-                  !showText
-                      ? const SizedBox.shrink()
-                      // ignore: dead_code
-                      : const Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                          child: Text('Maze:', style: textStyleBody),
-                        ),
-                  ...List<Widget>.generate(
-                    3,
-                    (int index) => mazeButtonSingle(context, game, index),
-                  ),
-                ],
+                children: List<Widget>.generate(
+                  3,
+                  (int index) => mazeButtonSingle(context, game, index),
+                ),
               ),
             ],
           ),
