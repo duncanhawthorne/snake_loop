@@ -15,8 +15,8 @@ import '../pacman_game.dart';
 /// This dialog is shown before starting the game.
 
 /// Main menu and level/maze selection dialog shown before a game session begins.
-class StartDialog extends StatelessWidget {
-  const StartDialog({super.key, required this.level, required this.game});
+class LevelChooseDialog extends StatelessWidget {
+  const LevelChooseDialog({super.key, required this.level, required this.game});
 
   /// The level configuration for the current game session.
   final GameLevel level;
