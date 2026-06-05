@@ -124,7 +124,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   late final DialogManager dialogs = DialogManager()..game = this;
 
   /// Evaluates whether the simulation frame is ready, running, and active inside the widget tree.
-  bool get isLive => !paused && isLoaded && isMounted;
+  bool get isLive => !paused && isLoaded && isMounted && timeScale != 0;
 
   @override
   Color backgroundColor() => Palette.background.color;
