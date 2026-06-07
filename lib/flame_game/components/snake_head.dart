@@ -8,7 +8,7 @@ import '../pacman_world.dart';
 import 'food_pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_wrapper.dart';
-import 'wall.dart';
+import 'wall_visual.dart';
 
 class SnakeHead extends SpriteComponent
     with

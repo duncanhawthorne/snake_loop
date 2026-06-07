@@ -1,4 +1,3 @@
-import 'dart:core';
 import 'dart:ui';
 
 import 'package:flame/camera.dart';
@@ -65,7 +64,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
          ),
          zoom: flameGameZoom * _visualZoomMultiplier,
        ) {
-    this.mazeId = mazeId;
+    maze.mazeId = mazeId;
   }
 
   /// Factory constructor managing a single global instance of [PacmanGame].
@@ -88,9 +87,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         appLifecycleStateNotifier: appLifecycleStateNotifier,
       );
     } else {
+      maze.mazeId = mazeId;
       _instance!
         ..level = level
-        ..mazeId = mazeId
         ..reset(firstRun: false, showStartDialog: true);
     }
     return _instance!;
@@ -101,10 +100,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   /// Holds structural metadata configuration relating to the current stage/level.
   GameLevel level;
-
-  set mazeId(int id) => maze.mazeId = id;
-
-  int get mazeId => maze.mazeId;
 
   /// General audio controller handling sound effects, loops, and device integrations.
   final AudioController audioController;
@@ -131,7 +126,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   static const bool stepDebug = false && kDebugMode;
 
   /// Evaluates whether the simulation frame is ready, running, and active inside the widget tree.
-  bool get isLive => (!paused || stepDebug) && isLoaded && isMounted;
+  bool get isLive =>
+      (!paused || stepDebug) && isLoaded && isMounted && timeScale != 0;
 
   @override
   Color backgroundColor() => Palette.background.color;
@@ -155,9 +151,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     }
     collisionDetection.broadphase.tree.optimize();
     if (showStartDialog) {
-      playback.isPlaybackAppropriate()
-          ? playState = PlayState.playbackMode
-          : playState = PlayState.levelChooseScreen;
+      playState = playback.isPlaybackAppropriate()
+          ? PlayState.playbackMode
+          : PlayState.levelChooseScreen;
     }
   }
 
@@ -212,15 +208,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     switch (s) {
       case PlayState.playbackMode:
         playback.enable();
-        dialogs.clean();
-        overlays.add(GameScreen.beginDialogKey);
+        dialogs.switchTo(GameScreen.beginDialogKey);
       case PlayState.levelChooseScreen:
         playback.disable();
-        dialogs.clean();
-        overlays.add(GameScreen.startDialogKey);
+        dialogs.switchTo(GameScreen.startDialogKey);
       case PlayState.gaming:
         playback.disable();
-        if (!session.isWonOrLost) {
+        if (!session.isWonOrLost && !lifecycle.stopwatchStarted) {
           dialogs.clean();
         }
         if (origState == PlayState.levelChooseScreen) {
