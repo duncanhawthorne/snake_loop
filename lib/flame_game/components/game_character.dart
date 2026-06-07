@@ -1,5 +1,3 @@
-import 'dart:core';
-
 import 'package:flame/components.dart';
 
 import '../effects/remove_effects.dart';
@@ -72,7 +70,7 @@ class GameCharacter extends SpriteCharacter with CloneManager {
       if (!starting) {
         assert(_physics.isLoaded);
         if (_physics.isLoaded) {
-          _physics.initaliseFromOwnerAndSetDynamic();
+          _physics.initialiseFromOwnerAndSetDynamic();
         }
       }
       state = PhysicsState.full;

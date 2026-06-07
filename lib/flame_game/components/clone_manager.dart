@@ -1,5 +1,3 @@
-import 'dart:core';
-
 import '../maze/maze.dart';
 import 'clones.dart';
 import 'game_character.dart';

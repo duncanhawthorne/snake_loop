@@ -1,4 +1,3 @@
-import 'dart:core';
 import 'dart:ui';
 
 import 'package:flame/camera.dart';
@@ -148,9 +147,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     }
     collisionDetection.broadphase.tree.optimize();
     if (showStartDialog) {
-      playback.isPlaybackAppropriate()
-          ? playState = PlayState.playbackMode
-          : playState = PlayState.levelChooseScreen;
+      playState = playback.isPlaybackAppropriate()
+          ? PlayState.playbackMode
+          : PlayState.levelChooseScreen;
     }
   }
 
