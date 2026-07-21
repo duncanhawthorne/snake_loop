@@ -18,9 +18,8 @@ import 'pacman.dart';
 import 'removal_actions.dart';
 
 final Paint _highQualityPaint = Paint()
-  // FIXME revert code change to work around flutter 3.45 sprite render issue
-  ..filterQuality = flameGameZoom == 30 ? FilterQuality.low : FilterQuality.high
-  //..color = const Color.fromARGB(255, 255, 255, 255)
+  ..filterQuality = FilterQuality.high
+//..color = const Color.fromARGB(255, 255, 255, 255)
   ..isAntiAlias = true;
 
 /// Component that handles the visual animation and collision hitbox for game characters.
@@ -32,7 +31,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
         LapAngle,
         IgnoreEvents {
   SpriteCharacter({super.position, this.original})
-    : super(anchor: Anchor.center, paint: _highQualityPaint);
+      : super(anchor: Anchor.center, paint: _highQualityPaint);
 
   /// Reference to the original character if this is a visual clone.
   late final GameCharacter? original;
@@ -60,7 +59,8 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     radius: maze.dimensions.spriteWidth / 2,
     position: Vector2.all(maze.dimensions.spriteWidth / 2),
     anchor: Anchor.center,
-  )..debugMode = drawDebugBoxes;
+  )
+    ..debugMode = drawDebugBoxes;
 
   /// Returns a map with a single sprite animation for the current state.
   Future<Map<CharacterState, SpriteAnimation>> getSingleSprite([
