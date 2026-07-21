@@ -11,7 +11,7 @@ import '../pacman_game.dart';
 import 'physics_ball.dart';
 import 'scaled_body_render.dart';
 
-final Vector2 _dynamicWallGravityScale = Vector2(-1, -1);
+final double _dynamicWallGravityScale = -1.0;
 
 const bool movingWallsDamage = kDebugMode && false;
 
@@ -20,7 +20,7 @@ final Paint _movingWallPaint = Paint()..color = Palette.text.color;
 /// A physical wall component that can move or be affected by physics.
 class WallDynamic extends BodyComponent<PacmanGame>
     with IgnoreEvents, ScaledBodyRender {
-  WallDynamic({required super.fixtureDefs, required Vector2 position})
+  WallDynamic({required super.shapeSpecs, required Vector2 position})
     : super(
         paint: _movingWallPaint,
         bodyDef: BodyDef(
@@ -38,7 +38,7 @@ class WallDynamic extends BodyComponent<PacmanGame>
 
   Vector2 _getSize() {
     final List<Vector2> v =
-        (body.fixtures.first.shape as PolygonShape).vertices;
+        (body.shapes.first.geometry as Polygon).points ?? <Vector2>[];
     final Iterable<double> xs = v.map((Vector2 element) => element.x);
     final Iterable<double> ys = v.map((Vector2 element) => element.y);
     final double minX = xs.reduce(min);

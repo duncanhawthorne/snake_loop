@@ -62,7 +62,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
            width: kVirtualGameSize,
            height: kVirtualGameSize,
          ),
-         zoom: flameGameZoom * _visualZoomMultiplier,
+         metersToPixels: flameGameZoom * _visualZoomMultiplier,
        ) {
     maze.mazeId = mazeId;
   }
