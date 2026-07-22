@@ -11,8 +11,9 @@ final Paint _wallGroundPaint = Paint()..color = Palette.seed.color;
 final BodyDef _staticBodyDef = BodyDef(type: BodyType.static);
 
 /// Physical body representing the combined static walls of the maze.
-class WallGround extends BodyComponent<PacmanGame> with IgnoreEvents {
-  WallGround({required super.fixtureDefs})
+class WallGround extends BodyComponent<PacmanGame>
+    with IgnoreEvents {
+  WallGround({required super.shapeSpecs})
     : super(paint: _wallGroundPaint, bodyDef: _staticBodyDef);
 
   @override

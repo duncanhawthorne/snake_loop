@@ -21,27 +21,25 @@ class MazePhysicsFactory {
   static const double _mazeInnerWallWidthFactor = 0.7;
   static const double _pixelationBuffer = 0.03;
 
-  static final Vector2 _reusableVector = Vector2.zero();
-
-  FixtureDef _fixtureDefBlock({
+  ShapeSpec _shapeSpecBlock({
     required Vector2 position,
     required double width,
     required double height,
     double density = 1,
   }) {
-    /// [_reusableVector] safely instantly consumed inside FixtureDef
-    return FixtureDef(
-      friction: openSpaceMovement ? 1 : 0,
-      restitution: openSpaceMovement ? 0.4 : 0,
-      PolygonShape()..setAsBox(
+    return ShapeSpec(
+      Polygon.offsetBox(
         width / 2 / spriteVsPhysicsScale,
         height / 2 / spriteVsPhysicsScale,
-        _reusableVector
-          ..setFrom(position)
-          ..scale(1 / spriteVsPhysicsScale),
-        0,
+        center: position.clone()..scale(1 / spriteVsPhysicsScale),
       ),
-      density: density,
+      ShapeDef(
+        material: SurfaceMaterial(
+          friction: openSpaceMovement ? 1 : 0,
+          restitution: openSpaceMovement ? 0.4 : 0,
+        ),
+        density: density,
+      ),
     );
   }
 
@@ -96,18 +94,16 @@ class MazePhysicsFactory {
     return l;
   }
 
-  FixtureDef _fixtureCircle({
+  ShapeSpec _shapeSpecCircle({
     required Vector2 position,
     required double radius,
   }) {
-    /// [_reusableVector] safely instantly consumed inside FixtureDef
-    return FixtureDef(
-      CircleShape(
+    return ShapeSpec(
+      Circle(
         radius: radius / spriteVsPhysicsScale,
-        position: _reusableVector
-          ..setFrom(position)
-          ..scale(1 / spriteVsPhysicsScale),
+        center: position.clone()..scale(1 / spriteVsPhysicsScale),
       ),
+      ShapeDef(),
     );
   }
 
@@ -116,7 +112,7 @@ class MazePhysicsFactory {
     bool includeGround = true,
     bool includeVisualWalls = true,
   }) {
-    final List<FixtureDef> fixtureDefs = <FixtureDef>[];
+    final List<ShapeSpec> shapeSpecs = <ShapeSpec>[];
     final List<Component> result = <Component>[];
     final double scale = _dimensions.blockWidth;
     final Vector2 center = Vector2.zero();
@@ -127,8 +123,8 @@ class MazePhysicsFactory {
         _dimensions.locationOfIJ(i, j, output: center);
         if (_layout.wallAt(i, j)) {
           if (_layout.circleAt(i, j)) {
-            fixtureDefs.add(
-              _fixtureCircle(position: center, radius: scale / 2),
+            shapeSpecs.add(
+              _shapeSpecCircle(position: center, radius: scale / 2),
             );
             result.add(
               WallCircleVisual(
@@ -147,8 +143,8 @@ class MazePhysicsFactory {
                 scale * (width + _pixelationBuffer),
                 scale * _mazeInnerWallWidthFactor,
               );
-              fixtureDefs.add(
-                _fixtureDefBlock(
+              shapeSpecs.add(
+                _shapeSpecBlock(
                   position: bigBlockCenter,
                   width: scale * (width + _pixelationBuffer),
                   height: scale,
@@ -172,8 +168,8 @@ class MazePhysicsFactory {
                 scale * _mazeInnerWallWidthFactor,
                 scale * (height + _pixelationBuffer),
               );
-              fixtureDefs.add(
-                _fixtureDefBlock(
+              shapeSpecs.add(
+                _shapeSpecBlock(
                   position: bigBlockCenter,
                   width: scale,
                   height: scale * (height + _pixelationBuffer),
@@ -211,7 +207,7 @@ class MazePhysicsFactory {
       result.clear();
     }
     if (includeGround) {
-      result.add(WallGround(fixtureDefs: fixtureDefs));
+      result.add(WallGround(shapeSpecs: shapeSpecs));
     }
     return result;
   }
