@@ -11,7 +11,8 @@ class Levels {
 
   static const List<int> _ghostSpawnTimerLengthPattern = <int>[5, 3, 2, 1];
 
-  static const double _levelSpeedFactor = 50 * (30 / flameGameZoom);
+  static const int levelSpeedPureScale = 50;
+  static const double _levelSpeedFactor = levelSpeedPureScale * mapSizeScale;
 
   double _tutorialFactor(int levelNum) {
     return levelNum >= 1

@@ -31,9 +31,9 @@ class MazePhysicsFactory {
   }) {
     return ShapeSpec(
       Polygon.offsetBox(
-        width / 2 / spriteVsPhysicsScale,
-        height / 2 / spriteVsPhysicsScale,
-        center: position.clone()..scale(1 / spriteVsPhysicsScale),
+        width / 2 * physicsScale,
+        height / 2 * physicsScale,
+        center: position.clone()..scale(physicsScale),
       ),
       ShapeDef(
         material: SurfaceMaterial(
@@ -102,8 +102,8 @@ class MazePhysicsFactory {
   }) {
     return ShapeSpec(
       Circle(
-        radius: radius / spriteVsPhysicsScale,
-        center: position.clone()..scale(1 / spriteVsPhysicsScale),
+        radius: radius * physicsScale,
+        center: position.clone()..scale(physicsScale),
       ),
       ShapeDef(),
     );

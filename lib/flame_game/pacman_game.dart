@@ -14,7 +14,6 @@ import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/helper.dart';
 import '../utils/src/workarounds.dart';
-import 'components/physics_ball.dart';
 import 'game_screen.dart';
 import 'managers/dialog_manager.dart';
 import 'managers/game_lifecycle.dart';
@@ -27,7 +26,7 @@ import 'pacman_world.dart';
 ///
 /// This class handles the initialization, state management, and lifecycle events
 /// of the Pacman simulation. It configures:
-/// * A [FixedResolutionViewport] mapping to a square [kVirtualGameSize] canvas to
+/// * A [FixedResolutionViewport] mapping to a square [worldSquareSize] canvas to
 ///   ensure aspect ratio consistency across diverse device screens.
 /// * A specialized [Forge2DGame] simulation utilizing a dedicated [PacmanWorld].
 /// * Custom QuadTree broadphase collision optimizations appropriate for high-density maps.
@@ -38,11 +37,12 @@ import 'pacman_world.dart';
 /// Note flame_forge2d has a maximum allowed speed for physical objects.
 /// Reducing map size 30x, scaling up gravity 30x, & zooming 30x changes nothing,
 /// but reduces chance of hitting maximum allowed speed.
-const double flameGameZoom = 30.0 / spriteVsPhysicsScale;
 const double _visualZoomMultiplier = 0.92;
 
 /// Determines the baseline layout coordinates and relative speed of the game.
-const double kVirtualGameSize = 1700;
+const double mapSizeScale = 1;
+const double _kVirtualGameSize = 1700 / 30;
+const double worldSquareSize = _kVirtualGameSize * mapSizeScale;
 
 class PacmanGame extends Forge2DGame<PacmanWorld>
     with
@@ -59,10 +59,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }) : super(
          world: PacmanWorld(),
          camera: CameraComponent.withFixedResolution(
-           width: kVirtualGameSize,
-           height: kVirtualGameSize,
-         ),
-         metersToPixels: flameGameZoom * _visualZoomMultiplier,
+           width: worldSquareSize,
+           height: worldSquareSize,
+         )..viewfinder.zoom = _visualZoomMultiplier,
+         metersToPixels: 1, //pixels per meter
        ) {
     maze.mazeId = mazeId;
   }
@@ -233,8 +233,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 Vector2 _sanitizeScreenSize(Vector2 size) {
   final double aspectRatio = size.x / size.y;
   return size.x > size.y
-      ? Vector2(kVirtualGameSize * aspectRatio, kVirtualGameSize)
-      : Vector2(kVirtualGameSize, kVirtualGameSize / aspectRatio);
+      ? Vector2(worldSquareSize * aspectRatio, worldSquareSize)
+      : Vector2(worldSquareSize, worldSquareSize / aspectRatio);
 }
 
 enum PlayState { playbackMode, levelChooseScreen, gaming, flourish, unflourish }

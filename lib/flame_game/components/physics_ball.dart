@@ -15,8 +15,10 @@ import 'scaled_body_render.dart';
 
 const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;
 
-const double spriteVsPhysicsScale = spriteVsPhysicsScaleConstant ? 1 : 30;
-const bool spriteVsPhysicsScaleConstant = true;
+const double physicsScale = kPhysicsScaleLockedAtOne ? 1 : 0.5;
+const double invPhysicsScale =
+    1 / physicsScale; // change to get if physicsScale non-constant
+const bool kPhysicsScaleLockedAtOne = true;
 
 final Paint _activePaint = Paint()..color = Palette.pacman.color;
 final Paint _inactivePaint = Paint()..color = Palette.warning.color;
@@ -41,8 +43,8 @@ class PhysicsBall extends BodyComponent<PacmanGame>
          bodyDef: BodyDef(
            enableSleep: false,
            angularDamping: openSpaceMovement ? 1 : 0,
-           position: position / spriteVsPhysicsScale,
-           linearVelocity: velocity / spriteVsPhysicsScale,
+           position: position * physicsScale,
+           linearVelocity: velocity * physicsScale,
            angularVelocity: angularVelocity,
            type: BodyType.dynamic,
            isEnabled: active,
@@ -73,7 +75,7 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
   static ShapeSpec _buildShape(double radius, double density) {
     return ShapeSpec(
-      Circle(radius: radius * _lubricationScaleFactor / spriteVsPhysicsScale),
+      Circle(radius: radius * _lubricationScaleFactor * physicsScale),
       ShapeDef(
         material: SurfaceMaterial(
           restitution: openSpaceMovement ? 0.2 : 0,
@@ -87,9 +89,9 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
   /// Synchronizes the physical body's position with the character's visual position.
   set position(Vector2 pos) => body.setTransform(
-    spriteVsPhysicsScaleConstant ? pos : _reusableVector
+    kPhysicsScaleLockedAtOne ? pos : _reusableVector
       ..setFrom(pos)
-      ..scale(1 / spriteVsPhysicsScale),
+      ..scale(physicsScale),
     Rot.fromAngle(owner.angle),
   );
 
@@ -101,14 +103,14 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
   /// Synchronizes the physical body's linear velocity.
   set velocity(Vector2 vel) => body.linearVelocity.setFrom(
-    spriteVsPhysicsScaleConstant ? vel : vel / spriteVsPhysicsScale,
+    kPhysicsScaleLockedAtOne ? vel : vel * physicsScale,
   );
 
   /// Applies a force to the physical body.
   set acceleration(Vector2 acceleration) => body.applyForce(
     _reusableVector
       ..setFrom(acceleration)
-      ..scale(body.mass / spriteVsPhysicsScale),
+      ..scale(body.mass * physicsScale),
   );
 
   /// Updates the radius of the physical fixture.
@@ -164,13 +166,10 @@ class PhysicsBall extends BodyComponent<PacmanGame>
 
   Vector2 _teleportedPosition() {
     _reusableVector.setValues(
-      _smallMod(position.x * spriteVsPhysicsScale, maze.dimensions.mazeWidth),
+      _smallMod(position.x * invPhysicsScale, maze.dimensions.mazeWidth),
       !_kVerticalPortalsEnabled
-          ? position.y * spriteVsPhysicsScale
-          : _smallMod(
-              position.y * spriteVsPhysicsScale,
-              maze.dimensions.mazeHeight,
-            ),
+          ? position.y * invPhysicsScale
+          : _smallMod(position.y * invPhysicsScale, maze.dimensions.mazeHeight),
     );
     return _reusableVector;
   }
