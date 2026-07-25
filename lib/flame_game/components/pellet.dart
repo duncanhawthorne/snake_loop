@@ -2,8 +2,8 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
+import '../custom_world.dart';
 import '../maze/maze.dart';
-import '../pacman_world.dart';
 
 const double _pelletScaleFactor = 0.4;
 final Vector2 _reusableVector = Vector2.zero(); //shared across all pellets
@@ -13,7 +13,7 @@ const double _spriteFactor = 1.2;
 
 /// A collectible item that Pacman eats to gain points and progress.
 class Pellet extends SpriteComponent
-    with IgnoreEvents, HasWorldReference<PacmanWorld> {
+    with IgnoreEvents, HasWorldReference<CustomWorld> {
   Pellet({
     required super.position,
     required this.pelletsRemainingNotifier,

@@ -4,8 +4,8 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 
 import '../../style/palette.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_world.dart';
+import '../custom_game.dart';
 import 'snake_body_part.dart';
 import 'snake_wrapper.dart';
 
@@ -18,15 +18,15 @@ final Vector2 _offscreenV = Vector2(_offscreen, _offscreen);
 final Vector2 _startSize = Vector2(1, 1);
 
 class SnakeLineBit extends SpriteComponent
-    with HasWorldReference<PacmanWorld>, IgnoreEvents {
+    with HasWorldReference<CustomWorld>, IgnoreEvents {
   SnakeLineBit({required SnakeBodyBit oneForward, required this.oneBack})
     : _oneForward = oneForward,
       super(
         position: _offscreenV,
         size: _startSize,
         anchor: Anchor.center,
-        paint: PacmanGame.stepDebug ? _snakeLinePaintDebug : _snakeLinePaint,
-        priority: PacmanGame.stepDebug ? 1000 : -10,
+        paint: CustomGame.stepDebug ? _snakeLinePaintDebug : _snakeLinePaint,
+        priority: CustomGame.stepDebug ? 1000 : -10,
       );
 
   SnakeBodyBit? oneBack;
@@ -38,7 +38,7 @@ class SnakeLineBit extends SpriteComponent
   Future<void> onLoad() async {
     super.onLoad();
     sprite = await Sprite.load('body.png');
-    height = snakeRadius * (PacmanGame.stepDebug ? 0.5 : 2);
+    height = snakeRadius * (CustomGame.stepDebug ? 0.5 : 2);
   }
 
   void _hide() {

@@ -3,8 +3,8 @@ import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
 
 import '../../utils/helper.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_world.dart';
+import '../custom_game.dart';
 import 'food_pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_wrapper.dart';
@@ -12,8 +12,8 @@ import 'wall_visual.dart';
 
 class SnakeHead extends SpriteComponent
     with
-        HasWorldReference<PacmanWorld>,
-        HasGameReference<PacmanGame>,
+        HasWorldReference<CustomWorld>,
+        HasGameReference<CustomGame>,
         CollisionCallbacks,
         IgnoreEvents {
   SnakeHead({required this.snakeWrapper})
@@ -21,7 +21,7 @@ class SnakeHead extends SpriteComponent
         paint: snakePaint,
         size: Vector2.all(snakeRadius * 2 * _spriteFactor),
         anchor: Anchor.center,
-        priority: PacmanGame.stepDebug ? -1 : 100,
+        priority: CustomGame.stepDebug ? -1 : 100,
       );
 
   static const double _spriteFactor = 1.4;

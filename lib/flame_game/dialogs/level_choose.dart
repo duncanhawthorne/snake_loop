@@ -10,9 +10,9 @@ import '../../router.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
 import '../../utils/constants.dart';
+import '../custom_game.dart';
 import '../game_screen.dart';
 import '../maze/maze.dart';
-import '../pacman_game.dart';
 
 /// This dialog is shown before starting the game.
 
@@ -23,7 +23,7 @@ class LevelChooseDialog extends StatelessWidget {
   /// The level configuration for the current game session.
   final GameLevel level;
 
-  final PacmanGame game;
+  final CustomGame game;
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class LevelChooseDialog extends StatelessWidget {
 }
 
 /// Widget that allows the user to select a game level.
-Widget levelSelector(BuildContext context, PacmanGame game) {
+Widget levelSelector(BuildContext context, CustomGame game) {
   return ListenableBuilder(
     listenable: game.playerProgress,
     builder: (BuildContext context, _) {
@@ -81,7 +81,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
 
 const int _cols = 5;
 const int _negativeRows = 0;
-Widget levelSelectorReal(BuildContext context, PacmanGame game) {
+Widget levelSelectorReal(BuildContext context, CustomGame game) {
   final int maxLevelToShowCache = _maxLevelToShow(game);
   return bodyWidget(
     child: Column(
@@ -97,7 +97,7 @@ Widget levelSelectorReal(BuildContext context, PacmanGame game) {
 
 Widget levelSelectorRow(
   BuildContext context,
-  PacmanGame game,
+  CustomGame game,
   int maxLevelToShowCache,
   int rowIndex,
 ) {
@@ -126,7 +126,7 @@ Widget levelSelectorRow(
   );
 }
 
-Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
+Widget levelButtonSingle(BuildContext context, CustomGame game, int levelNum) {
   if (levelNum < Levels.minLevel || levelNum > Levels.maxLevel) {
     return const SizedBox.shrink();
   }
@@ -155,7 +155,7 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
 }
 
 /// Widget that allows the user to select a maze layout.
-Widget mazeSelector(BuildContext context, PacmanGame game) {
+Widget mazeSelector(BuildContext context, CustomGame game) {
   return ListenableBuilder(
     listenable: game.playerProgress,
     builder: (BuildContext context, _) {
@@ -164,7 +164,7 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
+Widget mazeSelectorReal(BuildContext context, CustomGame game) {
   const bool enableMazeSelector = false;
   final int maxLevelToShowCache = _maxLevelToShow(game);
   return !enableMazeSelector ||
@@ -186,7 +186,7 @@ Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
         );
 }
 
-Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
+Widget mazeButtonSingle(BuildContext context, CustomGame game, int mazeId) {
   return TextButton(
     style: maze.mazeId == mazeId
         ? buttonStyle(small: true)
@@ -202,11 +202,11 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
   );
 }
 
-int _maxLevelToShow(PacmanGame game) {
+int _maxLevelToShow(CustomGame game) {
   return max(1, levelAfterPlaybackScreen(game));
 }
 
-int levelAfterPlaybackScreen(PacmanGame game) {
+int levelAfterPlaybackScreen(CustomGame game) {
   return <int>[
     game.level.number,
     game.playerProgress.maxLevelCompleted + 1,
@@ -229,7 +229,7 @@ Widget rotatedTitle() {
   );
 }
 
-Widget resetWidget(BuildContext context, PacmanGame game) {
+Widget resetWidget(BuildContext context, CustomGame game) {
   return IconButton(
     onPressed: () => game.dialogs.toggle(GameScreen.resetDialogKey),
     icon: const Icon(Icons.refresh, color: Palette.textColor),

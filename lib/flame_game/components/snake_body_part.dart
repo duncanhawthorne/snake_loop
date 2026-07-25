@@ -5,8 +5,8 @@ import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_world.dart';
+import '../custom_game.dart';
 import 'food_pellet.dart';
 import 'snake_head.dart';
 import 'snake_line_part.dart';
@@ -16,7 +16,7 @@ final Vector2 _volatileV2 = Vector2(0, 0);
 const double _spriteFactor = 1;
 
 class SnakeBodyBit extends SpriteComponent
-    with HasWorldReference<PacmanWorld>, IgnoreEvents, CollisionCallbacks {
+    with HasWorldReference<CustomWorld>, IgnoreEvents, CollisionCallbacks {
   SnakeBodyBit({
     required super.position,
     required this.snakeWrapper,
@@ -68,7 +68,7 @@ class SnakeBodyBit extends SpriteComponent
       //track
       position = snakeHead.position;
       _updateAngle();
-      if (PacmanGame.stepDebug) {
+      if (CustomGame.stepDebug) {
         paint = snakeTextPaint;
       }
     } else {
@@ -80,7 +80,7 @@ class SnakeBodyBit extends SpriteComponent
         ..scaleTo(distanceBetweenSnakeBits)
         ..add(snakeNeck.position);
       _updateAngle();
-      if (PacmanGame.stepDebug) {
+      if (CustomGame.stepDebug) {
         paint = snakePaint;
       }
       snakeWrapper.addToStartOfSnake();
@@ -115,7 +115,7 @@ class SnakeBodyBit extends SpriteComponent
           ..sub(_oneForward!.position)
           ..scaleTo(max(0, distanceBetweenSnakeBits - neckDistance))
           ..add(_oneForward!.position);
-        if (PacmanGame.stepDebug) {
+        if (CustomGame.stepDebug) {
           paint = snakeTextPaint;
         }
       }
@@ -176,7 +176,7 @@ class SnakeBodyBit extends SpriteComponent
   void _deactivate() {
     active = false;
     snakeWrapper.bodyBits.remove(this);
-    if (PacmanGame.stepDebug) {
+    if (CustomGame.stepDebug) {
       paint = snakeWarningPaint;
     }
     activateHitbox(false);

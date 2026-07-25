@@ -9,9 +9,9 @@ import '../../google/google.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
+import '../custom_game.dart';
 import '../game_screen.dart';
 import '../icons/circle_icon.dart';
-import '../pacman_game.dart';
 
 const double _statusWidgetHeightFactor = 1.0;
 const double _widgetSpacing = 8 * _statusWidgetHeightFactor;
@@ -22,7 +22,7 @@ const double circleIconSize = 10 * _statusWidgetHeightFactor;
 const double _pelletsSpacing = 2 * _statusWidgetHeightFactor;
 
 /// Top-level status widget displayed over the game.
-Widget topOverlayWidget(BuildContext context, PacmanGame game) {
+Widget topOverlayWidget(BuildContext context, CustomGame game) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
@@ -54,7 +54,7 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _topLeftWidget(BuildContext context, PacmanGame game) {
+Widget _topLeftWidget(BuildContext context, CustomGame game) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.start,
@@ -68,7 +68,7 @@ Widget _topLeftWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _topRightWidget(BuildContext context, PacmanGame game) {
+Widget _topRightWidget(BuildContext context, CustomGame game) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.end,
@@ -81,7 +81,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
+Widget _mainMenuButtonWidget(BuildContext context, CustomGame game) {
   return IconButton(
     onPressed: () {
       game.overlays.activeOverlays.contains(GameScreen.beginDialogKey)
@@ -92,7 +92,7 @@ Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _pelletsWidget(BuildContext context, PacmanGame game) {
+Widget _pelletsWidget(BuildContext context, CustomGame game) {
   return ValueListenableBuilder<int>(
     valueListenable: game.world.pellets.pelletsRemainingNotifier,
     builder: (BuildContext context, int value, Widget? child) {
@@ -109,14 +109,14 @@ Widget _pelletsWidget(BuildContext context, PacmanGame game) {
 }
 
 // ignore: unused_element
-Widget _infintyWidget(BuildContext context, PacmanGame game) {
+Widget _infintyWidget(BuildContext context, CustomGame game) {
   return !game.level.infLives
       ? const SizedBox.shrink()
       : Text("∞", style: TextStyle(color: Palette.pacman.color));
 }
 
 // ignore: unused_element
-Widget _clockWidget(PacmanGame game) {
+Widget _clockWidget(CustomGame game) {
   return GestureDetector(
     onLongPress: () {
       if (detailedAudioLog) {
@@ -143,7 +143,7 @@ Widget _clockWidget(PacmanGame game) {
   );
 }
 
-Widget _pelletsCounterWidget(PacmanGame game) {
+Widget _pelletsCounterWidget(CustomGame game) {
   return ValueListenableBuilder<int>(
     valueListenable: game.world.pellets.pelletsRemainingNotifier,
     builder: (BuildContext context, int value, Widget? child) {
@@ -153,7 +153,7 @@ Widget _pelletsCounterWidget(PacmanGame game) {
 }
 
 // ignore: unused_element
-Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
+Widget _audioOnOffButtonWidget(BuildContext context, CustomGame game) {
   const Color color = Palette.textColor;
   final SettingsController settingsController = context
       .watch<SettingsController>();
@@ -170,7 +170,7 @@ Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _mouseLockButtonWidget(BuildContext context, PacmanGame game) {
+Widget _mouseLockButtonWidget(BuildContext context, CustomGame game) {
   const Color color = Palette.textColor;
   return IconButton(
     onPressed: () {

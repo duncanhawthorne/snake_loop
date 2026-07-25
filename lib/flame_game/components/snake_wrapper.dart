@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 
 import '../../style/palette.dart';
 import '../../utils/helper.dart';
+import '../custom_world.dart';
 import '../game_screen.dart';
 import '../maze/maze.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_game.dart';
 import 'base_component.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
@@ -25,7 +25,7 @@ final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
 final Vector2 offscreen = Vector2(400, 400);
 
 class SnakeWrapper extends BaseComponent
-    with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
+    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
   @override
   final int priority = 1;
 

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 
 import '../../utils/constants.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'maze_layout.dart';
 import 'maze_tiles.dart';
 
