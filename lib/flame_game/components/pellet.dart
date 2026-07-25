@@ -46,8 +46,6 @@ class Pellet extends SpriteComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    sprite = await Sprite.load('apple.png');
-    angle = world.dragRotate.downAngle;
     add(_hitbox);
   }
 }

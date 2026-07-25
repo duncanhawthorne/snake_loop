@@ -2,7 +2,6 @@ import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../../utils/constants.dart';
-import '../components/wall_ground.dart';
 import '../components/wall_visual.dart';
 import 'maze_dimensions.dart';
 import 'maze_layout.dart';
@@ -207,7 +206,7 @@ class MazePhysicsFactory {
       result.clear();
     }
     if (includeGround) {
-      result.add(WallGround(shapeSpecs: shapeSpecs));
+      //removed
     }
     return result;
   }
