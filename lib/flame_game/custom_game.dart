@@ -9,7 +9,6 @@ import 'package:flutter/foundation.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
 import '../audio/audio_controller.dart';
-import '../audio/sounds.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
@@ -166,9 +165,6 @@ class CustomGame extends Forge2DGame<CustomWorld>
 
   /// Begins primary gameplay activities, including audio and world updates.
   void start() {
-    audioController
-      ..workaroundiOSSafariAudioOnUserInteraction()
-      ..playSfx(SfxType.startMusic);
     world.start();
   }
 

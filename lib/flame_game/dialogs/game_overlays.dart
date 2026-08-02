@@ -4,11 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../audio/audio_controller.dart';
 import '../../google/google.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
+import '../../utils/helper.dart';
 import '../custom_game.dart';
 import '../game_screen.dart';
 import '../icons/circle_icon.dart';

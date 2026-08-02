@@ -3,15 +3,14 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../audio/sounds.dart';
 import '../../firebase/firebase_saves.dart';
 import '../../utils/helper.dart';
 import '../../utils/string_helper.dart';
 import '../components/base_component.dart';
+import '../custom_game.dart';
 import '../custom_world.dart';
 import '../game_screen.dart';
 import '../maze/maze.dart';
-import '../custom_game.dart';
 
 /// Manages the current game session's state, including scoring, winning, and losing.
 ///
@@ -91,7 +90,6 @@ class GameSession extends BaseComponent
     assert(!(game.playState == PlayState.playbackMode));
     world.mouseMove.exitPointerLock();
     game.lifecycle.stopRegularItems();
-    game.audioController.playSfx(SfxType.endMusic);
     const int minRecordableWinTimeMillis = 10 * 1000;
     if (stopwatchMilliSeconds > minRecordableWinTimeMillis &&
         !game.level.isTutorial) {
