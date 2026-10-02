@@ -13,7 +13,7 @@ const double _spriteFactor = 1.2;
 
 /// A collectible item that Pacman eats to gain points and progress.
 class Pellet extends SpriteComponent
-    with IgnoreEvents, HasWorldReference<CustomWorld> {
+    with IgnoreEvents, HasWorldRef<CustomWorld> {
   Pellet({
     required super.position,
     required this.pelletsRemainingNotifier,
@@ -38,6 +38,8 @@ class Pellet extends SpriteComponent
       anchor: Anchor.center,
     )..debugMode = false;
   }
+
+  late final CustomWorld world = worldRef;
 
   double get radius => size.x / 2 / _spriteFactor;
   late final CircleHitbox _hitbox;

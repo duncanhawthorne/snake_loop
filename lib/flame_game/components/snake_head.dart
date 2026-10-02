@@ -3,8 +3,8 @@ import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
 
 import '../../utils/helper.dart';
-import '../custom_world.dart';
 import '../custom_game.dart';
+import '../custom_world.dart';
 import 'food_pellet.dart';
 import 'snake_body_part.dart';
 import 'snake_wrapper.dart';
@@ -12,8 +12,8 @@ import 'wall_visual.dart';
 
 class SnakeHead extends SpriteComponent
     with
-        HasWorldReference<CustomWorld>,
-        HasGameReference<CustomGame>,
+        HasWorldRef<CustomWorld>,
+        HasGameRef<CustomGame>,
         CollisionCallbacks,
         IgnoreEvents {
   SnakeHead({required this.snakeWrapper})
@@ -23,6 +23,9 @@ class SnakeHead extends SpriteComponent
         anchor: Anchor.center,
         priority: CustomGame.stepDebug ? -1 : 100,
       );
+
+  late final CustomGame game = gameRef;
+  late final CustomWorld world = worldRef;
 
   static const double _spriteFactor = 1.4;
 
@@ -40,7 +43,7 @@ class SnakeHead extends SpriteComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    sprite = await Sprite.load('head.png');
+    sprite = await Sprite.load('assets/images/head.png');
     add(_hitbox);
     debugMode = false;
     reset();
@@ -64,7 +67,7 @@ class SnakeHead extends SpriteComponent
 
   @override
   void onCollisionStart(
-    Set<Vector2> intersectionPoints,
+    List<Vector2> intersectionPoints,
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);

@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 
 import '../../style/palette.dart';
 import '../../utils/helper.dart';
+import '../custom_game.dart';
 import '../custom_world.dart';
 import '../game_screen.dart';
 import '../maze/maze.dart';
-import '../custom_game.dart';
 import 'base_component.dart';
 import 'food_pellet.dart';
 import 'pellet.dart';
@@ -25,7 +25,10 @@ final double distanceBetweenSnakeBits = snakeRadius * 2 / snakeBitsOverlaps;
 final Vector2 offscreen = Vector2(400, 400);
 
 class SnakeWrapper extends BaseComponent
-    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
+    with HasWorldRef<CustomWorld>, HasGameRef<CustomGame> {
+  late final CustomGame game = gameRef;
+  late final CustomWorld world = worldRef;
+
   @override
   final int priority = 1;
 
@@ -141,7 +144,7 @@ class SnakeWrapper extends BaseComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     add(snakeHead);
     add(food..position = getSafePositionForFood());
     game.camera.follow(snakeHead);

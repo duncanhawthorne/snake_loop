@@ -5,8 +5,8 @@ import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 
-import '../custom_world.dart';
 import '../custom_game.dart';
+import '../custom_world.dart';
 import 'food_pellet.dart';
 import 'snake_head.dart';
 import 'snake_line_part.dart';
@@ -16,7 +16,7 @@ final Vector2 _volatileV2 = Vector2(0, 0);
 const double _spriteFactor = 1;
 
 class SnakeBodyBit extends SpriteComponent
-    with HasWorldReference<CustomWorld>, IgnoreEvents, CollisionCallbacks {
+    with HasWorldRef<CustomWorld>, IgnoreEvents, CollisionCallbacks {
   SnakeBodyBit({
     required super.position,
     required this.snakeWrapper,
@@ -27,6 +27,8 @@ class SnakeBodyBit extends SpriteComponent
          anchor: Anchor.center,
          paint: snakePaint,
        );
+
+  late final CustomWorld world = worldRef;
 
   double get radius => size.x / 2 / _spriteFactor;
 
@@ -168,7 +170,7 @@ class SnakeBodyBit extends SpriteComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    sprite = await Sprite.load('body.png');
+    sprite = await Sprite.load('assets/images/body.png');
     _updateAngle();
     parent!.add(_backwardLineBit);
   }
@@ -209,7 +211,7 @@ class SnakeBodyBit extends SpriteComponent
   }
 
   @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollision(List<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     _onCollideWith(other);
   }

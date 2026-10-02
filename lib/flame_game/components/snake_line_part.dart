@@ -4,8 +4,8 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 
 import '../../style/palette.dart';
-import '../custom_world.dart';
 import '../custom_game.dart';
+import '../custom_world.dart';
 import 'snake_body_part.dart';
 import 'snake_wrapper.dart';
 
@@ -18,7 +18,7 @@ final Vector2 _offscreenV = Vector2(_offscreen, _offscreen);
 final Vector2 _startSize = Vector2(1, 1);
 
 class SnakeLineBit extends SpriteComponent
-    with HasWorldReference<CustomWorld>, IgnoreEvents {
+    with HasWorldRef<CustomWorld>, IgnoreEvents {
   SnakeLineBit({required SnakeBodyBit oneForward, required this.oneBack})
     : _oneForward = oneForward,
       super(
@@ -36,8 +36,8 @@ class SnakeLineBit extends SpriteComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
-    sprite = await Sprite.load('body.png');
+    await super.onLoad();
+    sprite = await Sprite.load('assets/images/body.png');
     height = snakeRadius * (CustomGame.stepDebug ? 0.5 : 2);
   }
 

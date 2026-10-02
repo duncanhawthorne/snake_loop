@@ -11,7 +11,7 @@ class Food extends Pellet {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    sprite = await Sprite.load('apple.png');
+    sprite = await Sprite.load('assets/images/apple.png');
     angle = world.dragRotate.downAngle;
   }
 }

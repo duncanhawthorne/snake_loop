@@ -46,7 +46,7 @@ const double worldSquareSize = _kVirtualGameSize * mapSizeScale;
 
 class CustomGame extends Forge2DGame<CustomWorld>
     with
-        HasQuadTreeCollisionDetection<CustomWorld>,
+        HasCollisionDetection<Broadphase<ShapeHitbox>>,
         SingleGameInstance,
         HasTimeScale {
   /// Private generative constructor initialized by the singleton factory wrapper.
@@ -127,7 +127,7 @@ class CustomGame extends Forge2DGame<CustomWorld>
 
   /// Evaluates whether the simulation frame is ready, running, and active inside the widget tree.
   bool get isLive =>
-      (!paused || stepDebug) && isLoaded && isMounted && timeScale != 0;
+      (!isPaused || stepDebug) && isLoaded && isMounted && timeScale != 0;
 
   @override
   Color backgroundColor() => Palette.background.color;
@@ -144,12 +144,14 @@ class CustomGame extends Forge2DGame<CustomWorld>
   ///
   /// * Set [firstRun] to `true` on initial canvas allocation to avoid resetting unbuilt items.
   /// * Set [showStartDialog] to `true` to push standard overlays over the current viewport layer.
-  void reset({bool firstRun = false, bool showStartDialog = false}) {
+  Future<void> reset({
+    bool firstRun = false,
+    bool showStartDialog = false,
+  }) async {
     if (!firstRun) {
-      assert(world.isLoaded);
-      world.reset();
+      await world.loaded;
+      await world.reset();
     }
-    collisionDetection.broadphase.tree.optimize();
     if (showStartDialog) {
       playState = playback.isPlaybackAppropriate()
           ? PlayState.playbackMode
@@ -172,15 +174,7 @@ class CustomGame extends Forge2DGame<CustomWorld>
   Future<void> onLoad() async {
     await super.onLoad();
     bugFixes();
-    initializeCollisionDetection(
-      mapDimensions: Rect.fromLTWH(
-        -maze.dimensions.mazeWidth / 2,
-        -maze.dimensions.mazeHeight / 2,
-        maze.dimensions.mazeWidth,
-        maze.dimensions.mazeHeight,
-      ),
-    ); // assumes maze size won't change
-    reset(firstRun: true, showStartDialog: true);
+    await reset(firstRun: true, showStartDialog: true);
   }
 
   @override

@@ -4,15 +4,14 @@ import 'package:flame/components.dart';
 
 import '../../utils/helper.dart';
 import '../components/base_component.dart';
-import '../custom_world.dart';
 import '../custom_game.dart';
 
 /// Automatically pauses the game engine when no activity is detected to save resources.
 ///
 /// It monitors frames rendered and game state to determine if the engine
 /// should be paused during inactivity (e.g., at the start of a level before play begins).
-class EngineAutoPauser extends BaseComponent
-    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
+class EngineAutoPauser extends BaseComponent with HasGameRef<CustomGame> {
+  late final CustomGame game = gameRef;
   int _framesRendered = 0;
 
   async.Timer? _activityCheckTimer;
@@ -29,7 +28,7 @@ class EngineAutoPauser extends BaseComponent
     _activityCheckTimer = async.Timer.periodic(
       const Duration(milliseconds: 1000),
       (async.Timer timer) {
-        if (game.paused) {
+        if (game.isPaused) {
           //already paused, no further action required, just cancel timer
           timer.cancel();
         } else if (game.playState == PlayState.playbackMode) {
